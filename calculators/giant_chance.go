@@ -71,26 +71,26 @@ func (sl *StrikeLuck) findNextUpgrade() int {
 	}
 
 	currentGiantChance := sl.calculateGiantRollChance(NoChange)
-	bestUpgrade := NoChange
-	bestGain := float64(0)
+	bestStrikeUpgrade := NoChange
+	bestStrikeGain := float64(0)
 	for _, strike := range strikeChoices {
 		chanceGain := sl.calculateGiantRollChance(strike) - currentGiantChance
 		upgradeCost := sl.strikePrices[strike][sl.strikeUpgrades[strike]+1]
 		gain := chanceGain / float64(upgradeCost)
-		if gain > bestGain {
-			bestUpgrade = strike
-			bestGain = gain
+		if gain > bestStrikeGain {
+			bestStrikeUpgrade = strike
+			bestStrikeGain = gain
 		}
 	}
 
 	giantLuckGain := sl.calculateGiantRollChance(GiantLuck)
 	upgradeCost := sl.giantLuckPrices[sl.giantLuckUpgrade+1]
 	gain := giantLuckGain / float64(upgradeCost)
-	if gain > bestGain {
+	if gain > bestStrikeGain {
 		return GiantLuck
 	}
 
-	return bestUpgrade
+	return bestStrikeUpgrade
 }
 
 func (sl *StrikeLuck) getRequiredFirstUpgrade() int {
