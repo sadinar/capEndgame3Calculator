@@ -16,15 +16,15 @@ const NoChange = 0
 type upgradeCostList map[int]int
 type strikeUpgrades map[int]int
 
-type StrikeLuck struct {
+type GiantCalculator struct {
 	strikeUpgrades   strikeUpgrades
 	strikePrices     map[int]upgradeCostList
 	giantLuckUpgrade int
 	giantLuckPrices  upgradeCostList
 }
 
-func New() StrikeLuck {
-	return StrikeLuck{
+func NewGiantCalculator() GiantCalculator {
+	return GiantCalculator{
 		strikeUpgrades: strikeUpgrades{},
 		strikePrices: map[int]upgradeCostList{
 			SingleStrike:    upgrade_data.GetSingleStrikePrices(),
@@ -37,13 +37,13 @@ func New() StrikeLuck {
 	}
 }
 
-func (sl *StrikeLuck) CalculateUpgradePath() {
+func (gc *GiantCalculator) CalculateUpgradePath() {
 	for {
-		if sl.findNextUpgrade() == 0 {
+		if gc.findNextUpgrade() == 0 {
 			return
 		}
 
-		nextUpgrade := sl.findNextUpgrade()
+		nextUpgrade := gc.findNextUpgrade()
 		if nextUpgrade == GiantLuck {
 			fmt.Println("upgrade giant luck")
 		} else {
@@ -51,31 +51,32 @@ func (sl *StrikeLuck) CalculateUpgradePath() {
 		}
 
 		if nextUpgrade == GiantLuck {
-			sl.giantLuckUpgrade++
+			gc.giantLuckUpgrade++
 		} else {
-			sl.strikeUpgrades[nextUpgrade]++
+			gc.strikeUpgrades[nextUpgrade]++
 		}
 
-		fmt.Println(sl.strikeUpgrades, sl.giantLuckUpgrade)
+		fmt.Println(fmt.Sprintf("giant chance after upgrade: %.10f", gc.calculateGiantRollChance(NoChange)))
+		fmt.Println(gc.strikeUpgrades, gc.giantLuckUpgrade)
 	}
 }
 
-func (sl *StrikeLuck) findNextUpgrade() int {
-	if sl.getRequiredFirstUpgrade() != NoChange {
-		return sl.getRequiredFirstUpgrade()
+func (gc *GiantCalculator) findNextUpgrade() int {
+	if gc.getRequiredFirstUpgrade() != NoChange {
+		return gc.getRequiredFirstUpgrade()
 	}
 
-	strikeChoices := sl.listPossibleStrikeUpgrades()
-	if len(strikeChoices) == 0 && sl.giantLuckUpgrade == len(sl.giantLuckPrices) {
+	strikeChoices := gc.listPossibleStrikeUpgrades()
+	if len(strikeChoices) == 0 && gc.giantLuckUpgrade == len(gc.giantLuckPrices) {
 		return NoChange
 	}
 
-	currentGiantChance := sl.calculateGiantRollChance(NoChange)
+	currentGiantChance := gc.calculateGiantRollChance(NoChange)
 	bestStrikeUpgrade := NoChange
 	bestStrikeGain := float64(0)
 	for _, strike := range strikeChoices {
-		chanceGain := sl.calculateGiantRollChance(strike) - currentGiantChance
-		upgradeCost := sl.strikePrices[strike][sl.strikeUpgrades[strike]+1]
+		chanceGain := gc.calculateGiantRollChance(strike) - currentGiantChance
+		upgradeCost := gc.strikePrices[strike][gc.strikeUpgrades[strike]+1]
 		gain := chanceGain / float64(upgradeCost)
 		if gain > bestStrikeGain {
 			bestStrikeUpgrade = strike
@@ -83,8 +84,8 @@ func (sl *StrikeLuck) findNextUpgrade() int {
 		}
 	}
 
-	giantLuckGain := sl.calculateGiantRollChance(GiantLuck)
-	upgradeCost := sl.giantLuckPrices[sl.giantLuckUpgrade+1]
+	giantLuckGain := gc.calculateGiantRollChance(GiantLuck)
+	upgradeCost := gc.giantLuckPrices[gc.giantLuckUpgrade+1]
 	gain := giantLuckGain / float64(upgradeCost)
 	if gain > bestStrikeGain {
 		return GiantLuck
@@ -93,57 +94,57 @@ func (sl *StrikeLuck) findNextUpgrade() int {
 	return bestStrikeUpgrade
 }
 
-func (sl *StrikeLuck) getRequiredFirstUpgrade() int {
-	if sl.strikeUpgrades[SingleStrike] == 0 {
+func (gc *GiantCalculator) getRequiredFirstUpgrade() int {
+	if gc.strikeUpgrades[SingleStrike] == 0 {
 		return SingleStrike
 	}
-	if sl.strikeUpgrades[DoubleStrike] == 0 {
+	if gc.strikeUpgrades[DoubleStrike] == 0 {
 		return DoubleStrike
 	}
-	if sl.strikeUpgrades[TripleStrike] == 0 {
+	if gc.strikeUpgrades[TripleStrike] == 0 {
 		return TripleStrike
 	}
-	if sl.strikeUpgrades[QuadrupleStrike] == 0 {
+	if gc.strikeUpgrades[QuadrupleStrike] == 0 {
 		return QuadrupleStrike
 	}
-	if sl.strikeUpgrades[QuintupleStrike] == 0 {
+	if gc.strikeUpgrades[QuintupleStrike] == 0 {
 		return QuintupleStrike
 	}
-	if sl.giantLuckUpgrade == 0 {
+	if gc.giantLuckUpgrade == 0 {
 		return GiantLuck
 	}
 
 	return NoChange
 }
 
-func (sl *StrikeLuck) listPossibleStrikeUpgrades() []int {
+func (gc *GiantCalculator) listPossibleStrikeUpgrades() []int {
 	strikeChoices := make([]int, 0)
-	if sl.strikeUpgrades[SingleStrike] < len(sl.strikePrices[SingleStrike]) {
+	if gc.strikeUpgrades[SingleStrike] < len(gc.strikePrices[SingleStrike]) {
 		strikeChoices = append(strikeChoices, SingleStrike)
 	}
-	if sl.strikeUpgrades[DoubleStrike] < len(sl.strikePrices[DoubleStrike]) {
+	if gc.strikeUpgrades[DoubleStrike] < len(gc.strikePrices[DoubleStrike]) {
 		strikeChoices = append(strikeChoices, DoubleStrike)
 	}
-	if sl.strikeUpgrades[TripleStrike] < len(sl.strikePrices[TripleStrike]) {
+	if gc.strikeUpgrades[TripleStrike] < len(gc.strikePrices[TripleStrike]) {
 		strikeChoices = append(strikeChoices, TripleStrike)
 	}
-	if sl.strikeUpgrades[QuadrupleStrike] < len(sl.strikePrices[QuadrupleStrike]) {
+	if gc.strikeUpgrades[QuadrupleStrike] < len(gc.strikePrices[QuadrupleStrike]) {
 		strikeChoices = append(strikeChoices, QuadrupleStrike)
 	}
-	if sl.strikeUpgrades[QuintupleStrike] < len(sl.strikePrices[QuintupleStrike]) {
+	if gc.strikeUpgrades[QuintupleStrike] < len(gc.strikePrices[QuintupleStrike]) {
 		strikeChoices = append(strikeChoices, QuintupleStrike)
 	}
 
 	return strikeChoices
 }
 
-func (sl *StrikeLuck) calculateGiantRollChance(incrementedChance int) float64 {
-	singleChance := float64(sl.strikeUpgrades[SingleStrike]) * upgrade_data.PerStepStrikeImprovement
-	doubleChance := float64(sl.strikeUpgrades[DoubleStrike]) * upgrade_data.PerStepStrikeImprovement
-	tripleChance := float64(sl.strikeUpgrades[TripleStrike]) * upgrade_data.PerStepStrikeImprovement
-	quadrupleChance := float64(sl.strikeUpgrades[QuadrupleStrike]) * upgrade_data.PerStepStrikeImprovement
-	quintupleChance := float64(sl.strikeUpgrades[QuintupleStrike]) * upgrade_data.PerStepStrikeImprovement
-	giantLuckChance := float64(sl.giantLuckUpgrade) * upgrade_data.PerStepGiantLuckImprovement
+func (gc *GiantCalculator) calculateGiantRollChance(incrementedChance int) float64 {
+	singleChance := float64(gc.strikeUpgrades[SingleStrike]) * upgrade_data.PerStepStrikeImprovement
+	doubleChance := float64(gc.strikeUpgrades[DoubleStrike]) * upgrade_data.PerStepStrikeImprovement
+	tripleChance := float64(gc.strikeUpgrades[TripleStrike]) * upgrade_data.PerStepStrikeImprovement
+	quadrupleChance := float64(gc.strikeUpgrades[QuadrupleStrike]) * upgrade_data.PerStepStrikeImprovement
+	quintupleChance := float64(gc.strikeUpgrades[QuintupleStrike]) * upgrade_data.PerStepStrikeImprovement
+	giantLuckChance := float64(gc.giantLuckUpgrade) * upgrade_data.PerStepGiantLuckImprovement
 
 	switch incrementedChance {
 	case SingleStrike:

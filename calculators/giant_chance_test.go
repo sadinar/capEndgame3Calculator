@@ -105,8 +105,8 @@ func TestFindNextUpgrade(t *testing.T) {
 	assert.Equal(t, 1, sl.findNextUpgrade())
 }
 
-func getCalculatorWithDummyPrices() StrikeLuck {
-	return StrikeLuck{
+func getCalculatorWithDummyPrices() GiantCalculator {
+	return GiantCalculator{
 		strikeUpgrades: map[int]int{},
 		strikePrices: map[int]upgradeCostList{
 			SingleStrike: {
