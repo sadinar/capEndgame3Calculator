@@ -39,21 +39,17 @@ func NewGiantCalculator() GiantCalculator {
 
 func (gc *GiantCalculator) CalculateUpgradePath() {
 	for {
-		if gc.findNextUpgrade() == 0 {
+		if gc.findNextUpgrade() == NoChange {
 			return
 		}
 
 		nextUpgrade := gc.findNextUpgrade()
 		if nextUpgrade == GiantLuck {
 			fmt.Println("upgrade giant luck")
-		} else {
-			fmt.Println(fmt.Sprintf("upgrade x%d strike", nextUpgrade))
-		}
-
-		if nextUpgrade == GiantLuck {
 			gc.giantLuckUpgrade++
 		} else {
 			gc.strikeUpgrades[nextUpgrade]++
+			fmt.Println(fmt.Sprintf("upgrade x%d strike", nextUpgrade))
 		}
 
 		fmt.Println(fmt.Sprintf("giant chance after upgrade: %.10f", gc.calculateGiantRollChance(NoChange)))
