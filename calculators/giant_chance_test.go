@@ -22,13 +22,11 @@ func TestCalculateGiantRollChance(t *testing.T) {
 	assert.Equal(t, float64(0), sl.calculateGiantRollChance(0))
 
 	sl.giantLuckUpgrade = 1
-	expected := fmt.Sprintf("%.14f", .01*.01*.01*.01*.01*.001)
+	expected := fmt.Sprintf("%.14f", .01*.01*.01*.01*.001)
 	calcResult := fmt.Sprintf("%.14f", sl.calculateGiantRollChance(0))
 	assert.Equal(t, expected, calcResult)
 
-	expected = fmt.Sprintf("%.14f", .02*.01*.01*.01*.01*.001)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(1))
-	assert.Equal(t, expected, calcResult)
+	expected = fmt.Sprintf("%.14f", .02*.01*.01*.01*.001)
 	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(2))
 	assert.Equal(t, expected, calcResult)
 	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(3))
@@ -38,43 +36,36 @@ func TestCalculateGiantRollChance(t *testing.T) {
 	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(5))
 	assert.Equal(t, expected, calcResult)
 
-	sl.strikeUpgrades[1] = 6
 	sl.strikeUpgrades[2] = 2
 	sl.strikeUpgrades[3] = 9
 	sl.strikeUpgrades[4] = 1
 	sl.strikeUpgrades[5] = 7
-	expected = fmt.Sprintf("%.14f", .06*.02*.09*.01*.07*.001)
+	expected = fmt.Sprintf("%.14f", .02*.09*.01*.07*.001)
 	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(0))
 	assert.Equal(t, expected, calcResult)
-	expected = fmt.Sprintf("%.14f", .07*.02*.09*.01*.07*.001)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(1))
-	assert.Equal(t, expected, calcResult)
-	expected = fmt.Sprintf("%.14f", .06*.03*.09*.01*.07*.001)
+	expected = fmt.Sprintf("%.14f", .03*.09*.01*.07*.001)
 	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(2))
 	assert.Equal(t, expected, calcResult)
-	expected = fmt.Sprintf("%.14f", .06*.02*.10*.01*.07*.001)
+	expected = fmt.Sprintf("%.14f", .02*.10*.01*.07*.001)
 	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(3))
 	assert.Equal(t, expected, calcResult)
-	expected = fmt.Sprintf("%.14f", .06*.02*.09*.02*.07*.001)
+	expected = fmt.Sprintf("%.14f", .02*.09*.02*.07*.001)
 	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(4))
 	assert.Equal(t, expected, calcResult)
-	expected = fmt.Sprintf("%.14f", .06*.02*.09*.01*.08*.001)
+	expected = fmt.Sprintf("%.14f", .02*.09*.01*.08*.001)
 	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(5))
 	assert.Equal(t, expected, calcResult)
 	sl.giantLuckUpgrade = 5
-	expected = fmt.Sprintf("%.14f", .06*.02*.09*.01*.07*.005)
+	expected = fmt.Sprintf("%.14f", .02*.09*.01*.07*.005)
 	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(0))
 	assert.Equal(t, expected, calcResult)
-	expected = fmt.Sprintf("%.14f", .06*.02*.09*.01*.07*.006)
+	expected = fmt.Sprintf("%.14f", .02*.09*.01*.07*.006)
 	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(9000))
 	assert.Equal(t, expected, calcResult)
 }
 
 func TestFindNextUpgrade(t *testing.T) {
 	sl := getCalculatorWithDummyPrices()
-	assert.Equal(t, 1, sl.findNextUpgrade())
-
-	sl.strikeUpgrades[1] = 1
 	assert.Equal(t, 2, sl.findNextUpgrade())
 
 	sl.strikeUpgrades[2] = 1
@@ -90,9 +81,6 @@ func TestFindNextUpgrade(t *testing.T) {
 	assert.Equal(t, 9000, sl.findNextUpgrade())
 
 	sl.giantLuckUpgrade = 1
-	assert.Equal(t, 1, sl.findNextUpgrade())
-
-	sl.strikeUpgrades[1] = 2
 	assert.Equal(t, 2, sl.findNextUpgrade())
 
 	sl.strikeUpgrades[3] = 3
@@ -102,25 +90,13 @@ func TestFindNextUpgrade(t *testing.T) {
 	sl.strikeUpgrades[2] = 2
 	sl.strikeUpgrades[3] = 2
 	sl.strikeUpgrades[4] = 2
-	assert.Equal(t, 1, sl.findNextUpgrade())
+	assert.Equal(t, 5, sl.findNextUpgrade())
 }
 
 func getCalculatorWithDummyPrices() GiantCalculator {
 	return GiantCalculator{
 		strikeUpgrades: map[int]int{},
 		strikePrices: map[int]upgradeCostList{
-			SingleStrike: {
-				1:  10000,
-				2:  20000,
-				3:  30000,
-				4:  40000,
-				5:  50000,
-				6:  60000,
-				7:  70000,
-				8:  80000,
-				9:  90000,
-				10: 100000,
-			},
 			DoubleStrike: {
 				1:  20000,
 				2:  40000,

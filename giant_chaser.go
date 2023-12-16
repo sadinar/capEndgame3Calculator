@@ -4,5 +4,6 @@ import "capEndgame3Calculator/calculators"
 
 func main() {
 	giantCalc := calculators.NewGiantCalculator()
-	giantCalc.CalculateUpgradePath()
+	//giantCalc.CalculateUpgradePath()
+	giantCalc.GetNextUpgrade(73, 65)
 }

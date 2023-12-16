@@ -5,7 +5,6 @@ import (
 	"fmt"
 )
 
-const SingleStrike = 1
 const DoubleStrike = 2
 const TripleStrike = 3
 const QuadrupleStrike = 4
@@ -27,13 +26,27 @@ func NewGiantCalculator() GiantCalculator {
 	return GiantCalculator{
 		strikeUpgrades: strikeUpgrades{},
 		strikePrices: map[int]upgradeCostList{
-			SingleStrike:    upgrade_data.GetSingleStrikePrices(),
-			DoubleStrike:    upgrade_data.GetDoubleStrikePrices(),
-			TripleStrike:    upgrade_data.GetTripleStrikePrices(),
-			QuadrupleStrike: upgrade_data.GetQuadrupleStrikePrices(),
-			QuintupleStrike: upgrade_data.GetQuintupleStrikePrices(),
+			DoubleStrike:    upgrade_data.GetStrikePrices(),
+			TripleStrike:    upgrade_data.GetStrikePrices(),
+			QuadrupleStrike: upgrade_data.GetStrikePrices(),
+			QuintupleStrike: upgrade_data.GetStrikePrices(),
 		},
 		giantLuckPrices: upgrade_data.GetGiantLuckPrices(),
+	}
+}
+
+func (gc *GiantCalculator) GetNextUpgrade(strikeLevel, giantLuckLevel int) {
+	gc.strikeUpgrades[DoubleStrike] = strikeLevel
+	gc.strikeUpgrades[TripleStrike] = strikeLevel
+	gc.strikeUpgrades[QuadrupleStrike] = strikeLevel
+	gc.strikeUpgrades[QuintupleStrike] = strikeLevel
+	gc.giantLuckUpgrade = giantLuckLevel
+
+	nextUpgrade := gc.findNextUpgrade()
+	if nextUpgrade == GiantLuck {
+		fmt.Println("giant luck")
+	} else {
+		fmt.Println(fmt.Sprintf("upgrade x%d strike", nextUpgrade))
 	}
 }
 
@@ -91,9 +104,6 @@ func (gc *GiantCalculator) findNextUpgrade() int {
 }
 
 func (gc *GiantCalculator) getRequiredFirstUpgrade() int {
-	if gc.strikeUpgrades[SingleStrike] == 0 {
-		return SingleStrike
-	}
 	if gc.strikeUpgrades[DoubleStrike] == 0 {
 		return DoubleStrike
 	}
@@ -115,9 +125,6 @@ func (gc *GiantCalculator) getRequiredFirstUpgrade() int {
 
 func (gc *GiantCalculator) listPossibleStrikeUpgrades() []int {
 	strikeChoices := make([]int, 0)
-	if gc.strikeUpgrades[SingleStrike] < len(gc.strikePrices[SingleStrike]) {
-		strikeChoices = append(strikeChoices, SingleStrike)
-	}
 	if gc.strikeUpgrades[DoubleStrike] < len(gc.strikePrices[DoubleStrike]) {
 		strikeChoices = append(strikeChoices, DoubleStrike)
 	}
@@ -135,7 +142,6 @@ func (gc *GiantCalculator) listPossibleStrikeUpgrades() []int {
 }
 
 func (gc *GiantCalculator) calculateGiantRollChance(incrementedChance int) float64 {
-	singleChance := float64(gc.strikeUpgrades[SingleStrike]) * upgrade_data.PerStepStrikeImprovement
 	doubleChance := float64(gc.strikeUpgrades[DoubleStrike]) * upgrade_data.PerStepStrikeImprovement
 	tripleChance := float64(gc.strikeUpgrades[TripleStrike]) * upgrade_data.PerStepStrikeImprovement
 	quadrupleChance := float64(gc.strikeUpgrades[QuadrupleStrike]) * upgrade_data.PerStepStrikeImprovement
@@ -143,8 +149,6 @@ func (gc *GiantCalculator) calculateGiantRollChance(incrementedChance int) float
 	giantLuckChance := float64(gc.giantLuckUpgrade) * upgrade_data.PerStepGiantLuckImprovement
 
 	switch incrementedChance {
-	case SingleStrike:
-		singleChance += upgrade_data.PerStepStrikeImprovement
 	case DoubleStrike:
 		doubleChance += upgrade_data.PerStepStrikeImprovement
 	case TripleStrike:
@@ -157,5 +161,5 @@ func (gc *GiantCalculator) calculateGiantRollChance(incrementedChance int) float
 		giantLuckChance += upgrade_data.PerStepGiantLuckImprovement
 	}
 
-	return singleChance * doubleChance * tripleChance * quadrupleChance * quintupleChance * giantLuckChance
+	return doubleChance * tripleChance * quadrupleChance * quintupleChance * giantLuckChance
 }
