@@ -1,6 +1,6 @@
 package upgrade_data
 
-const PerStepStrikeImprovement = 0.01
+const PerStepStrikeImprovement = 0.25
 
 func GetStrikePrices() map[int]int {
 	return map[int]int{

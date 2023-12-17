@@ -1,6 +1,6 @@
 package upgrade_data
 
-const PerStepGiantLuckImprovement = 0.001
+const PerStepGiantLuckImprovement = 0.1
 
 func GetGiantLuckPrices() map[int]int {
 	return map[int]int{
