@@ -57,7 +57,7 @@ func TestCalculateGiantRollChance(t *testing.T) {
 	assert.Equal(t, expected, calcResult)
 	sl.giantLuckUpgrade = 5
 	expected = fmt.Sprintf("%.14f", .0025*2*.0025*9*.0025*1*.0025*7*.001*5)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(0))
+	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(0))se
 	assert.Equal(t, expected, calcResult)
 	expected = fmt.Sprintf("%.14f", .0025*2*.0025*9*.0025*1*.0025*7*.001*6)
 	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(9000))
