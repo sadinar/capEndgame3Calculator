@@ -11,42 +11,63 @@ const QuadrupleStrike = 4
 const QuintupleStrike = 5
 const GiantLuck = 9000
 const NoChange = 0
+const x2Overclock = 1.4
+const x3Overclock = 1.6
+const x4Overclock = 1.8
+const x5Overclock = 2.0
+const giantLuckOverclock = 1.5
 
 type upgradeCostList map[int]int
 type strikeUpgrades map[int]int
 
-type GiantCalculator struct {
-	strikeUpgrades   strikeUpgrades
-	strikePrices     map[int]upgradeCostList
-	giantLuckUpgrade int
-	giantLuckPrices  upgradeCostList
+type OverclockConfig struct {
+	DoubleEnabled    bool
+	TripleEnabled    bool
+	QuadrupleEnabled bool
+	QuintupleEnabled bool
+	GiantLuckEnabled bool
 }
 
-func NewGiantCalculator() GiantCalculator {
+type GiantCalculator struct {
+	strikeUpgrades               strikeUpgrades
+	strikePrices                 map[int]upgradeCostList
+	giantLuckUpgrade             int
+	giantLuckPrices              upgradeCostList
+	overclocks                   OverclockConfig
+	achievementGiantLuckModifier float64
+	runeGiantLuckModifier        float64
+}
+
+func NewGiantCalculator(ocConfig OverclockConfig, achievementModifier, runeModifier float64, strikeLevels map[int]int, giantLuckLevel int) GiantCalculator {
+	if achievementModifier < 1 {
+		achievementModifier = 1
+	}
+	if runeModifier < 1 {
+		runeModifier = 1
+	}
+
 	return GiantCalculator{
-		strikeUpgrades: strikeUpgrades{},
+		strikeUpgrades: strikeLevels,
 		strikePrices: map[int]upgradeCostList{
 			DoubleStrike:    upgrade_data.GetStrikePrices(),
 			TripleStrike:    upgrade_data.GetStrikePrices(),
 			QuadrupleStrike: upgrade_data.GetStrikePrices(),
 			QuintupleStrike: upgrade_data.GetStrikePrices(),
 		},
-		giantLuckPrices: upgrade_data.GetGiantLuckPrices(),
+		giantLuckUpgrade:             giantLuckLevel,
+		giantLuckPrices:              upgrade_data.GetGiantLuckPrices(),
+		overclocks:                   ocConfig,
+		achievementGiantLuckModifier: achievementModifier,
+		runeGiantLuckModifier:        runeModifier,
 	}
 }
 
-func (gc *GiantCalculator) GetNextUpgrade(strikeLevel, giantLuckLevel int) {
-	gc.strikeUpgrades[DoubleStrike] = strikeLevel
-	gc.strikeUpgrades[TripleStrike] = strikeLevel
-	gc.strikeUpgrades[QuadrupleStrike] = strikeLevel
-	gc.strikeUpgrades[QuintupleStrike] = strikeLevel
-	gc.giantLuckUpgrade = giantLuckLevel
-
+func (gc *GiantCalculator) GetNextUpgrade() string {
 	nextUpgrade := gc.findNextUpgrade()
 	if nextUpgrade == GiantLuck {
-		fmt.Println("giant luck")
+		return "giant luck"
 	} else {
-		fmt.Println(fmt.Sprintf("upgrade x%d strike", nextUpgrade))
+		return fmt.Sprintf("upgrade x%d strike", nextUpgrade)
 	}
 }
 
@@ -68,6 +89,30 @@ func (gc *GiantCalculator) CalculateUpgradePath() {
 		fmt.Println(fmt.Sprintf("giant chance after upgrade: %.10f", gc.calculateGiantRollChance(NoChange)))
 		fmt.Println(gc.strikeUpgrades, gc.giantLuckUpgrade)
 	}
+}
+
+func (gc *GiantCalculator) CalculateChancePerSTrike() float64 {
+	chance := gc.calculateGiantRollChance(0)
+	if gc.overclocks.DoubleEnabled {
+		chance *= x2Overclock
+	}
+	if gc.overclocks.TripleEnabled {
+		chance *= x3Overclock
+	}
+	if gc.overclocks.QuadrupleEnabled {
+		chance *= x4Overclock
+	}
+	if gc.overclocks.QuintupleEnabled {
+		chance *= x5Overclock
+	}
+	if gc.overclocks.GiantLuckEnabled {
+		chance *= giantLuckOverclock
+	}
+
+	chance *= gc.achievementGiantLuckModifier
+	chance *= gc.runeGiantLuckModifier
+
+	return chance
 }
 
 func (gc *GiantCalculator) findNextUpgrade() int {
