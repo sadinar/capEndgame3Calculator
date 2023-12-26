@@ -6,23 +6,24 @@ import (
 )
 
 func main() {
+
 	giantCalc := calculators.NewGiantCalculator(
-		calculators.OverclockConfig{QuadrupleEnabled: true, QuintupleEnabled: true, GiantLuckEnabled: true},
+		calculators.NewOverclockConfig(false, false, true, true, true),
 		1.06,
-		1.146,
+		1.163,
 		map[int]int{
 			2: 73,
 			3: 73,
 			4: 73,
 			5: 73,
 		},
-		66,
+		67,
 	)
 	//giantCalc.CalculateUpgradePath()
 	fmt.Println(
 		fmt.Sprintf(
 			"current chance per strike: %.10f%%",
-			giantCalc.CalculateChancePerSTrike()*100,
+			giantCalc.CalculateChancePerSTrike(0.875)*100,
 		),
 	)
 	fmt.Println("next upgrade should be", giantCalc.GetNextUpgrade())

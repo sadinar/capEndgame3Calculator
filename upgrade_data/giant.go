@@ -71,5 +71,6 @@ func GetGiantLuckPrices() map[int]int {
 		65: 0,
 		66: 1100000,
 		67: 1200000,
+		68: 1300000,
 	}
 }

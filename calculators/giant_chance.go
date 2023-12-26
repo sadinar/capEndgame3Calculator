@@ -19,13 +19,16 @@ const giantLuckOverclock = 1.5
 
 type upgradeCostList map[int]int
 type strikeUpgrades map[int]int
+type OverclockConfig map[int]bool
 
-type OverclockConfig struct {
-	DoubleEnabled    bool
-	TripleEnabled    bool
-	QuadrupleEnabled bool
-	QuintupleEnabled bool
-	GiantLuckEnabled bool
+func NewOverclockConfig(x2, x3, x4, x5, giant bool) OverclockConfig {
+	return OverclockConfig{
+		DoubleStrike:    x2,
+		TripleStrike:    x3,
+		QuadrupleStrike: x4,
+		QuintupleStrike: x5,
+		GiantLuck:       giant,
+	}
 }
 
 type GiantCalculator struct {
@@ -38,7 +41,7 @@ type GiantCalculator struct {
 	runeGiantLuckModifier        float64
 }
 
-func NewGiantCalculator(ocConfig OverclockConfig, achievementModifier, runeModifier float64, strikeLevels map[int]int, giantLuckLevel int) GiantCalculator {
+func NewGiantCalculator(ocConfig OverclockConfig, achievementModifier, runeModifier float64, strikeLevels strikeUpgrades, giantLuckLevel int) GiantCalculator {
 	if achievementModifier < 1 {
 		achievementModifier = 1
 	}
@@ -91,26 +94,11 @@ func (gc *GiantCalculator) CalculateUpgradePath() {
 	}
 }
 
-func (gc *GiantCalculator) CalculateChancePerSTrike() float64 {
+func (gc *GiantCalculator) CalculateChancePerSTrike(firstStrikeChance float64) float64 {
 	chance := gc.calculateGiantRollChance(0)
-	if gc.overclocks.DoubleEnabled {
-		chance *= x2Overclock
-	}
-	if gc.overclocks.TripleEnabled {
-		chance *= x3Overclock
-	}
-	if gc.overclocks.QuadrupleEnabled {
-		chance *= x4Overclock
-	}
-	if gc.overclocks.QuintupleEnabled {
-		chance *= x5Overclock
-	}
-	if gc.overclocks.GiantLuckEnabled {
-		chance *= giantLuckOverclock
-	}
-
 	chance *= gc.achievementGiantLuckModifier
 	chance *= gc.runeGiantLuckModifier
+	chance *= firstStrikeChance
 
 	return chance
 }
@@ -204,6 +192,22 @@ func (gc *GiantCalculator) calculateGiantRollChance(incrementedChance int) float
 		quintupleChance += upgrade_data.PerStepStrikeImprovement
 	case GiantLuck:
 		giantLuckChance += upgrade_data.PerStepGiantLuckImprovement
+	}
+
+	if gc.overclocks[DoubleStrike] {
+		doubleChance *= x2Overclock
+	}
+	if gc.overclocks[TripleStrike] {
+		tripleChance *= x3Overclock
+	}
+	if gc.overclocks[QuadrupleStrike] {
+		quadrupleChance *= x4Overclock
+	}
+	if gc.overclocks[QuintupleStrike] {
+		quintupleChance *= x5Overclock
+	}
+	if gc.overclocks[GiantLuck] {
+		giantLuckChance *= giantLuckOverclock
 	}
 
 	return doubleChance * tripleChance * quadrupleChance * quintupleChance * giantLuckChance
