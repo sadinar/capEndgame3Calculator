@@ -27,22 +27,5 @@ func main() {
 		),
 	)
 	fmt.Println("next upgrade should be", giantCalc.GetNextUpgrade())
-
-	trialsPerDay := giantCalc.GetEggsMinedPerDay()
-	probabilitySuccess := giantCalc.CalculateChancePerSTrike(1)
-	successCount, consumedProbabilitySpace := calculators.FindReasonableProbability(trialsPerDay, probabilitySuccess)
-	reportedProbabilitySpace := 0.0
-	medianProbability := 0.0
-	medianSuccesses := 0
-	for i := 0; i <= int(successCount); i++ {
-		chance := calculators.BinomialProbability(trialsPerDay, uint64(i), probabilitySuccess)
-		fmt.Println(fmt.Sprintf("%d: %.12f%%", i, chance*100))
-		reportedProbabilitySpace += chance
-		if medianSuccesses == 0 && reportedProbabilitySpace >= .5 {
-			medianSuccesses = i
-			medianProbability = chance
-		}
-	}
-	fmt.Println(fmt.Sprintf("%d+: %.12f%%", successCount+1, (1-consumedProbabilitySpace)*100))
-	fmt.Println(fmt.Sprintf("Median giant successes: %d @ %.12f%%", medianSuccesses, medianProbability*100))
+	giantCalc.PrintProbabilityDistribution()
 }

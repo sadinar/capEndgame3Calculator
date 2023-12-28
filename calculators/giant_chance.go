@@ -122,7 +122,37 @@ func (gc *GiantCalculator) CalculateChancePerSTrike(firstStrikeChance float64) f
 	return chance
 }
 
-func (gc *GiantCalculator) GetEggsMinedPerDay() uint64 {
+func (gc *GiantCalculator) PrintProbabilityDistribution() {
+	dailyAttempts := gc.getEggsMinedPerDay()
+	successProbability := gc.CalculateChancePerSTrike(1)
+	successCount, consumedProbabilitySpace := FindReasonableProbability(dailyAttempts, successProbability)
+	reportedProbabilitySpace := 0.0
+	medianProbability := 0.0
+	medianSuccesses := 0
+	subFiveProbabilitySpace := 0.0
+	hasPrintedSubFiveTotal := false
+	for i := 0; i <= int(successCount); i++ {
+		chance := BinomialProbability(dailyAttempts, uint64(i), successProbability)
+		if subFiveProbabilitySpace < .05 {
+			subFiveProbabilitySpace += chance
+		} else if !hasPrintedSubFiveTotal {
+			hasPrintedSubFiveTotal = true
+			fmt.Println(fmt.Sprintf("%d-%d: %.12f%%", 0, i, subFiveProbabilitySpace*100))
+		} else {
+			fmt.Println(fmt.Sprintf("%d: %.12f%%", i, chance*100))
+		}
+
+		reportedProbabilitySpace += chance
+		if medianSuccesses == 0 && reportedProbabilitySpace >= .5 {
+			medianSuccesses = i
+			medianProbability = chance
+		}
+	}
+	fmt.Println(fmt.Sprintf("%d+: %.12f%%", successCount+1, (1-consumedProbabilitySpace)*100))
+	fmt.Println(fmt.Sprintf("Median giant successes: %d @ %.12f%%", medianSuccesses, medianProbability*100))
+}
+
+func (gc *GiantCalculator) getEggsMinedPerDay() uint64 {
 	return uint64(gc.mineSpeed * 60 * 60 * 24)
 }
 
