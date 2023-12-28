@@ -89,13 +89,30 @@ func (gc *GiantCalculator) CalculateUpgradePath() {
 			fmt.Println(fmt.Sprintf("upgrade x%d strike", nextUpgrade))
 		}
 
-		fmt.Println(fmt.Sprintf("giant chance after upgrade: %.10f", gc.calculateGiantRollChance(NoChange)))
+		fmt.Println(fmt.Sprintf("giant chance after upgrade: %.10f", gc.calculateBaseGiantRollChance(NoChange)))
 		fmt.Println(gc.strikeUpgrades, gc.giantLuckUpgrade)
 	}
 }
 
 func (gc *GiantCalculator) CalculateChancePerSTrike(firstStrikeChance float64) float64 {
-	chance := gc.calculateGiantRollChance(0)
+	chance := gc.calculateBaseGiantRollChance(0)
+
+	if gc.overclocks[DoubleStrike] {
+		chance *= x2Overclock
+	}
+	if gc.overclocks[TripleStrike] {
+		chance *= x3Overclock
+	}
+	if gc.overclocks[QuadrupleStrike] {
+		chance *= x4Overclock
+	}
+	if gc.overclocks[QuintupleStrike] {
+		chance *= x5Overclock
+	}
+	if gc.overclocks[GiantLuck] {
+		chance *= giantLuckOverclock
+	}
+
 	chance *= gc.achievementGiantLuckModifier
 	chance *= gc.runeGiantLuckModifier
 	chance *= firstStrikeChance
@@ -113,11 +130,11 @@ func (gc *GiantCalculator) findNextUpgrade() int {
 		return NoChange
 	}
 
-	currentGiantChance := gc.calculateGiantRollChance(NoChange)
+	currentGiantChance := gc.calculateBaseGiantRollChance(NoChange)
 	bestStrikeUpgrade := NoChange
 	bestStrikeGain := float64(0)
 	for _, strike := range strikeChoices {
-		chanceGain := gc.calculateGiantRollChance(strike) - currentGiantChance
+		chanceGain := gc.calculateBaseGiantRollChance(strike) - currentGiantChance
 		upgradeCost := gc.strikePrices[strike][gc.strikeUpgrades[strike]+1]
 		gain := chanceGain / float64(upgradeCost)
 		if gain > bestStrikeGain {
@@ -126,7 +143,7 @@ func (gc *GiantCalculator) findNextUpgrade() int {
 		}
 	}
 
-	giantLuckGain := gc.calculateGiantRollChance(GiantLuck)
+	giantLuckGain := gc.calculateBaseGiantRollChance(GiantLuck)
 	upgradeCost := gc.giantLuckPrices[gc.giantLuckUpgrade+1]
 	gain := giantLuckGain / float64(upgradeCost)
 	if gain > bestStrikeGain {
@@ -174,7 +191,7 @@ func (gc *GiantCalculator) listPossibleStrikeUpgrades() []int {
 	return strikeChoices
 }
 
-func (gc *GiantCalculator) calculateGiantRollChance(incrementedChance int) float64 {
+func (gc *GiantCalculator) calculateBaseGiantRollChance(incrementedChance int) float64 {
 	doubleChance := float64(gc.strikeUpgrades[DoubleStrike]) * upgrade_data.PerStepStrikeImprovement
 	tripleChance := float64(gc.strikeUpgrades[TripleStrike]) * upgrade_data.PerStepStrikeImprovement
 	quadrupleChance := float64(gc.strikeUpgrades[QuadrupleStrike]) * upgrade_data.PerStepStrikeImprovement
@@ -192,22 +209,6 @@ func (gc *GiantCalculator) calculateGiantRollChance(incrementedChance int) float
 		quintupleChance += upgrade_data.PerStepStrikeImprovement
 	case GiantLuck:
 		giantLuckChance += upgrade_data.PerStepGiantLuckImprovement
-	}
-
-	if gc.overclocks[DoubleStrike] {
-		doubleChance *= x2Overclock
-	}
-	if gc.overclocks[TripleStrike] {
-		tripleChance *= x3Overclock
-	}
-	if gc.overclocks[QuadrupleStrike] {
-		quadrupleChance *= x4Overclock
-	}
-	if gc.overclocks[QuintupleStrike] {
-		quintupleChance *= x5Overclock
-	}
-	if gc.overclocks[GiantLuck] {
-		giantLuckChance *= giantLuckOverclock
 	}
 
 	return doubleChance * tripleChance * quadrupleChance * quintupleChance * giantLuckChance

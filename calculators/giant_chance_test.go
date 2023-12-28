@@ -8,32 +8,32 @@ import (
 
 func TestCalculateGiantRollChance(t *testing.T) {
 	sl := getCalculatorWithDummyPrices()
-	assert.Equal(t, float64(0), sl.calculateGiantRollChance(0))
+	assert.Equal(t, float64(0), sl.calculateBaseGiantRollChance(0))
 
 	sl.strikeUpgrades[1] = 1
-	assert.Equal(t, float64(0), sl.calculateGiantRollChance(0))
+	assert.Equal(t, float64(0), sl.calculateBaseGiantRollChance(0))
 
 	sl.strikeUpgrades[2] = 1
 	sl.strikeUpgrades[3] = 1
 	sl.strikeUpgrades[5] = 1
-	assert.Equal(t, float64(0), sl.calculateGiantRollChance(0))
+	assert.Equal(t, float64(0), sl.calculateBaseGiantRollChance(0))
 
 	sl.strikeUpgrades[4] = 1
-	assert.Equal(t, float64(0), sl.calculateGiantRollChance(0))
+	assert.Equal(t, float64(0), sl.calculateBaseGiantRollChance(0))
 
 	sl.giantLuckUpgrade = 1
 	expected := fmt.Sprintf("%.16f", 0.0025*0.0025*0.0025*0.0025*0.001)
-	calcResult := fmt.Sprintf("%.16f", sl.calculateGiantRollChance(0))
+	calcResult := fmt.Sprintf("%.16f", sl.calculateBaseGiantRollChance(0))
 	assert.Equal(t, expected, calcResult)
 
 	expected = fmt.Sprintf("%.14f", .0025*2*0.0025*0.0025*0.0025*.001)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(2))
+	calcResult = fmt.Sprintf("%.14f", sl.calculateBaseGiantRollChance(2))
 	assert.Equal(t, expected, calcResult)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(3))
+	calcResult = fmt.Sprintf("%.14f", sl.calculateBaseGiantRollChance(3))
 	assert.Equal(t, expected, calcResult)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(4))
+	calcResult = fmt.Sprintf("%.14f", sl.calculateBaseGiantRollChance(4))
 	assert.Equal(t, expected, calcResult)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(5))
+	calcResult = fmt.Sprintf("%.14f", sl.calculateBaseGiantRollChance(5))
 	assert.Equal(t, expected, calcResult)
 
 	sl.strikeUpgrades[2] = 2
@@ -41,26 +41,26 @@ func TestCalculateGiantRollChance(t *testing.T) {
 	sl.strikeUpgrades[4] = 1
 	sl.strikeUpgrades[5] = 7
 	expected = fmt.Sprintf("%.14f", .0025*2*.0025*9*.0025*1*.0025*7*.001)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(0))
+	calcResult = fmt.Sprintf("%.14f", sl.calculateBaseGiantRollChance(0))
 	assert.Equal(t, expected, calcResult)
 	expected = fmt.Sprintf("%.14f", .0025*3*.0025*9*.0025*1*.0025*7*.001)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(2))
+	calcResult = fmt.Sprintf("%.14f", sl.calculateBaseGiantRollChance(2))
 	assert.Equal(t, expected, calcResult)
 	expected = fmt.Sprintf("%.14f", .0025*2*.0025*10*.0025*1*.0025*7*.001)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(3))
+	calcResult = fmt.Sprintf("%.14f", sl.calculateBaseGiantRollChance(3))
 	assert.Equal(t, expected, calcResult)
 	expected = fmt.Sprintf("%.14f", .0025*2*.0025*9*.0025*2*.0025*7*.001)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(4))
+	calcResult = fmt.Sprintf("%.14f", sl.calculateBaseGiantRollChance(4))
 	assert.Equal(t, expected, calcResult)
 	expected = fmt.Sprintf("%.14f", .0025*2*.0025*9*.0025*1*.0025*8*.001)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(5))
+	calcResult = fmt.Sprintf("%.14f", sl.calculateBaseGiantRollChance(5))
 	assert.Equal(t, expected, calcResult)
 	sl.giantLuckUpgrade = 5
 	expected = fmt.Sprintf("%.14f", .0025*2*.0025*9*.0025*1*.0025*7*.001*5)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(0))
+	calcResult = fmt.Sprintf("%.14f", sl.calculateBaseGiantRollChance(0))
 	assert.Equal(t, expected, calcResult)
 	expected = fmt.Sprintf("%.14f", .0025*2*.0025*9*.0025*1*.0025*7*.001*6)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateGiantRollChance(9000))
+	calcResult = fmt.Sprintf("%.14f", sl.calculateBaseGiantRollChance(9000))
 	assert.Equal(t, expected, calcResult)
 }
 
