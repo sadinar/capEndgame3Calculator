@@ -142,7 +142,9 @@ func (gc *GiantCalculator) PrintProbabilityDistribution() {
 			fmt.Println(fmt.Sprintf("%d: %.12f%%", i, chance*100))
 		}
 
-		reportedProbabilitySpace += chance
+		if reportedProbabilitySpace < .5 {
+			reportedProbabilitySpace += chance
+		}
 		if medianSuccesses == 0 && reportedProbabilitySpace >= .5 {
 			medianSuccesses = i
 			medianProbability = chance
@@ -150,6 +152,7 @@ func (gc *GiantCalculator) PrintProbabilityDistribution() {
 	}
 	fmt.Println(fmt.Sprintf("%d+: %.12f%%", successCount+1, (1-consumedProbabilitySpace)*100))
 	fmt.Println(fmt.Sprintf("Median giant successes: %d @ %.12f%%", medianSuccesses, medianProbability*100))
+	fmt.Println(fmt.Sprintf("%.4f%% chance %d or fewer giants and %.4f%% chance over %d giants", reportedProbabilitySpace*100, medianSuccesses, (1-reportedProbabilitySpace)*100, medianSuccesses))
 }
 
 func (gc *GiantCalculator) getEggsMinedPerDay() uint64 {

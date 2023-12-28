@@ -19,11 +19,10 @@ func main() {
 		},
 		67,
 	)
-	//giantCalc.CalculateUpgradePath()
 	fmt.Println(
 		fmt.Sprintf(
 			"current chance per strike: %.10f%%",
-			giantCalc.CalculateChancePerSTrike(0.875)*100,
+			giantCalc.CalculateChancePerSTrike(1)*100,
 		),
 	)
 	fmt.Println("next upgrade should be", giantCalc.GetNextUpgrade())
