@@ -6,11 +6,10 @@ import (
 )
 
 func main() {
-
 	giantCalc := calculators.NewGiantCalculator(
 		calculators.NewOverclockConfig(false, false, true, true, true),
-		1.06,
-		1.163,
+		1.07,
+		1.184,
 		map[int]int{
 			2: 73,
 			3: 73,
@@ -27,4 +26,13 @@ func main() {
 		),
 	)
 	fmt.Println("next upgrade should be", giantCalc.GetNextUpgrade())
+
+	trialsPerDay := uint64(0.64 * 60 * 60 * 24)
+	pSuccess := giantCalc.CalculateChancePerSTrike(0.875)
+	successCount, totalProbabilitySpace := calculators.FindReasonableProbability(trialsPerDay, pSuccess)
+	for i := 0; i <= int(successCount); i++ {
+		chance := calculators.BinomialProbability(trialsPerDay, uint64(i), pSuccess)
+		fmt.Println(fmt.Sprintf("%d: %.12f%%", i, chance*100))
+	}
+	fmt.Println(fmt.Sprintf("%d+: %.12f%%", successCount+1, (1-totalProbabilitySpace)*100))
 }
