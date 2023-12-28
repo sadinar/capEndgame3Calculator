@@ -39,9 +39,10 @@ type GiantCalculator struct {
 	overclocks                   OverclockConfig
 	achievementGiantLuckModifier float64
 	runeGiantLuckModifier        float64
+	mineSpeed                    float64
 }
 
-func NewGiantCalculator(ocConfig OverclockConfig, achievementModifier, runeModifier float64, strikeLevels strikeUpgrades, giantLuckLevel int) GiantCalculator {
+func NewGiantCalculator(ocConfig OverclockConfig, achievementModifier, runeModifier, mineSpeed float64, strikeLevels strikeUpgrades, giantLuckLevel int) GiantCalculator {
 	if achievementModifier < 1 {
 		achievementModifier = 1
 	}
@@ -62,6 +63,7 @@ func NewGiantCalculator(ocConfig OverclockConfig, achievementModifier, runeModif
 		overclocks:                   ocConfig,
 		achievementGiantLuckModifier: achievementModifier,
 		runeGiantLuckModifier:        runeModifier,
+		mineSpeed:                    mineSpeed,
 	}
 }
 
@@ -118,6 +120,10 @@ func (gc *GiantCalculator) CalculateChancePerSTrike(firstStrikeChance float64) f
 	chance *= firstStrikeChance
 
 	return chance
+}
+
+func (gc *GiantCalculator) GetEggsMinedPerDay() uint64 {
+	return uint64(gc.mineSpeed * 60 * 60 * 24)
 }
 
 func (gc *GiantCalculator) findNextUpgrade() int {

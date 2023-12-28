@@ -14,21 +14,8 @@ func Factorial(factor *big.Int) *big.Int {
 	return factor.Mul(factor, Factorial(oneLess))
 }
 
-func TotalCombinations(trials uint64, successes uint64) *big.Int {
-	if successes == 0 {
-		return big.NewInt(1)
-	}
-
-	numerator := big.NewInt(int64(trials))
-	for i := trials - 1; i > trials-successes; i-- {
-		numerator.Mul(numerator, big.NewInt(int64(i)))
-	}
-
-	return numerator.Div(numerator, Factorial(big.NewInt(int64(successes))))
-}
-
 func BinomialProbability(trials uint64, successes uint64, pSuccess float64) float64 {
-	combinations := TotalCombinations(trials, successes)
+	combinations := totalCombinations(trials, successes)
 	fCombinations := big.NewFloat(0).SetInt(combinations)
 
 	pFail := float64(1) - pSuccess
@@ -39,21 +26,6 @@ func BinomialProbability(trials uint64, successes uint64, pSuccess float64) floa
 	probability, _ := t.Float64()
 
 	return probability
-}
-
-func bigFloatPow(base float64, exponent uint64) *big.Float {
-	if exponent == 0 {
-		return big.NewFloat(1)
-	}
-
-	answer := big.NewFloat(base)
-	for {
-		if exponent == 1 {
-			return answer
-		}
-		answer = answer.Mul(answer, big.NewFloat(base))
-		exponent--
-	}
 }
 
 func FindReasonableProbability(trials uint64, pSuccess float64) (uint64, float64) {
@@ -69,4 +41,32 @@ func FindReasonableProbability(trials uint64, pSuccess float64) (uint64, float64
 	}
 
 	return successCount - 1, totalProbability
+}
+
+func totalCombinations(trials uint64, successes uint64) *big.Int {
+	if successes == 0 {
+		return big.NewInt(1)
+	}
+
+	numerator := big.NewInt(int64(trials))
+	for i := trials - 1; i > trials-successes; i-- {
+		numerator.Mul(numerator, big.NewInt(int64(i)))
+	}
+
+	return numerator.Div(numerator, Factorial(big.NewInt(int64(successes))))
+}
+
+func bigFloatPow(base float64, exponent uint64) *big.Float {
+	if exponent == 0 {
+		return big.NewFloat(1)
+	}
+
+	answer := big.NewFloat(base)
+	for {
+		if exponent == 1 {
+			return answer
+		}
+		answer = answer.Mul(answer, big.NewFloat(base))
+		exponent--
+	}
 }
