@@ -28,7 +28,7 @@ func BinomialProbability(trials uint64, successes uint64, pSuccess float64) floa
 	return probability
 }
 
-func FindReasonableProbability(trials uint64, pSuccess float64) (uint64, float64) {
+func FindReasonableSuccessCeiling(trials uint64, pSuccess float64) (uint64, float64) {
 	totalProbability := float64(0)
 	successCount := uint64(0)
 	for {

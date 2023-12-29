@@ -126,7 +126,7 @@ func (gc *GiantCalculator) CalculateChancePerSTrike(firstStrikeChance float64) f
 func (gc *GiantCalculator) PrintProbabilityDistribution(duration time.Duration, firstStrikeChance float64) {
 	dailyAttempts := gc.getEggsMined(duration)
 	successProbability := gc.CalculateChancePerSTrike(firstStrikeChance)
-	successCount, consumedProbabilitySpace := FindReasonableProbability(dailyAttempts, successProbability)
+	successCount, consumedProbabilitySpace := FindReasonableSuccessCeiling(dailyAttempts, successProbability)
 	reportedProbabilitySpace := 0.0
 	medianProbability := 0.0
 	medianSuccesses := 0
