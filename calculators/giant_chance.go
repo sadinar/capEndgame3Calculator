@@ -3,6 +3,7 @@ package calculators
 import (
 	"capEndgame3Calculator/upgrade_data"
 	"fmt"
+	"time"
 )
 
 const DoubleStrike = 2
@@ -122,9 +123,9 @@ func (gc *GiantCalculator) CalculateChancePerSTrike(firstStrikeChance float64) f
 	return chance
 }
 
-func (gc *GiantCalculator) PrintProbabilityDistribution() {
-	dailyAttempts := gc.getEggsMinedPerDay()
-	successProbability := gc.CalculateChancePerSTrike(1)
+func (gc *GiantCalculator) PrintProbabilityDistribution(duration time.Duration, firstStrikeChance float64) {
+	dailyAttempts := gc.getEggsMined(duration)
+	successProbability := gc.CalculateChancePerSTrike(firstStrikeChance)
 	successCount, consumedProbabilitySpace := FindReasonableProbability(dailyAttempts, successProbability)
 	reportedProbabilitySpace := 0.0
 	medianProbability := 0.0
@@ -152,11 +153,11 @@ func (gc *GiantCalculator) PrintProbabilityDistribution() {
 	}
 	fmt.Println(fmt.Sprintf("%d+: %.12f%%", successCount+1, (1-consumedProbabilitySpace)*100))
 	fmt.Println(fmt.Sprintf("Median giant successes: %d @ %.12f%%", medianSuccesses, medianProbability*100))
-	fmt.Println(fmt.Sprintf("%.4f%% chance %d or fewer giants and %.4f%% chance over %d giants per 24 hours", reportedProbabilitySpace*100, medianSuccesses, (1-reportedProbabilitySpace)*100, medianSuccesses))
+	fmt.Println(fmt.Sprintf("%.4f%% chance %d or fewer giants and %.4f%% chance over %d giants in %v", reportedProbabilitySpace*100, medianSuccesses, (1-reportedProbabilitySpace)*100, medianSuccesses, duration))
 }
 
-func (gc *GiantCalculator) getEggsMinedPerDay() uint64 {
-	return uint64(gc.mineSpeed * 60 * 60 * 24)
+func (gc *GiantCalculator) getEggsMined(duration time.Duration) uint64 {
+	return uint64(duration.Seconds() * gc.mineSpeed)
 }
 
 func (gc *GiantCalculator) findNextUpgrade() int {
