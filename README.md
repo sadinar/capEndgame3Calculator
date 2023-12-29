@@ -6,13 +6,13 @@ The calculator's constructor takes the player's current state and returns an obj
 upgrades, suggest the next upgrade, show the chance per strike of getting a giant, and show the full probability table
 for a given time period.
 
-The constructor take the following arguments:
+The constructor takes the following arguments:
 - overclock configuration
 - giant achievement modifier, exactly as shown in game
 - rune giant luck modifier, exactly as shown in game
 - mining speed, exactly as shown in game
 - list of current strike levels
-- giant luck level
+- giant luck level, in game giant luck divided by 0.1. For example, `6.7 % 0.1 = 67`
 
 ###### Overclock configuration
 The overclock configuration constructor takes the following arguments:
@@ -24,7 +24,8 @@ The overclock configuration constructor takes the following arguments:
 
 ###### Strike level list
 Map of strike number to upgrade level and expects indexes 2, 3, 4, and 5 to be set. Index two is the x2 strike upgrade
-level. Index three is the x3 strike upgrade level. And so on.
+level. Index three is the x3 strike upgrade level. And so on. To determine your strike level, divide the percentage 
+shown in game by 0.25. For example, 18.25% would be `18.25 % 0.25 = 73` for a strike level of 73.
 
 ``` go
 giantCalc := calculators.NewGiantCalculator(

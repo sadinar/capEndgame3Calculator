@@ -11,7 +11,7 @@ func main() {
 		calculators.NewOverclockConfig(false, false, true, true, true),
 		1.07,
 		1.188,
-		0.64,
+		0.65,
 		map[int]int{
 			2: 73,
 			3: 73,
