@@ -92,13 +92,13 @@ func (gc *GiantCalculator) CalculateUpgradePath() {
 			fmt.Println(fmt.Sprintf("upgrade x%d strike", nextUpgrade))
 		}
 
-		fmt.Println(fmt.Sprintf("giant chance after upgrade: %.10f", gc.calculateBaseGiantRollChance(NoChange)))
+		fmt.Println(fmt.Sprintf("giant chance after upgrade: %.10f", gc.calculateBaseGiantChance(NoChange)))
 		fmt.Println(gc.strikeUpgrades, gc.giantLuckUpgrade)
 	}
 }
 
 func (gc *GiantCalculator) CalculateChancePerSTrike(firstStrikeChance float64) float64 {
-	chance := gc.calculateBaseGiantRollChance(0)
+	chance := gc.calculateBaseGiantChance(0)
 
 	if gc.overclocks[DoubleStrike] {
 		chance *= x2Overclock
@@ -170,11 +170,11 @@ func (gc *GiantCalculator) findNextUpgrade() int {
 		return NoChange
 	}
 
-	currentGiantChance := gc.calculateBaseGiantRollChance(NoChange)
+	currentGiantChance := gc.calculateBaseGiantChance(NoChange)
 	bestStrikeUpgrade := NoChange
 	bestStrikeGain := float64(0)
 	for _, strike := range strikeChoices {
-		chanceGain := gc.calculateBaseGiantRollChance(strike) - currentGiantChance
+		chanceGain := gc.calculateBaseGiantChance(strike) - currentGiantChance
 		upgradeCost := gc.strikePrices[strike][gc.strikeUpgrades[strike]+1]
 		gain := chanceGain / float64(upgradeCost)
 		if gain > bestStrikeGain {
@@ -183,7 +183,7 @@ func (gc *GiantCalculator) findNextUpgrade() int {
 		}
 	}
 
-	giantLuckGain := gc.calculateBaseGiantRollChance(GiantLuck)
+	giantLuckGain := gc.calculateBaseGiantChance(GiantLuck)
 	upgradeCost := gc.giantLuckPrices[gc.giantLuckUpgrade+1]
 	gain := giantLuckGain / float64(upgradeCost)
 	if gain > bestStrikeGain {
@@ -231,7 +231,7 @@ func (gc *GiantCalculator) listPossibleStrikeUpgrades() []int {
 	return strikeChoices
 }
 
-func (gc *GiantCalculator) calculateBaseGiantRollChance(incrementedChance int) float64 {
+func (gc *GiantCalculator) calculateBaseGiantChance(incrementedChance int) float64 {
 	doubleChance := float64(gc.strikeUpgrades[DoubleStrike]) * upgrade_data.PerStepStrikeImprovement
 	tripleChance := float64(gc.strikeUpgrades[TripleStrike]) * upgrade_data.PerStepStrikeImprovement
 	quadrupleChance := float64(gc.strikeUpgrades[QuadrupleStrike]) * upgrade_data.PerStepStrikeImprovement

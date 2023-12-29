@@ -12,3 +12,14 @@ func TestBigFloatPow(t *testing.T) {
 	assert.Equal(t, big.NewFloat(25), bigFloatPow(5, 2))
 	assert.Equal(t, big.NewFloat(27), bigFloatPow(3, 3))
 }
+
+func TestBinomialProbability(t *testing.T) {
+	assert.Equal(t, 0.3125, BinomialProbability(5, 2, 0.5))
+	assert.Equal(t, 0.15625, BinomialProbability(5, 4, 0.5))
+	assert.Equal(t, 0.03125, BinomialProbability(5, 5, 0.5))
+}
+
+func TestFactorial(t *testing.T) {
+	assert.Equal(t, int64(3*2), Factorial(big.NewInt(3)).Int64())
+	assert.Equal(t, int64(9*8*7*6*5*4*3*2), Factorial(big.NewInt(9)).Int64())
+}
