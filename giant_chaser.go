@@ -8,9 +8,9 @@ import (
 
 func main() {
 	giantCalc := calculators.NewGiantCalculator(
-		calculators.NewOverclockConfig(false, false, true, true, true),
+		calculators.NewOverclockConfig(false, true, true, true, true),
 		1.07,
-		1.188,
+		1.2,
 		0.65,
 		map[int]int{
 			2: 73,
@@ -18,7 +18,7 @@ func main() {
 			4: 73,
 			5: 73,
 		},
-		67,
+		69,
 	)
 	fmt.Println(
 		fmt.Sprintf(
@@ -26,6 +26,18 @@ func main() {
 			giantCalc.CalculateChancePerSTrike(1.0)*100,
 		),
 	)
+
 	fmt.Println("next upgrade should be", giantCalc.GetNextUpgrade())
-	giantCalc.PrintProbabilityDistribution(time.Hour*24, 1.0)
+
+	giantCalc.PrintProbabilityDistribution(time.Hour*24, 0.783)
+
+	//fullPlanCalculator := calculators.NewGiantCalculator(
+	//	calculators.NewOverclockConfig(false, false, false, false, false),
+	//	1,
+	//	1,
+	//	0.5,
+	//	map[int]int{2: 0, 3: 0, 4: 0, 5: 0},
+	//	0,
+	//)
+	//fullPlanCalculator.CalculateUpgradePath()
 }

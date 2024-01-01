@@ -78,6 +78,8 @@ func (gc *GiantCalculator) GetNextUpgrade() string {
 }
 
 func (gc *GiantCalculator) CalculateUpgradePath() {
+	fmt.Println("----------------------------------")
+	fmt.Println("| x2 | x3 | x4 | x5 | giant luck |")
 	for {
 		if gc.findNextUpgrade() == NoChange {
 			return
@@ -85,15 +87,25 @@ func (gc *GiantCalculator) CalculateUpgradePath() {
 
 		nextUpgrade := gc.findNextUpgrade()
 		if nextUpgrade == GiantLuck {
-			fmt.Println("upgrade giant luck")
+			//fmt.Println("upgrade giant luck")
 			gc.giantLuckUpgrade++
 		} else {
 			gc.strikeUpgrades[nextUpgrade]++
-			fmt.Println(fmt.Sprintf("upgrade x%d strike", nextUpgrade))
+			//fmt.Println(fmt.Sprintf("upgrade x%d strike", nextUpgrade))
 		}
 
-		fmt.Println(fmt.Sprintf("giant chance after upgrade: %.10f", gc.calculateBaseGiantChance(NoChange)))
-		fmt.Println(gc.strikeUpgrades, gc.giantLuckUpgrade)
+		//fmt.Println(fmt.Sprintf("giant chance after upgrade: %.10f", gc.calculateBaseGiantChance(NoChange)))
+		//fmt.Println(gc.strikeUpgrades, gc.giantLuckUpgrade)
+		fmt.Println(
+			fmt.Sprintf(
+				"|%03d |%03d |%03d |%03d |%03d         |",
+				gc.strikeUpgrades[DoubleStrike],
+				gc.strikeUpgrades[TripleStrike],
+				gc.strikeUpgrades[QuadrupleStrike],
+				gc.strikeUpgrades[QuintupleStrike],
+				gc.giantLuckUpgrade,
+			),
+		)
 	}
 }
 
@@ -134,7 +146,7 @@ func (gc *GiantCalculator) PrintProbabilityDistribution(duration time.Duration, 
 	hasPrintedSubFiveTotal := false
 	for i := 0; i <= int(successCount); i++ {
 		chance := BinomialProbability(dailyAttempts, uint64(i), successProbability)
-		if subFiveProbabilitySpace < .05 {
+		if subFiveProbabilitySpace < .05 && chance < .10 {
 			subFiveProbabilitySpace += chance
 		} else if !hasPrintedSubFiveTotal {
 			hasPrintedSubFiveTotal = true
@@ -175,6 +187,11 @@ func (gc *GiantCalculator) findNextUpgrade() int {
 	bestStrikeGain := float64(0)
 	for _, strike := range strikeChoices {
 		chanceGain := gc.calculateBaseGiantChance(strike) - currentGiantChance
+
+		if gc.strikePrices[strike][gc.strikeUpgrades[strike]+1] == 0 {
+			panic("ran out of strike prices!")
+		}
+
 		upgradeCost := gc.strikePrices[strike][gc.strikeUpgrades[strike]+1]
 		gain := chanceGain / float64(upgradeCost)
 		if gain > bestStrikeGain {
@@ -184,6 +201,11 @@ func (gc *GiantCalculator) findNextUpgrade() int {
 	}
 
 	giantLuckGain := gc.calculateBaseGiantChance(GiantLuck)
+
+	if gc.giantLuckPrices[gc.giantLuckUpgrade+1] == 0 {
+		panic("ran out of giant luck prices!")
+	}
+
 	upgradeCost := gc.giantLuckPrices[gc.giantLuckUpgrade+1]
 	gain := giantLuckGain / float64(upgradeCost)
 	if gain > bestStrikeGain {
