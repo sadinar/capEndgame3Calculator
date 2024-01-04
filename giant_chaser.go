@@ -9,7 +9,7 @@ import (
 func main() {
 	giantCalc := calculators.NewGiantCalculator(
 		calculators.NewOverclockConfig(false, true, true, true, true),
-		1.07,
+		1.08,
 		1.2,
 		0.65,
 		map[int]int{
