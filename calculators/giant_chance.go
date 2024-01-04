@@ -139,33 +139,42 @@ func (gc *GiantCalculator) PrintProbabilityDistribution(duration time.Duration, 
 	dailyAttempts := gc.getEggsMined(duration)
 	successProbability := gc.CalculateChancePerSTrike(firstStrikeChance)
 	successCount, consumedProbabilitySpace := FindReasonableSuccessCeiling(dailyAttempts, successProbability)
-	reportedProbabilitySpace := 0.0
-	medianProbability := 0.0
-	medianSuccesses := 0
-	subFiveProbabilitySpace := 0.0
-	hasPrintedSubFiveTotal := false
+
+	probabilityList := make(map[int]float64, 0)
 	for i := 0; i <= int(successCount); i++ {
 		chance := BinomialProbability(dailyAttempts, uint64(i), successProbability)
-		if subFiveProbabilitySpace < .05 && chance < .10 {
-			subFiveProbabilitySpace += chance
-		} else if !hasPrintedSubFiveTotal {
-			hasPrintedSubFiveTotal = true
-			fmt.Println(fmt.Sprintf("%d-%d: %.12f%%", 0, i, subFiveProbabilitySpace*100))
-		} else {
-			fmt.Println(fmt.Sprintf("%d: %.12f%%", i, chance*100))
-		}
+		probabilityList[i] = chance
+	}
 
-		if reportedProbabilitySpace < .5 {
-			reportedProbabilitySpace += chance
-		}
-		if medianSuccesses == 0 && reportedProbabilitySpace >= .5 {
-			medianSuccesses = i
-			medianProbability = chance
+	lowIndex, lowProbability := gc.findProbabilityBreakpoint(probabilityList, 0.05)
+	msgPrefix := "0-"
+	if lowIndex == 0 {
+		msgPrefix = ""
+	}
+	fmt.Println(fmt.Sprintf("%s%d: %.12f%%", msgPrefix, lowIndex, lowProbability*100))
+	for i := lowIndex + 1; i < len(probabilityList); i++ {
+		fmt.Println(fmt.Sprintf("%d: %.12f%%", i, probabilityList[i]*100))
+	}
+	fmt.Println(fmt.Sprintf("%d+: %.12f%%", len(probabilityList), (1-consumedProbabilitySpace)*100))
+
+	medianIndex, medianProbability := gc.findProbabilityBreakpoint(probabilityList, 0.5)
+	fmt.Println(fmt.Sprintf("median of %d: %.12f%% chance of %d or fewer", medianIndex, medianProbability*100, medianIndex))
+}
+
+func (gc *GiantCalculator) findProbabilityBreakpoint(probabilityList map[int]float64, breakPoint float64) (int, float64) {
+	totalProbability := 0.0
+	maxIncludedIndex := 0
+
+	for i := 0; i <= len(probabilityList); i++ {
+		totalProbability += probabilityList[i]
+		maxIncludedIndex = i
+
+		if totalProbability >= breakPoint {
+			return maxIncludedIndex, totalProbability
 		}
 	}
-	fmt.Println(fmt.Sprintf("%d+: %.12f%%", successCount+1, (1-consumedProbabilitySpace)*100))
-	fmt.Println(fmt.Sprintf("Median giant successes: %d @ %.12f%%", medianSuccesses, medianProbability*100))
-	fmt.Println(fmt.Sprintf("%.4f%% chance %d or fewer giants and %.4f%% chance over %d giants in %v", reportedProbabilitySpace*100, medianSuccesses, (1-reportedProbabilitySpace)*100, medianSuccesses, duration))
+
+	panic("failed to walk the probability list")
 }
 
 func (gc *GiantCalculator) getEggsMined(duration time.Duration) uint64 {

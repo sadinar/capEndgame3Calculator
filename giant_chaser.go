@@ -29,7 +29,7 @@ func main() {
 
 	fmt.Println("next upgrade should be", giantCalc.GetNextUpgrade())
 
-	giantCalc.PrintProbabilityDistribution(time.Hour*24, 0.783)
+	giantCalc.PrintProbabilityDistribution(time.Hour*24, 1)
 
 	//fullPlanCalculator := calculators.NewGiantCalculator(
 	//	calculators.NewOverclockConfig(false, false, false, false, false),
