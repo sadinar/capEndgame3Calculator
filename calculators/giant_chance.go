@@ -158,7 +158,7 @@ func (gc *GiantCalculator) PrintProbabilityDistribution(duration time.Duration, 
 	fmt.Println(fmt.Sprintf("%d+: %.12f%%", len(probabilityList), (1-consumedProbabilitySpace)*100))
 
 	medianIndex, medianProbability := gc.findProbabilityBreakpoint(probabilityList, 0.5)
-	fmt.Println(fmt.Sprintf("median of %d: %.12f%% chance of %d or fewer", medianIndex, medianProbability*100, medianIndex))
+	fmt.Println(fmt.Sprintf("median of %d giants: %.12f%% chance of %d or fewer gians in %v", medianIndex, medianProbability*100, medianIndex, duration))
 }
 
 func (gc *GiantCalculator) findProbabilityBreakpoint(probabilityList map[int]float64, breakPoint float64) (int, float64) {

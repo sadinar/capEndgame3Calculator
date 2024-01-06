@@ -1,6 +1,7 @@
 package calculators
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"math/big"
 	"testing"
@@ -17,6 +18,12 @@ func TestBinomialProbability(t *testing.T) {
 	assert.Equal(t, 0.3125, BinomialProbability(5, 2, 0.5))
 	assert.Equal(t, 0.15625, BinomialProbability(5, 4, 0.5))
 	assert.Equal(t, 0.03125, BinomialProbability(5, 5, 0.5))
+
+	rounded := fmt.Sprintf("%.4f", BinomialProbability(10, 7, 0.8))
+	assert.Equal(t, "0.2013", rounded)
+
+	rounded = fmt.Sprintf("%.4f", BinomialProbability(5, 3, .75))
+	assert.Equal(t, "0.2637", rounded)
 }
 
 func TestFactorial(t *testing.T) {
