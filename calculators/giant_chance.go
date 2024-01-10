@@ -139,12 +139,15 @@ func (gc *GiantCalculator) PrintProbabilityDistribution(duration time.Duration, 
 		probabilityList[i] = chance
 	}
 
+	fmt.Println(fmt.Sprintf("0: %.12f%%", probabilityList[0]*100))
 	lowIndex, lowProbability := gc.findProbabilityBreakpoint(probabilityList, 0.05)
-	msgPrefix := "0-"
-	if lowIndex == 0 {
-		msgPrefix = ""
+	msgPrefix := "1-"
+	if lowIndex > 1 {
+		fmt.Println(fmt.Sprintf("%s%d: %.12f%%", msgPrefix, lowIndex, lowProbability*100))
+	} else {
+		lowIndex = 0
 	}
-	fmt.Println(fmt.Sprintf("%s%d: %.12f%%", msgPrefix, lowIndex, lowProbability*100))
+
 	for i := lowIndex + 1; i < len(probabilityList); i++ {
 		fmt.Println(fmt.Sprintf("%d: %.12f%%", i, probabilityList[i]*100))
 	}
@@ -173,7 +176,7 @@ func (gc *GiantCalculator) findProbabilityBreakpoint(probabilityList map[int]flo
 	totalProbability := 0.0
 	maxIncludedIndex := 0
 
-	for i := 0; i <= len(probabilityList); i++ {
+	for i := 1; i < len(probabilityList); i++ {
 		totalProbability += probabilityList[i]
 		maxIncludedIndex = i
 
@@ -182,7 +185,7 @@ func (gc *GiantCalculator) findProbabilityBreakpoint(probabilityList map[int]flo
 		}
 	}
 
-	panic("failed to walk the probability list")
+	return maxIncludedIndex, totalProbability
 }
 
 func (gc *GiantCalculator) getEggsMined(duration time.Duration) uint64 {
