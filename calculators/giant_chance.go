@@ -34,7 +34,7 @@ func NewOverclockConfig(x2, x3, x4, x5, giant bool) OverclockConfig {
 
 type GiantCalculator struct {
 	strikeUpgrades               strikeUpgrades
-	strikePrices                 map[int]upgradeCostList
+	strikePrices                 upgradeCostList
 	giantLuckUpgrade             int
 	giantLuckPrices              upgradeCostList
 	overclocks                   OverclockConfig
@@ -52,13 +52,8 @@ func NewGiantCalculator(ocConfig OverclockConfig, achievementModifier, runeModif
 	}
 
 	return GiantCalculator{
-		strikeUpgrades: strikeLevels,
-		strikePrices: map[int]upgradeCostList{
-			DoubleStrike:    upgrade_data.GetStrikePrices(),
-			TripleStrike:    upgrade_data.GetStrikePrices(),
-			QuadrupleStrike: upgrade_data.GetStrikePrices(),
-			QuintupleStrike: upgrade_data.GetStrikePrices(),
-		},
+		strikeUpgrades:               strikeLevels,
+		strikePrices:                 upgrade_data.GetStrikePrices(),
 		giantLuckUpgrade:             giantLuckLevel,
 		giantLuckPrices:              upgrade_data.GetGiantLuckPrices(),
 		overclocks:                   ocConfig,
@@ -78,8 +73,8 @@ func (gc *GiantCalculator) GetNextUpgrade() string {
 }
 
 func (gc *GiantCalculator) CalculateUpgradePath() {
-	fmt.Println("----------------------------------")
-	fmt.Println("| x2 | x3 | x4 | x5 | giant luck |")
+	fmt.Println("------------------------------------------------------------")
+	fmt.Println("| x2 | x3 | x4 | x5 | giant |   chance/hit   | stone cost")
 	for {
 		if gc.findNextUpgrade() == NoChange {
 			return
@@ -94,12 +89,14 @@ func (gc *GiantCalculator) CalculateUpgradePath() {
 
 		fmt.Println(
 			fmt.Sprintf(
-				"|%03d |%03d |%03d |%03d |%03d         |",
+				"|%03d |%03d |%03d |%03d |%03d    | %.12f | %d",
 				gc.strikeUpgrades[DoubleStrike],
 				gc.strikeUpgrades[TripleStrike],
 				gc.strikeUpgrades[QuadrupleStrike],
 				gc.strikeUpgrades[QuintupleStrike],
 				gc.giantLuckUpgrade,
+				gc.calculateBaseGiantChance(0),
+				gc.GetUpgradeCost(),
 			),
 		)
 	}
@@ -157,6 +154,21 @@ func (gc *GiantCalculator) PrintProbabilityDistribution(duration time.Duration, 
 	fmt.Println(fmt.Sprintf("median of %d giants: %.12f%% chance of %d or fewer gians in %v", medianIndex, medianProbability*100, medianIndex, duration))
 }
 
+func (gc *GiantCalculator) GetUpgradeCost() int {
+	totalCost := 0
+	for _, level := range gc.strikeUpgrades {
+		for i := 1; i <= level; i++ {
+			totalCost += gc.strikePrices[i]
+		}
+	}
+
+	for i := 1; i <= gc.giantLuckUpgrade; i++ {
+		totalCost += gc.giantLuckPrices[i]
+	}
+
+	return totalCost
+}
+
 func (gc *GiantCalculator) findProbabilityBreakpoint(probabilityList map[int]float64, breakPoint float64) (int, float64) {
 	totalProbability := 0.0
 	maxIncludedIndex := 0
@@ -193,7 +205,7 @@ func (gc *GiantCalculator) findNextUpgrade() int {
 	for _, strike := range strikeChoices {
 		chanceGain := gc.calculateBaseGiantChance(strike) - currentGiantChance
 
-		upgradeCost := gc.strikePrices[strike][gc.strikeUpgrades[strike]+1]
+		upgradeCost := gc.strikePrices[gc.strikeUpgrades[strike]+1]
 		gain := chanceGain / float64(upgradeCost)
 		if gain > bestStrikeGain {
 			bestStrikeUpgrade = strike
@@ -205,7 +217,7 @@ func (gc *GiantCalculator) findNextUpgrade() int {
 		return bestStrikeUpgrade
 	}
 
-	giantLuckGain := gc.calculateBaseGiantChance(GiantLuck)
+	giantLuckGain := gc.calculateBaseGiantChance(GiantLuck) - currentGiantChance
 	upgradeCost := gc.giantLuckPrices[gc.giantLuckUpgrade+1]
 	gain := giantLuckGain / float64(upgradeCost)
 	if gain > bestStrikeGain {
@@ -237,16 +249,16 @@ func (gc *GiantCalculator) getRequiredFirstUpgrade() int {
 
 func (gc *GiantCalculator) listPossibleStrikeUpgrades() []int {
 	strikeChoices := make([]int, 0)
-	if gc.strikeUpgrades[DoubleStrike] < len(gc.strikePrices[DoubleStrike]) {
+	if gc.strikeUpgrades[DoubleStrike] < len(gc.strikePrices) {
 		strikeChoices = append(strikeChoices, DoubleStrike)
 	}
-	if gc.strikeUpgrades[TripleStrike] < len(gc.strikePrices[TripleStrike]) {
+	if gc.strikeUpgrades[TripleStrike] < len(gc.strikePrices) {
 		strikeChoices = append(strikeChoices, TripleStrike)
 	}
-	if gc.strikeUpgrades[QuadrupleStrike] < len(gc.strikePrices[QuadrupleStrike]) {
+	if gc.strikeUpgrades[QuadrupleStrike] < len(gc.strikePrices) {
 		strikeChoices = append(strikeChoices, QuadrupleStrike)
 	}
-	if gc.strikeUpgrades[QuintupleStrike] < len(gc.strikePrices[QuintupleStrike]) {
+	if gc.strikeUpgrades[QuintupleStrike] < len(gc.strikePrices) {
 		strikeChoices = append(strikeChoices, QuintupleStrike)
 	}
 

@@ -31,13 +31,13 @@ func main() {
 
 	giantCalc.PrintProbabilityDistribution(time.Hour*24, 1)
 
-	fullPlanCalculator := calculators.NewGiantCalculator(
-		calculators.NewOverclockConfig(false, false, false, false, false),
-		1,
-		1,
-		0.5,
-		map[int]int{2: 0, 3: 0, 4: 0, 5: 0},
-		0,
-	)
-	fullPlanCalculator.CalculateUpgradePath()
+	//fullPlanCalculator := calculators.NewGiantCalculator(
+	//	calculators.NewOverclockConfig(false, false, false, false, false),
+	//	1,
+	//	1,
+	//	0.5,
+	//	map[int]int{2: 0, 3: 0, 4: 0, 5: 0},
+	//	0,
+	//)
+	//fullPlanCalculator.CalculateUpgradePath()
 }
