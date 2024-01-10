@@ -24,6 +24,12 @@ func TestBinomialProbability(t *testing.T) {
 
 	rounded = fmt.Sprintf("%.4f", BinomialProbability(5, 3, .75))
 	assert.Equal(t, "0.2637", rounded)
+
+	rounded = fmt.Sprintf("%.3f", BinomialProbability(10, 7, 0.6))
+	assert.Equal(t, "0.215", rounded)
+
+	rounded = fmt.Sprintf("%.3f", BinomialProbability(9, 6, 0.8))
+	assert.Equal(t, "0.176", rounded)
 }
 
 func TestFactorial(t *testing.T) {
