@@ -74,7 +74,7 @@ func (gc *GiantCalculator) GetNextUpgrade() string {
 
 func (gc *GiantCalculator) CalculateUpgradePath() {
 	fmt.Println("------------------------------------------------------------")
-	fmt.Println("| x2 | x3 | x4 | x5 | giant |   chance/hit   | stone cost")
+	fmt.Println("| x2 | x3 | x4 | x5 | giant |    chance/hit   | stone cost")
 	for {
 		if gc.findNextUpgrade() == NoChange {
 			return
@@ -89,13 +89,13 @@ func (gc *GiantCalculator) CalculateUpgradePath() {
 
 		fmt.Println(
 			fmt.Sprintf(
-				"|%03d |%03d |%03d |%03d |%03d    | %.12f | %d",
+				"|%03d |%03d |%03d |%03d |%03d    | %.12f%% | %d",
 				gc.strikeUpgrades[DoubleStrike],
 				gc.strikeUpgrades[TripleStrike],
 				gc.strikeUpgrades[QuadrupleStrike],
 				gc.strikeUpgrades[QuintupleStrike],
 				gc.giantLuckUpgrade,
-				gc.calculateBaseGiantChance(0),
+				gc.calculateBaseGiantChance(0)*100,
 				gc.GetUpgradeCost(),
 			),
 		)
