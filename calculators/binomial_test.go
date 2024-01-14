@@ -30,6 +30,9 @@ func TestBinomialProbability(t *testing.T) {
 
 	rounded = fmt.Sprintf("%.3f", BinomialProbability(9, 6, 0.8))
 	assert.Equal(t, "0.176", rounded)
+
+	rounded = fmt.Sprintf("%.6f", BinomialProbability(1000, 500, 0.5))
+	assert.Equal(t, "0.025225", rounded)
 }
 
 func TestFactorial(t *testing.T) {
