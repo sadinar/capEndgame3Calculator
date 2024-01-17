@@ -173,6 +173,10 @@ func (gc *GiantCalculator) GetUpgradeCost() int {
 }
 
 func (gc *GiantCalculator) findProbabilityBreakpoint(probabilityList map[int]float64, breakPoint float64) (int, float64) {
+	if probabilityList[0] >= 0.5 {
+		return 0, probabilityList[0]
+	}
+
 	totalProbability := 0.0
 	maxIncludedIndex := 0
 
