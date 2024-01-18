@@ -104,14 +104,14 @@ func (sc *Stones) calculateMinedStones(period time.Duration) int {
 		return 0
 	}
 
-	eggModifier := 1.0
+	stonesPerStrike := 1.0
 	for i := 2; i <= sc.eggLevel; i++ {
-		eggModifier += PerLevelEggModifier
+		stonesPerStrike += PerLevelEggModifier
 	}
 
-	strikeModifier := sc.pickModifier * eggModifier
+	stoneModifier := sc.pickModifier
 	if sc.stonesOverclocked {
-		strikeModifier *= 1.5
+		stoneModifier *= 1.5
 	}
 
 	regularStrikes := 0.0
@@ -136,11 +136,11 @@ func (sc *Stones) calculateMinedStones(period time.Duration) int {
 	x5Strikes := x4Strikes * sc.x5Strike
 	x4Strikes -= x5Strikes
 
-	stones := regularStrikes * strikeModifier
-	stones += x2Strikes * strikeModifier * 2
-	stones += x3Strikes * strikeModifier * 3
-	stones += x4Strikes * strikeModifier * 4
-	stones += x5Strikes * strikeModifier * 5
+	stones := regularStrikes * stonesPerStrike * stoneModifier
+	stones += x2Strikes * stonesPerStrike * stoneModifier * 2
+	stones += x3Strikes * stonesPerStrike * stoneModifier * 3
+	stones += x4Strikes * stonesPerStrike * stoneModifier * 4
+	stones += x5Strikes * stonesPerStrike * stoneModifier * 5
 
 	return int(stones)
 }
