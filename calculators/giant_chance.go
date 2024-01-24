@@ -20,17 +20,6 @@ const giantLuckOverclock = 1.5
 
 type upgradeCostList map[int]int
 type strikeUpgrades map[int]int
-type OverclockConfig map[int]bool
-
-func NewOverclockConfig(x2, x3, x4, x5, giant bool) OverclockConfig {
-	return OverclockConfig{
-		DoubleStrike:    x2,
-		TripleStrike:    x3,
-		QuadrupleStrike: x4,
-		QuintupleStrike: x5,
-		GiantLuck:       giant,
-	}
-}
 
 type GiantCalculator struct {
 	strikeUpgrades               strikeUpgrades
@@ -41,25 +30,20 @@ type GiantCalculator struct {
 	achievementGiantLuckModifier float64
 	runeGiantLuckModifier        float64
 	mineSpeed                    float64
+	firstStrike                  float64
 }
 
-func NewGiantCalculator(ocConfig OverclockConfig, achievementModifier, runeModifier, mineSpeed float64, strikeLevels strikeUpgrades, giantLuckLevel int) GiantCalculator {
-	if achievementModifier < 1 {
-		achievementModifier = 1
-	}
-	if runeModifier < 1 {
-		runeModifier = 1
-	}
-
+func NewGiantCalculator(ocConfig OverclockConfig, um UserModifiers) GiantCalculator {
 	return GiantCalculator{
-		strikeUpgrades:               strikeLevels,
+		strikeUpgrades:               um.StrikeUpgrades,
 		strikePrices:                 upgrade_data.GetStrikePrices(),
-		giantLuckUpgrade:             giantLuckLevel,
+		giantLuckUpgrade:             um.GiantLuckLevel,
 		giantLuckPrices:              upgrade_data.GetGiantLuckPrices(),
 		overclocks:                   ocConfig,
-		achievementGiantLuckModifier: achievementModifier,
-		runeGiantLuckModifier:        runeModifier,
-		mineSpeed:                    mineSpeed,
+		achievementGiantLuckModifier: um.GiantLuckAchievementModifier,
+		runeGiantLuckModifier:        um.GiantLuckRuneModifier,
+		mineSpeed:                    um.MineSpeed,
+		firstStrike:                  um.FirstStrike,
 	}
 }
 
@@ -68,7 +52,7 @@ func (gc *GiantCalculator) GetNextUpgrade() string {
 	if nextUpgrade == GiantLuck {
 		return "giant luck"
 	} else {
-		return fmt.Sprintf("upgrade x%d strike", nextUpgrade)
+		return fmt.Sprintf("x%d strike", nextUpgrade)
 	}
 }
 
@@ -102,7 +86,7 @@ func (gc *GiantCalculator) CalculateUpgradePath() {
 	}
 }
 
-func (gc *GiantCalculator) CalculateChancePerSTrike(firstStrikeChance float64) float64 {
+func (gc *GiantCalculator) CalculateChancePerStrike() float64 {
 	chance := gc.calculateBaseGiantChance(0)
 
 	if gc.overclocks[DoubleStrike] {
@@ -123,21 +107,16 @@ func (gc *GiantCalculator) CalculateChancePerSTrike(firstStrikeChance float64) f
 
 	chance *= gc.achievementGiantLuckModifier
 	chance *= gc.runeGiantLuckModifier
-	chance *= firstStrikeChance
+	chance *= gc.firstStrike
 
 	return chance
 }
 
-func (gc *GiantCalculator) PrintProbabilityDistribution(duration time.Duration, firstStrikeChance float64) {
+func (gc *GiantCalculator) PrintProbabilityDistribution(duration time.Duration) {
 	dailyAttempts := gc.getEggsMined(duration)
-	successProbability := gc.CalculateChancePerSTrike(firstStrikeChance)
+	successProbability := gc.CalculateChancePerStrike()
 	successCount, consumedProbabilitySpace := FindReasonableSuccessCeiling(dailyAttempts, successProbability)
-
-	probabilityList := make(map[int]float64, 0)
-	for i := 0; i <= int(successCount); i++ {
-		chance := BinomialProbability(dailyAttempts, uint64(i), successProbability)
-		probabilityList[i] = chance
-	}
+	probabilityList := gc.getProbabilityList(successCount, dailyAttempts, successProbability)
 
 	fmt.Println(fmt.Sprintf("0: %.12f%%", probabilityList[0]*100))
 	lowIndex, lowProbability := gc.findProbabilityBreakpoint(probabilityList, 0.05)
@@ -152,6 +131,13 @@ func (gc *GiantCalculator) PrintProbabilityDistribution(duration time.Duration, 
 		fmt.Println(fmt.Sprintf("%d: %.12f%%", i, probabilityList[i]*100))
 	}
 	fmt.Println(fmt.Sprintf("%d+: %.12f%%", len(probabilityList), (1-consumedProbabilitySpace)*100))
+}
+
+func (gc *GiantCalculator) PrintProbabilityMedian(duration time.Duration) {
+	dailyAttempts := gc.getEggsMined(duration)
+	successProbability := gc.CalculateChancePerStrike()
+	successCount, _ := FindReasonableSuccessCeiling(dailyAttempts, successProbability)
+	probabilityList := gc.getProbabilityList(successCount, dailyAttempts, successProbability)
 
 	medianIndex, medianProbability := gc.findProbabilityBreakpoint(probabilityList, 0.5)
 	fmt.Println(fmt.Sprintf("median of %d giants: %.12f%% chance of %d or fewer gians in %v", medianIndex, medianProbability*100, medianIndex, duration))
@@ -293,4 +279,14 @@ func (gc *GiantCalculator) calculateBaseGiantChance(incrementedChance int) float
 	}
 
 	return doubleChance * tripleChance * quadrupleChance * quintupleChance * giantLuckChance
+}
+
+func (gc *GiantCalculator) getProbabilityList(successCount, trials uint64, successProbability float64) map[int]float64 {
+	probabilityList := make(map[int]float64, 0)
+	for i := 0; i <= int(successCount); i++ {
+		chance := BinomialProbability(trials, uint64(i), successProbability)
+		probabilityList[i] = chance
+	}
+
+	return probabilityList
 }

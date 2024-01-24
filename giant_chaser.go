@@ -7,11 +7,12 @@ import (
 )
 
 func main() {
-	giantCalc := calculators.NewGiantCalculator(
-		calculators.NewOverclockConfig(false, true, true, true, true),
+	ocConfig := calculators.NewOverclockConfig(true, false, false, true, true, false)
+	userMods := calculators.NewUserModifiers(
 		1.09,
 		1.2,
 		0.65,
+		1,
 		map[int]int{
 			2: 74,
 			3: 73,
@@ -20,31 +21,18 @@ func main() {
 		},
 		70,
 	)
-	//fmt.Println(
-	//	fmt.Sprintf(
-	//		"current chance per strike: %.10f%%",
-	//		giantCalc.CalculateChancePerSTrike(1.0)*100,
-	//	),
-	//)
-	//
-	//fmt.Println("next upgrade should be", giantCalc.GetNextUpgrade())
-	//
-	giantCalc.PrintProbabilityDistribution(time.Hour*24, 1)
-	//
-	//giantCalc.CalculateUpgradePath()
 
-	//fullPlanCalculator := calculators.NewGiantCalculator(
-	//	calculators.NewOverclockConfig(false, false, false, false, false),
-	//	1,
-	//	1,
-	//	0.5,
-	//	map[int]int{2: 0, 3: 0, 4: 0, 5: 0},
-	//	0,
-	//)
-	//fullPlanCalculator.CalculateUpgradePath()
+	giantCalc := calculators.NewGiantCalculator(ocConfig, userMods)
+	fmt.Println("next giant chance upgrade should be", giantCalc.GetNextUpgrade())
+	giantCalc.PrintProbabilityMedian(time.Hour * 24)
 
-	sc := calculators.NewStonesCalculator(1, .1825, .1825, .1825, .1825, .65, calculators.QuartzPick, 0.43, calculators.LegendaryEgg, false, false, true, true, true)
-	//sc := calculators.NewStonesCalculator(1, calculators.RubyPick, 0.40, calculators.MythicEgg, true)
-	//sc := calculators.NewStonesCalculator(.6, calculators.AmethystPick, 0.45, calculators.UncommonEgg, true)
-	fmt.Println(sc.CalculateStones(time.Hour * 24))
+	sc := calculators.NewStonesCalculator(
+		userMods,
+		calculators.RubyPick,
+		0.43,
+		calculators.MythicEgg,
+		ocConfig,
+	)
+	duration := time.Hour * 24
+	fmt.Println(fmt.Sprintf("%d stones gained in %v", sc.CalculateCombinedStones(duration), duration))
 }

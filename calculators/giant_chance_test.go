@@ -95,32 +95,35 @@ func TestFindNextUpgrade(t *testing.T) {
 
 func TestGetNextUpgrade(t *testing.T) {
 	gc := NewGiantCalculator(
-		NewOverclockConfig(false, false, false, false, false),
-		1.0,
-		1.0,
-		0.5,
-		map[int]int{
-			2: 0,
-			3: 0,
-			4: 0,
-			5: 0,
-		},
-		0,
+		NewOverclockConfig(false, false, false, false, false, false),
+		NewUserModifiers(
+			1.0,
+			1.0,
+			0.5,
+			1,
+			map[int]int{
+				2: 0,
+				3: 0,
+				4: 0,
+				5: 0,
+			},
+			0,
+		),
 	)
 	nu := gc.GetNextUpgrade()
-	assert.Equal(t, "upgrade x2 strike", nu)
+	assert.Equal(t, "x2 strike", nu)
 
 	gc.strikeUpgrades[DoubleStrike] = 1
 	nu = gc.GetNextUpgrade()
-	assert.Equal(t, "upgrade x3 strike", nu)
+	assert.Equal(t, "x3 strike", nu)
 
 	gc.strikeUpgrades[TripleStrike] = 1
 	nu = gc.GetNextUpgrade()
-	assert.Equal(t, "upgrade x4 strike", nu)
+	assert.Equal(t, "x4 strike", nu)
 
 	gc.strikeUpgrades[QuadrupleStrike] = 1
 	nu = gc.GetNextUpgrade()
-	assert.Equal(t, "upgrade x5 strike", nu)
+	assert.Equal(t, "x5 strike", nu)
 
 	gc.strikeUpgrades[QuintupleStrike] = 1
 	nu = gc.GetNextUpgrade()
@@ -139,7 +142,7 @@ func TestGetNextUpgrade(t *testing.T) {
 
 	gc.giantLuckUpgrade = 60
 	nu = gc.GetNextUpgrade()
-	assert.Equal(t, "upgrade x2 strike", nu)
+	assert.Equal(t, "x2 strike", nu)
 }
 
 func getCalculatorWithDummyPrices() GiantCalculator {

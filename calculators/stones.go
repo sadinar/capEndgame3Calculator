@@ -1,6 +1,8 @@
 package calculators
 
 import (
+	"capEndgame3Calculator/upgrade_data"
+	"fmt"
 	"time"
 )
 
@@ -14,7 +16,7 @@ const TopazPick = 1.4
 const QuartzPick = 1.5
 const DiamondPick = 1.75
 const RubyPick = 2.0
-const PerLevelEggModifier = 0.5
+const PerLevelEggModifier = 0.45
 const StoneOverclockModifier = 1.5
 const CommonEgg = 1
 const UncommonEgg = 2
@@ -38,47 +40,47 @@ type Stones struct {
 	stonesOverclocked bool
 }
 
-func NewStonesCalculator(firstStrike, x2Strike, x3Strike, x4Strike, x5Strike, mineSpeed, pickModifier, eggLuck float64, eggLevel int, stonesOverclocked, x2Overclocked, x3Overclocked, x4Overclocked, x5Overclocked bool) Stones {
+func NewStonesCalculator(um UserModifiers, pickModifier, eggLuck float64, eggLevel int, ocConfig OverclockConfig) Stones {
 	sc := Stones{
-		firstStrike:       firstStrike,
-		x2Strike:          x2Strike,
-		x3Strike:          x3Strike,
-		x4Strike:          x4Strike,
-		x5Strike:          x5Strike,
-		mineSpeed:         mineSpeed,
+		firstStrike:       um.FirstStrike,
+		x2Strike:          float64(um.StrikeUpgrades[DoubleStrike]) * upgrade_data.PerStepStrikeImprovement,
+		x3Strike:          float64(um.StrikeUpgrades[TripleStrike]) * upgrade_data.PerStepStrikeImprovement,
+		x4Strike:          float64(um.StrikeUpgrades[QuadrupleStrike]) * upgrade_data.PerStepStrikeImprovement,
+		x5Strike:          float64(um.StrikeUpgrades[QuintupleStrike]) * upgrade_data.PerStepStrikeImprovement,
+		mineSpeed:         um.MineSpeed,
 		pickModifier:      pickModifier,
 		eggLuck:           eggLuck,
 		eggLevel:          eggLevel,
-		stonesOverclocked: stonesOverclocked,
+		stonesOverclocked: ocConfig[StoneOverclockIndex],
 	}
 
-	if x5Overclocked {
+	if ocConfig[QuintupleStrike] {
 		sc.x5Strike *= 2
 	}
 
-	if x4Overclocked {
+	if ocConfig[QuadrupleStrike] {
 		sc.x4Strike *= 1.8
 	}
 
-	if x3Overclocked {
+	if ocConfig[TripleStrike] {
 		sc.x3Strike *= 1.6
 	}
 
-	if x2Overclocked {
+	if ocConfig[DoubleStrike] {
 		sc.x2Strike *= 1.4
 	}
 
 	return sc
 }
 
-func (sc *Stones) CalculateStones(period time.Duration) int {
-	generatedStones := sc.calculateGeneratedStones(period)
-	minedStones := sc.calculateMinedStones(period)
+func (sc *Stones) CalculateCombinedStones(period time.Duration) int {
+	generatedStones := sc.CalculateGeneratedStones(period)
+	minedStones := sc.CalculateMinedStones(period)
 
 	return generatedStones + minedStones
 }
 
-func (sc *Stones) calculateGeneratedStones(period time.Duration) int {
+func (sc *Stones) CalculateGeneratedStones(period time.Duration) int {
 	if period < time.Second {
 		return 0
 	}
@@ -93,13 +95,21 @@ func (sc *Stones) calculateGeneratedStones(period time.Duration) int {
 		totalEggs = eggsPerSecond * 60 * 60 * period.Hours()
 	}
 
+	shinyLuck := 1.0 / 1000 * 1.1 * 1.1 * 1.2 * 3.7 * 4.5
 	directMythics := sc.eggLuck * totalEggs
+	totalAscended := totalEggs - directMythics
+	ascDmgMult := totalAscended / 6.0 / 1000.0 * shinyLuck
 	fusedMythics := (totalEggs - directMythics) / 3
+	totalMythics := directMythics + fusedMythics
+	mythDmgMult := totalMythics / 6.0 / 1000.0 * shinyLuck
 
-	return int(directMythics) + int(fusedMythics)*MaxCalcify
+	fmt.Println(fmt.Sprintf("ascended generated: %d ascended dmg multiplier gained: x%.5f (+%d dmg)", int(totalAscended), ascDmgMult, int(1950*ascDmgMult)))
+	fmt.Println(fmt.Sprintf("mythic generated: %d mythic dmg multiplier gained: x%.5f (+%d dmg)", int(totalMythics), mythDmgMult, int(2000*mythDmgMult)))
+
+	return int(totalMythics) * MaxCalcify
 }
 
-func (sc *Stones) calculateMinedStones(period time.Duration) int {
+func (sc *Stones) CalculateMinedStones(period time.Duration) int {
 	if period < time.Second {
 		return 0
 	}
@@ -107,11 +117,6 @@ func (sc *Stones) calculateMinedStones(period time.Duration) int {
 	stonesPerStrike := 1.0
 	for i := 2; i <= sc.eggLevel; i++ {
 		stonesPerStrike += PerLevelEggModifier
-	}
-
-	stoneModifier := sc.pickModifier
-	if sc.stonesOverclocked {
-		stoneModifier *= 1.5
 	}
 
 	regularStrikes := 0.0
@@ -136,11 +141,15 @@ func (sc *Stones) calculateMinedStones(period time.Duration) int {
 	x5Strikes := x4Strikes * sc.x5Strike
 	x4Strikes -= x5Strikes
 
-	stones := regularStrikes * stonesPerStrike * stoneModifier
-	stones += x2Strikes * stonesPerStrike * stoneModifier * 2
-	stones += x3Strikes * stonesPerStrike * stoneModifier * 3
-	stones += x4Strikes * stonesPerStrike * stoneModifier * 4
-	stones += x5Strikes * stonesPerStrike * stoneModifier * 5
+	stones := regularStrikes * stonesPerStrike * sc.pickModifier
+	stones += x2Strikes * stonesPerStrike * sc.pickModifier * 2
+	stones += x3Strikes * stonesPerStrike * sc.pickModifier * 3
+	stones += x4Strikes * stonesPerStrike * sc.pickModifier * 4
+	stones += x5Strikes * stonesPerStrike * sc.pickModifier * 5
+
+	if sc.stonesOverclocked {
+		return int(stones * 1.5)
+	}
 
 	return int(stones)
 }
