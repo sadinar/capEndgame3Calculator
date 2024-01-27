@@ -11,7 +11,7 @@ func main() {
 	userMods := calculators.NewUserModifiers(
 		1.1,
 		1.2,
-		0.66,
+		0.67,
 		1,
 		map[int]int{
 			2: 74,
