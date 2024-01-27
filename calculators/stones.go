@@ -16,7 +16,7 @@ const TopazPick = 1.4
 const QuartzPick = 1.5
 const DiamondPick = 1.75
 const RubyPick = 2.0
-const PerLevelEggModifier = 0.45
+const PerLevelEggModifier = 0.40
 const StoneOverclockModifier = 1.5
 const CommonEgg = 1
 const UncommonEgg = 2
@@ -87,19 +87,13 @@ func (sc *Stones) CalculateGeneratedStones(period time.Duration) int {
 
 	totalEggs := 0.0
 	eggsPerSecond := MaxGenSpeed
-	if period < time.Minute {
-		totalEggs = eggsPerSecond * period.Seconds()
-	} else if period < time.Hour {
-		totalEggs = eggsPerSecond * 60 * period.Minutes()
-	} else {
-		totalEggs = eggsPerSecond * 60 * 60 * period.Hours()
-	}
+	totalEggs = eggsPerSecond * period.Seconds()
 
-	shinyLuck := 1.0 / 1000 * 1.1 * 1.1 * 1.2 * 3.7 * 4.5
+	shinyLuck := 1.0 / 1000 * 1.1 * 1.1 * 1.2 * 4.2 * 5.2
 	directMythics := sc.eggLuck * totalEggs
 	totalAscended := totalEggs - directMythics
 	ascDmgMult := totalAscended / 6.0 / 1000.0 * shinyLuck
-	fusedMythics := (totalEggs - directMythics) / 3
+	fusedMythics := totalAscended / 3
 	totalMythics := directMythics + fusedMythics
 	mythDmgMult := totalMythics / 6.0 / 1000.0 * shinyLuck
 
@@ -120,13 +114,7 @@ func (sc *Stones) CalculateMinedStones(period time.Duration) int {
 	}
 
 	regularStrikes := 0.0
-	if period < time.Minute {
-		regularStrikes = sc.mineSpeed * period.Seconds()
-	} else if period < time.Hour {
-		regularStrikes = sc.mineSpeed * 60 * period.Minutes()
-	} else {
-		regularStrikes = sc.mineSpeed * 60 * 60 * period.Hours()
-	}
+	regularStrikes = sc.mineSpeed * period.Seconds()
 	regularStrikes *= sc.firstStrike
 
 	x2Strikes := regularStrikes * sc.x2Strike

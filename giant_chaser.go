@@ -7,11 +7,11 @@ import (
 )
 
 func main() {
-	ocConfig := calculators.NewOverclockConfig(true, false, false, true, true, false)
+	ocConfig := calculators.NewOverclockConfig(true, false, true, true, true, true)
 	userMods := calculators.NewUserModifiers(
-		1.09,
+		1.1,
 		1.2,
-		0.65,
+		0.66,
 		1,
 		map[int]int{
 			2: 74,
@@ -21,10 +21,11 @@ func main() {
 		},
 		70,
 	)
+	duration := time.Hour * 24
 
 	giantCalc := calculators.NewGiantCalculator(ocConfig, userMods)
 	fmt.Println("next giant chance upgrade should be", giantCalc.GetNextUpgrade())
-	giantCalc.PrintProbabilityMedian(time.Hour * 24)
+	giantCalc.PrintProbabilityMedian(duration)
 
 	sc := calculators.NewStonesCalculator(
 		userMods,
@@ -33,6 +34,5 @@ func main() {
 		calculators.MythicEgg,
 		ocConfig,
 	)
-	duration := time.Hour * 24
 	fmt.Println(fmt.Sprintf("%d stones gained in %v", sc.CalculateCombinedStones(duration), duration))
 }
