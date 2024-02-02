@@ -16,7 +16,7 @@ const TopazPick = 1.4
 const QuartzPick = 1.5
 const DiamondPick = 1.75
 const RubyPick = 2.0
-const PerLevelEggModifier = 0.40
+const PerLevelEggModifier = 0.50
 const StoneOverclockModifier = 1.5
 const CommonEgg = 1
 const UncommonEgg = 2
@@ -25,7 +25,7 @@ const EpicEgg = 4
 const LegendaryEgg = 5
 const ProdigiousEgg = 6
 const AscendedEgg = 7
-const MythicEgg = 9
+const MythicEgg = 8
 
 type Stones struct {
 	firstStrike       float64
@@ -73,11 +73,8 @@ func NewStonesCalculator(um UserModifiers, pickModifier, eggLuck float64, eggLev
 	return sc
 }
 
-func (sc *Stones) CalculateCombinedStones(period time.Duration) int {
-	generatedStones := sc.CalculateGeneratedStones(period)
-	minedStones := sc.CalculateMinedStones(period)
-
-	return generatedStones + minedStones
+func (sc *Stones) CalculateCombinedStones(period time.Duration) (generatedStones, minedStones int) {
+	return sc.CalculateGeneratedStones(period), sc.CalculateMinedStones(period)
 }
 
 func (sc *Stones) CalculateGeneratedStones(period time.Duration) int {

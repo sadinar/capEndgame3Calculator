@@ -7,17 +7,17 @@ import (
 )
 
 func main() {
-	ocConfig := calculators.NewOverclockConfig(true, false, true, true, true, true)
+	ocConfig := calculators.NewOverclockConfig(true, true, false, true, true, true)
 	userMods := calculators.NewUserModifiers(
 		1.1,
 		1.2,
-		0.69,
+		0.71,
 		1,
 		map[int]int{
 			2: 74,
-			3: 73,
-			4: 73,
-			5: 73,
+			3: 74,
+			4: 74,
+			5: 74,
 		},
 		70,
 	)
@@ -34,5 +34,6 @@ func main() {
 		calculators.MythicEgg,
 		ocConfig,
 	)
-	fmt.Println(fmt.Sprintf("%d stones gained in %v", sc.CalculateCombinedStones(duration), duration))
+	gennedStones, minedStones := sc.CalculateCombinedStones(duration)
+	fmt.Println(fmt.Sprintf("%d stones (%d genned and %d mined) gained in %v", gennedStones+minedStones, gennedStones, minedStones, duration))
 }
