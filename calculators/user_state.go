@@ -34,3 +34,28 @@ func NewUserModifiers(giantLuckAchievementModifier, giantLuckRuneModifier, mineS
 		GiantLuckLevel:               giantLuckLevel,
 	}
 }
+
+type ShinyModifiers struct {
+	shinyAchievement      float64
+	shinyGiantAchievement float64
+	rune                  float64
+	wall                  float64
+	petScoreModifier      float64
+	prismaticShine        float64
+}
+
+func NewShinyModifiers(shinyAchievement, shinyGiantAchievement, rune, wall, prismaticShine float64, petScore int) ShinyModifiers {
+	petScoreModifier := float64(petScore)/float64(10000000) + 1
+	return ShinyModifiers{
+		shinyAchievement:      shinyAchievement,
+		shinyGiantAchievement: shinyGiantAchievement,
+		rune:                  rune,
+		wall:                  wall,
+		petScoreModifier:      petScoreModifier,
+		prismaticShine:        prismaticShine,
+	}
+}
+
+func (sm ShinyModifiers) CalculateShinyOdds() float64 {
+	return sm.shinyGiantAchievement * sm.shinyGiantAchievement * sm.rune * sm.wall * sm.petScoreModifier * sm.prismaticShine / 1000
+}

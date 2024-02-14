@@ -3,6 +3,8 @@ package calculators
 import (
 	"capEndgame3Calculator/upgrade_data"
 	"fmt"
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 	"time"
 )
 
@@ -38,6 +40,8 @@ type Stones struct {
 	eggLuck           float64
 	eggLevel          int
 	stonesOverclocked bool
+	userModifiers     UserModifiers
+	printer           *message.Printer
 }
 
 func NewStonesCalculator(um UserModifiers, pickModifier, eggLuck float64, eggLevel int, ocConfig OverclockConfig) Stones {
@@ -52,6 +56,8 @@ func NewStonesCalculator(um UserModifiers, pickModifier, eggLuck float64, eggLev
 		eggLuck:           eggLuck,
 		eggLevel:          eggLevel,
 		stonesOverclocked: ocConfig[StoneOverclockIndex],
+		userModifiers:     um,
+		printer:           message.NewPrinter(language.English),
 	}
 
 	if ocConfig[QuintupleStrike] {
@@ -86,18 +92,46 @@ func (sc *Stones) CalculateGeneratedStones(period time.Duration) int {
 	eggsPerSecond := MaxGenSpeed
 	totalEggs = eggsPerSecond * period.Seconds()
 
-	shinyLuck := 1.0 / 1000 * 1.1 * 1.1 * 1.2 * 4.2 * 5.2
 	directMythics := sc.eggLuck * totalEggs
 	totalAscended := totalEggs - directMythics
-	ascDmgMult := totalAscended / 6.0 / 1000.0 * shinyLuck
 	fusedMythics := totalAscended / 3
 	totalMythics := directMythics + fusedMythics
-	mythDmgMult := totalMythics / 6.0 / 1000.0 * shinyLuck
-
-	fmt.Println(fmt.Sprintf("ascended generated: %d ascended dmg multiplier gained: x%.5f (+%d dmg)", int(totalAscended), ascDmgMult, int(1950*ascDmgMult)))
-	fmt.Println(fmt.Sprintf("mythic generated: %d mythic dmg multiplier gained: x%.5f (+%d dmg)", int(totalMythics), mythDmgMult, int(2000*mythDmgMult)))
 
 	return int(totalMythics) * MaxCalcify
+}
+
+func (sc *Stones) PrintDamageChange(period time.Duration, sMods ShinyModifiers) {
+	if period < time.Second {
+		return
+	}
+
+	totalEggs := 0.0
+	eggsPerSecond := MaxGenSpeed
+	totalEggs = eggsPerSecond * period.Seconds()
+
+	directMythics := sc.eggLuck * totalEggs
+	totalAscended := totalEggs - directMythics
+	ascDmgMultiplier := totalAscended / 6.0 / 1000.0 * sMods.CalculateShinyOdds()
+	fusedMythics := totalAscended / 3
+	totalMythics := directMythics + fusedMythics
+	mythDmgMultiplier := totalMythics / 6.0 / 1000.0 * sMods.CalculateShinyOdds()
+
+	fmt.Println(
+		sc.printer.Sprintf(
+			"ascended generated: %d ascended dmg multiplier gained: x%.5f (+%d dmg)",
+			int(totalAscended),
+			ascDmgMultiplier,
+			int(1950*ascDmgMultiplier),
+		),
+	)
+	fmt.Println(
+		sc.printer.Sprintf(
+			"mythic generated: %d mythic dmg multiplier gained: x%.5f (+%d dmg)",
+			int(totalMythics),
+			mythDmgMultiplier,
+			int(2000*mythDmgMultiplier),
+		),
+	)
 }
 
 func (sc *Stones) CalculateMinedStones(period time.Duration) int {
@@ -137,4 +171,78 @@ func (sc *Stones) CalculateMinedStones(period time.Duration) int {
 	}
 
 	return int(stones)
+}
+
+func (sc *Stones) FindNextUpgrade(speedCost int) string {
+	bestStrike := 0
+	bestCostMargin := 0.0
+	testDuration := time.Hour * 24
+
+	for i := DoubleStrike; i <= QuintupleStrike; i++ {
+		margin := sc.calculateStrikeImprovementMargin(i, testDuration)
+		if margin > bestCostMargin {
+			bestStrike = i
+			bestCostMargin = margin
+		}
+	}
+
+	margin := sc.calculateSpeedImprovementMargin(speedCost, testDuration)
+	if margin > bestCostMargin {
+		return "speed"
+	}
+
+	return fmt.Sprintf("x%d strike", bestStrike)
+}
+
+func (sc *Stones) calculateStrikeImprovementMargin(strikeType int, period time.Duration) float64 {
+	strikeLevel := sc.userModifiers.StrikeUpgrades[strikeType] + 1
+	strikeCosts := upgrade_data.GetStrikePrices()
+
+	upgradeCalculator := Stones{
+		x2Strike:     float64(sc.userModifiers.StrikeUpgrades[DoubleStrike]) * upgrade_data.PerStepStrikeImprovement,
+		x3Strike:     float64(sc.userModifiers.StrikeUpgrades[TripleStrike]) * upgrade_data.PerStepStrikeImprovement,
+		x4Strike:     float64(sc.userModifiers.StrikeUpgrades[QuadrupleStrike]) * upgrade_data.PerStepStrikeImprovement,
+		x5Strike:     float64(sc.userModifiers.StrikeUpgrades[QuintupleStrike]) * upgrade_data.PerStepStrikeImprovement,
+		eggLuck:      sc.eggLuck,
+		eggLevel:     MythicEgg,
+		mineSpeed:    sc.userModifiers.MineSpeed,
+		firstStrike:  1,
+		pickModifier: RubyPick,
+	}
+	baselineStones := upgradeCalculator.CalculateMinedStones(period)
+
+	switch strikeType {
+	case DoubleStrike:
+		upgradeCalculator.x2Strike += upgrade_data.PerStepStrikeImprovement
+	case TripleStrike:
+		upgradeCalculator.x3Strike += upgrade_data.PerStepStrikeImprovement
+	case QuadrupleStrike:
+		upgradeCalculator.x4Strike += upgrade_data.PerStepStrikeImprovement
+	case QuintupleStrike:
+		upgradeCalculator.x5Strike += upgrade_data.PerStepStrikeImprovement
+	}
+
+	postUpgradeStones := upgradeCalculator.CalculateMinedStones(period)
+	upgradeCost := strikeCosts[strikeLevel]
+	return float64(postUpgradeStones-baselineStones) / float64(upgradeCost)
+}
+
+func (sc *Stones) calculateSpeedImprovementMargin(upgradeCost int, period time.Duration) float64 {
+	upgradeCalculator := Stones{
+		x2Strike:     float64(sc.userModifiers.StrikeUpgrades[DoubleStrike]) * upgrade_data.PerStepStrikeImprovement,
+		x3Strike:     float64(sc.userModifiers.StrikeUpgrades[TripleStrike]) * upgrade_data.PerStepStrikeImprovement,
+		x4Strike:     float64(sc.userModifiers.StrikeUpgrades[QuadrupleStrike]) * upgrade_data.PerStepStrikeImprovement,
+		x5Strike:     float64(sc.userModifiers.StrikeUpgrades[QuintupleStrike]) * upgrade_data.PerStepStrikeImprovement,
+		eggLuck:      sc.eggLuck,
+		eggLevel:     MythicEgg,
+		mineSpeed:    sc.userModifiers.MineSpeed,
+		firstStrike:  1,
+		pickModifier: RubyPick,
+	}
+
+	baselineStones := upgradeCalculator.CalculateMinedStones(period)
+	upgradeCalculator.mineSpeed += 0.1
+	postUpgradeStones := upgradeCalculator.CalculateMinedStones(period)
+
+	return float64(postUpgradeStones-baselineStones) / float64(upgradeCost)
 }

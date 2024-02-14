@@ -3,6 +3,8 @@ package calculators
 import (
 	"capEndgame3Calculator/upgrade_data"
 	"fmt"
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 	"time"
 )
 
@@ -31,6 +33,7 @@ type GiantCalculator struct {
 	runeGiantLuckModifier        float64
 	mineSpeed                    float64
 	firstStrike                  float64
+	printer                      *message.Printer
 }
 
 func NewGiantCalculator(ocConfig OverclockConfig, um UserModifiers) GiantCalculator {
@@ -44,6 +47,7 @@ func NewGiantCalculator(ocConfig OverclockConfig, um UserModifiers) GiantCalcula
 		runeGiantLuckModifier:        um.GiantLuckRuneModifier,
 		mineSpeed:                    um.MineSpeed,
 		firstStrike:                  um.FirstStrike,
+		printer:                      message.NewPrinter(language.English),
 	}
 }
 
@@ -133,14 +137,23 @@ func (gc *GiantCalculator) PrintProbabilityDistribution(duration time.Duration) 
 	fmt.Println(fmt.Sprintf("%d+: %.12f%%", len(probabilityList), (1-consumedProbabilitySpace)*100))
 }
 
-func (gc *GiantCalculator) PrintProbabilityMedian(duration time.Duration) {
+func (gc *GiantCalculator) PrintProbabilityMedian(duration time.Duration, sMods ShinyModifiers) {
 	dailyAttempts := gc.getEggsMined(duration)
 	successProbability := gc.CalculateChancePerStrike()
 	successCount, _ := FindReasonableSuccessCeiling(dailyAttempts, successProbability)
 	probabilityList := gc.getProbabilityList(successCount, dailyAttempts, successProbability)
 
 	medianIndex, medianProbability := gc.findProbabilityBreakpoint(probabilityList, 0.5)
-	fmt.Println(fmt.Sprintf("median of %d giants: %.12f%% chance of %d or fewer gians in %v", medianIndex, medianProbability*100, medianIndex, duration))
+	shinyCount := int(float64(medianIndex) * sMods.CalculateShinyOdds())
+	fmt.Println(
+		gc.printer.Sprintf("median of %d (%d shiny) giants: %.12f%% chance of %d or fewer giants in %v",
+			medianIndex,
+			shinyCount,
+			medianProbability*100,
+			medianIndex,
+			duration,
+		),
+	)
 }
 
 func (gc *GiantCalculator) GetUpgradeCost() int {
