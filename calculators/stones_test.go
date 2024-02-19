@@ -61,11 +61,11 @@ func TestFindNextStoneUpgrade(t *testing.T) {
 	)
 
 	result := sc.FindNextUpgrade(1800000)
-	assert.Equal(t, "next stone upgrade should be speed", result)
+	assert.Equal(t, "speed", result)
 
 	result = sc.FindNextUpgrade(18000000)
-	assert.Equal(t, "next stone upgrade should be speed", result)
+	assert.Equal(t, "speed", result)
 
 	result = sc.FindNextUpgrade(180000000)
-	assert.Equal(t, "next stone upgrade should be x2 strike", result)
+	assert.Equal(t, "x2 strike", result)
 }

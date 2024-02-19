@@ -117,7 +117,7 @@ func (gc *GiantCalculator) CalculateChancePerStrike() float64 {
 }
 
 func (gc *GiantCalculator) PrintProbabilityDistribution(duration time.Duration) {
-	dailyAttempts := gc.getEggsMined(duration)
+	dailyAttempts := gc.getEggMineAttempts(duration)
 	successProbability := gc.CalculateChancePerStrike()
 	successCount, consumedProbabilitySpace := FindReasonableSuccessCeiling(dailyAttempts, successProbability)
 	probabilityList := gc.getProbabilityList(successCount, dailyAttempts, successProbability)
@@ -138,7 +138,7 @@ func (gc *GiantCalculator) PrintProbabilityDistribution(duration time.Duration) 
 }
 
 func (gc *GiantCalculator) PrintProbabilityMedian(duration time.Duration, sMods ShinyModifiers) {
-	dailyAttempts := gc.getEggsMined(duration)
+	dailyAttempts := gc.getEggMineAttempts(duration)
 	successProbability := gc.CalculateChancePerStrike()
 	successCount, _ := FindReasonableSuccessCeiling(dailyAttempts, successProbability)
 	probabilityList := gc.getProbabilityList(successCount, dailyAttempts, successProbability)
@@ -171,6 +171,38 @@ func (gc *GiantCalculator) GetUpgradeCost() int {
 	return totalCost
 }
 
+func (gc *GiantCalculator) SpeedComparison(speedUpgradeCost int, timePeriod time.Duration) (isSpeedBetter bool) {
+	bestNonSpeed := gc.findNextUpgrade()
+	upgradeCost := 0
+	strikeCosts := upgrade_data.GetStrikePrices()
+	giantLuckCosts := upgrade_data.GetGiantLuckPrices()
+
+	switch bestNonSpeed {
+	case DoubleStrike:
+		upgradeCost = strikeCosts[gc.strikeUpgrades[DoubleStrike]+1]
+	case TripleStrike:
+		upgradeCost = strikeCosts[gc.strikeUpgrades[TripleStrike]+1]
+	case QuadrupleStrike:
+		upgradeCost = strikeCosts[gc.strikeUpgrades[QuadrupleStrike]+1]
+	case QuintupleStrike:
+		upgradeCost = strikeCosts[gc.strikeUpgrades[QuintupleStrike]+1]
+	case GiantLuck:
+		upgradeCost = giantLuckCosts[gc.giantLuckUpgrade] + 1
+	}
+
+	nonSpeedMineStrikes := gc.getEggMineAttempts(timePeriod)
+	nonSpeedGiantCount := float64(nonSpeedMineStrikes) * gc.calculateBaseGiantChance(bestNonSpeed)
+	nonSpeedEfficiency := nonSpeedGiantCount / float64(upgradeCost)
+
+	gc.mineSpeed += upgrade_data.PerStepSpeedImprovement
+	speedMineStrikes := gc.getEggMineAttempts(timePeriod)
+	speedGiantCount := float64(speedMineStrikes) * gc.calculateBaseGiantChance(NoChange)
+	speedEfficiency := speedGiantCount / float64(speedUpgradeCost)
+
+	gc.mineSpeed -= upgrade_data.PerStepSpeedImprovement
+	return speedEfficiency > nonSpeedEfficiency
+}
+
 func (gc *GiantCalculator) findProbabilityBreakpoint(probabilityList map[int]float64, breakPoint float64) (int, float64) {
 	if probabilityList[0] >= 0.5 {
 		return 0, probabilityList[0]
@@ -191,7 +223,7 @@ func (gc *GiantCalculator) findProbabilityBreakpoint(probabilityList map[int]flo
 	return maxIncludedIndex, totalProbability
 }
 
-func (gc *GiantCalculator) getEggsMined(duration time.Duration) uint64 {
+func (gc *GiantCalculator) getEggMineAttempts(duration time.Duration) uint64 {
 	return uint64(duration.Seconds() * gc.mineSpeed)
 }
 

@@ -10,7 +10,7 @@ import (
 const OneMillion = 1000000
 
 func main() {
-	ocConfig := calculators.NewOverclockConfig(true, true, true, true, true, false)
+	ocConfig := calculators.NewOverclockConfig(true, true, true, true, true, true)
 	userMods := calculators.NewUserModifiers(
 		1.1,
 		1.2,
@@ -26,11 +26,11 @@ func main() {
 	)
 	shinyMods := calculators.NewShinyModifiers(
 		1.1,
-		1.09,
+		1.1,
 		1.2,
 		10,
 		1,
-		65*OneMillion,
+		73*OneMillion,
 	)
 	duration := time.Hour * 24
 
@@ -43,7 +43,11 @@ func main() {
 		ocConfig,
 	)
 
-	fmt.Println("next giant chance upgrade should be", giantCalc.GetNextUpgrade())
+	if giantCalc.SpeedComparison(1800000, duration*5) {
+		fmt.Println("next giant chance upgrade should be speed")
+	} else {
+		fmt.Println("next giant chance upgrade should be", giantCalc.GetNextUpgrade())
+	}
 	fmt.Println("next stone upgrade should be", sc.FindNextUpgrade(1800000))
 
 	giantCalc.PrintProbabilityMedian(duration, shinyMods)
@@ -51,4 +55,5 @@ func main() {
 	sc.PrintDamageChange(duration, shinyMods)
 	p := message.NewPrinter(message.MatchLanguage("en"))
 	fmt.Println(p.Sprintf("%d stones (%d genned and %d mined) gained in %v", gennedStones+minedStones, gennedStones, minedStones, duration))
+	fmt.Println(p.Sprintf("Shiny odds: %.4f%%", 100*shinyMods.CalculateShinyOdds()))
 }
