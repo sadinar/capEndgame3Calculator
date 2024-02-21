@@ -10,7 +10,7 @@ import (
 const OneMillion = 1000000
 
 func main() {
-	ocConfig := calculators.NewOverclockConfig(true, true, true, true, true, true)
+	ocConfig := calculators.NewOverclockConfig(true, true, true, true, true, true, false)
 	userMods := calculators.NewUserModifiers(
 		1.1,
 		1.2,
@@ -30,7 +30,7 @@ func main() {
 		1.2,
 		10,
 		1,
-		73*OneMillion,
+		76*OneMillion,
 	)
 	duration := time.Hour * 24
 
@@ -55,5 +55,6 @@ func main() {
 	sc.PrintDamageChange(duration, shinyMods)
 	p := message.NewPrinter(message.MatchLanguage("en"))
 	fmt.Println(p.Sprintf("%d stones (%d genned and %d mined) gained in %v", gennedStones+minedStones, gennedStones, minedStones, duration))
-	fmt.Println(p.Sprintf("Shiny odds: %.4f%%", 100*shinyMods.CalculateShinyOdds()))
+	fmt.Println(p.Sprintf("Extra stones per day from +0.1%% genned pets: %v", float64(gennedStones)*0.1))
+	fmt.Println(p.Sprintf("Shiny odds w/o mine OC: %.4f%%", 100*shinyMods.CalculateShinyOdds()))
 }

@@ -144,7 +144,11 @@ func (gc *GiantCalculator) PrintProbabilityMedian(duration time.Duration, sMods 
 	probabilityList := gc.getProbabilityList(successCount, dailyAttempts, successProbability)
 
 	medianIndex, medianProbability := gc.findProbabilityBreakpoint(probabilityList, 0.5)
-	shinyCount := int(float64(medianIndex) * sMods.CalculateShinyOdds())
+	shinyOdds := sMods.CalculateShinyOdds()
+	if gc.overclocks[ShinyOverclockIndex] {
+		shinyOdds *= 1.5
+	}
+	shinyCount := int(float64(medianIndex) * shinyOdds)
 	fmt.Println(
 		gc.printer.Sprintf("median of %d (%d shiny) giants: %.12f%% chance of %d or fewer giants in %v",
 			medianIndex,

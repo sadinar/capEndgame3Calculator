@@ -1,10 +1,11 @@
 package calculators
 
 const StoneOverclockIndex = 1337
+const ShinyOverclockIndex = 101001
 
 type OverclockConfig map[int]bool
 
-func NewOverclockConfig(stones, x2, x3, x4, x5, giant bool) OverclockConfig {
+func NewOverclockConfig(stones, x2, x3, x4, x5, giant, shiny bool) OverclockConfig {
 	return OverclockConfig{
 		StoneOverclockIndex: stones,
 		DoubleStrike:        x2,
@@ -12,6 +13,7 @@ func NewOverclockConfig(stones, x2, x3, x4, x5, giant bool) OverclockConfig {
 		QuadrupleStrike:     x4,
 		QuintupleStrike:     x5,
 		GiantLuck:           giant,
+		ShinyOverclockIndex: shiny,
 	}
 }
 
