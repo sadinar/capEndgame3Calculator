@@ -50,7 +50,7 @@ func NewStonesCalculator(mm MiningModifiers, miningStoneBonus, eggLuck, cloneLuc
 		x4Strike:          float64(mm.StrikeUpgrades[QuadrupleStrike]) * upgrade_data.PerStepStrikeImprovement,
 		x5Strike:          float64(mm.StrikeUpgrades[QuintupleStrike]) * upgrade_data.PerStepStrikeImprovement,
 		mineSpeed:         mm.MineSpeed,
-		miningStoneBonus:  miningStoneBonus,
+		miningStoneBonus:  1 + (miningStoneBonus / 100),
 		eggLuck:           eggLuck,
 		cloneLuck:         cloneLuck,
 		calcifyChance:     1 + (calcifyChance / 100),
@@ -128,9 +128,9 @@ func (sc *Stones) CalculateMinedStones(period time.Duration) int {
 	}
 
 	stonesPerStrike := 1.0
-	//for i := 2; i <= sc.eggLevel; i++ {
-	//	stonesPerStrike += PerLevelEggModifier
-	//}
+	for i := 2; i <= sc.eggLevel; i++ {
+		stonesPerStrike += PerLevelEggModifier
+	}
 
 	regularStrikes := 0.0
 	regularStrikes = sc.mineSpeed * period.Seconds()
