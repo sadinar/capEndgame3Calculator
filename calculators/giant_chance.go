@@ -36,7 +36,7 @@ type GiantCalculator struct {
 	printer                      *message.Printer
 }
 
-func NewGiantCalculator(ocConfig OverclockConfig, um UserModifiers) GiantCalculator {
+func NewGiantCalculator(ocConfig OverclockConfig, um MiningModifiers) GiantCalculator {
 	return GiantCalculator{
 		strikeUpgrades:               um.StrikeUpgrades,
 		strikePrices:                 upgrade_data.GetStrikePrices(),

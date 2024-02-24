@@ -7,8 +7,8 @@ import (
 )
 
 func TestCalculateStrikeImprovementMargin(t *testing.T) {
-	ocConfig := NewOverclockConfig(true, true, false, true, true, true)
-	userMods := NewUserModifiers(
+	ocConfig := NewOverclockConfig(true, true, false, true, true, true, false)
+	userMods := NewMiningModifiers(
 		1.1,
 		1.2,
 		0.72,
@@ -25,8 +25,11 @@ func TestCalculateStrikeImprovementMargin(t *testing.T) {
 		userMods,
 		RubyPick,
 		0.43,
+		0,
+		2,
 		MythicEgg,
 		ocConfig,
+		false,
 	)
 
 	assert.Equal(t, 0.185, sc.x3Strike)
@@ -38,8 +41,8 @@ func TestCalculateStrikeImprovementMargin(t *testing.T) {
 }
 
 func TestFindNextStoneUpgrade(t *testing.T) {
-	ocConfig := NewOverclockConfig(true, true, false, true, true, true)
-	userMods := NewUserModifiers(
+	ocConfig := NewOverclockConfig(true, true, false, true, true, true, false)
+	userMods := NewMiningModifiers(
 		1.1,
 		1.2,
 		0.72,
@@ -56,16 +59,22 @@ func TestFindNextStoneUpgrade(t *testing.T) {
 		userMods,
 		RubyPick,
 		0.43,
+		0,
+		100,
 		MythicEgg,
 		ocConfig,
+		false,
 	)
 
-	result := sc.FindNextUpgrade(1800000)
+	result := sc.FindNextUpgrade(1800000, 10000000000)
 	assert.Equal(t, "speed", result)
 
-	result = sc.FindNextUpgrade(18000000)
+	result = sc.FindNextUpgrade(18000000, 10000000000)
 	assert.Equal(t, "speed", result)
 
-	result = sc.FindNextUpgrade(180000000)
+	result = sc.FindNextUpgrade(180000000, 10000000000)
 	assert.Equal(t, "x2 strike", result)
+
+	result = sc.FindNextUpgrade(180000000, 5)
+	assert.Equal(t, "clone luck", result)
 }

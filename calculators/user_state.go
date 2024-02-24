@@ -17,7 +17,7 @@ func NewOverclockConfig(stones, x2, x3, x4, x5, giant, shiny bool) OverclockConf
 	}
 }
 
-type UserModifiers struct {
+type MiningModifiers struct {
 	GiantLuckAchievementModifier float64
 	GiantLuckRuneModifier        float64
 	MineSpeed                    float64
@@ -26,8 +26,8 @@ type UserModifiers struct {
 	GiantLuckLevel               int
 }
 
-func NewUserModifiers(giantLuckAchievementModifier, giantLuckRuneModifier, mineSpeed, firstStrike float64, strikeUpgrades strikeUpgrades, giantLuckLevel int) UserModifiers {
-	return UserModifiers{
+func NewMiningModifiers(giantLuckAchievementModifier, giantLuckRuneModifier, mineSpeed, firstStrike float64, strikeUpgrades strikeUpgrades, giantLuckLevel int) MiningModifiers {
+	return MiningModifiers{
 		GiantLuckAchievementModifier: giantLuckAchievementModifier,
 		GiantLuckRuneModifier:        giantLuckRuneModifier,
 		MineSpeed:                    mineSpeed,

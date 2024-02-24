@@ -95,8 +95,8 @@ func TestFindNextUpgrade(t *testing.T) {
 
 func TestGetNextUpgrade(t *testing.T) {
 	gc := NewGiantCalculator(
-		NewOverclockConfig(false, false, false, false, false, false),
-		NewUserModifiers(
+		NewOverclockConfig(false, false, false, false, false, false, false),
+		NewMiningModifiers(
 			1.0,
 			1.0,
 			0.5,
