@@ -9,15 +9,8 @@ import (
 )
 
 const MaxGenSpeed = 5.0
-const MaxFactoryCalcify = 2.0 // todo this is only from the factory. fix to allow more mods now
-const StonePick = 1.0
-const EmeraldPick = 1.1
-const SapphirePick = 1.2
-const AmethystPick = 1.3
-const TopazPick = 1.4
-const QuartzPick = 1.5
-const DiamondPick = 1.75
-const RubyPick = 2.0
+const MaxFactoryCalcify = 2.0
+const RubyPickMiningBonus = 2.0
 const PerLevelEggModifier = 0.50
 const StoneOverclockModifier = 1.5
 const CommonEgg = 1
@@ -38,7 +31,7 @@ type Stones struct {
 	x4Strike          float64
 	x5Strike          float64
 	mineSpeed         float64
-	pickModifier      float64
+	miningStoneBonus  float64
 	eggLuck           float64
 	cloneLuck         float64
 	calcifyChance     float64
@@ -49,7 +42,7 @@ type Stones struct {
 	printer           *message.Printer
 }
 
-func NewStonesCalculator(mm MiningModifiers, pickModifier, eggLuck, cloneLuck, calcifyChance float64, eggLevel int, ocConfig OverclockConfig, recursiveClone bool) Stones {
+func NewStonesCalculator(mm MiningModifiers, miningStoneBonus, eggLuck, cloneLuck, calcifyChance float64, eggLevel int, ocConfig OverclockConfig, recursiveClone bool) Stones {
 	sc := Stones{
 		firstStrike:       mm.FirstStrike,
 		x2Strike:          float64(mm.StrikeUpgrades[DoubleStrike]) * upgrade_data.PerStepStrikeImprovement,
@@ -57,7 +50,7 @@ func NewStonesCalculator(mm MiningModifiers, pickModifier, eggLuck, cloneLuck, c
 		x4Strike:          float64(mm.StrikeUpgrades[QuadrupleStrike]) * upgrade_data.PerStepStrikeImprovement,
 		x5Strike:          float64(mm.StrikeUpgrades[QuintupleStrike]) * upgrade_data.PerStepStrikeImprovement,
 		mineSpeed:         mm.MineSpeed,
-		pickModifier:      pickModifier,
+		miningStoneBonus:  miningStoneBonus,
 		eggLuck:           eggLuck,
 		cloneLuck:         cloneLuck,
 		calcifyChance:     1 + (calcifyChance / 100),
@@ -135,9 +128,9 @@ func (sc *Stones) CalculateMinedStones(period time.Duration) int {
 	}
 
 	stonesPerStrike := 1.0
-	for i := 2; i <= sc.eggLevel; i++ {
-		stonesPerStrike += PerLevelEggModifier
-	}
+	//for i := 2; i <= sc.eggLevel; i++ {
+	//	stonesPerStrike += PerLevelEggModifier
+	//}
 
 	regularStrikes := 0.0
 	regularStrikes = sc.mineSpeed * period.Seconds()
@@ -155,11 +148,11 @@ func (sc *Stones) CalculateMinedStones(period time.Duration) int {
 	x5Strikes := x4Strikes * sc.x5Strike
 	x4Strikes -= x5Strikes
 
-	stones := regularStrikes * stonesPerStrike * sc.pickModifier
-	stones += x2Strikes * stonesPerStrike * sc.pickModifier * 2
-	stones += x3Strikes * stonesPerStrike * sc.pickModifier * 3
-	stones += x4Strikes * stonesPerStrike * sc.pickModifier * 4
-	stones += x5Strikes * stonesPerStrike * sc.pickModifier * 5
+	stones := regularStrikes * stonesPerStrike * sc.miningStoneBonus
+	stones += x2Strikes * stonesPerStrike * sc.miningStoneBonus * 2
+	stones += x3Strikes * stonesPerStrike * sc.miningStoneBonus * 3
+	stones += x4Strikes * stonesPerStrike * sc.miningStoneBonus * 4
+	stones += x5Strikes * stonesPerStrike * sc.miningStoneBonus * 5
 
 	if sc.stonesOverclocked {
 		return int(stones * 1.5)
@@ -258,15 +251,15 @@ func (sc *Stones) calculateCloneImprovementMargin(upgradeCost int, period time.D
 
 func (sc *Stones) getBaselineComparator() Stones {
 	return Stones{
-		x2Strike:     float64(sc.miningModifiers.StrikeUpgrades[DoubleStrike]) * upgrade_data.PerStepStrikeImprovement,
-		x3Strike:     float64(sc.miningModifiers.StrikeUpgrades[TripleStrike]) * upgrade_data.PerStepStrikeImprovement,
-		x4Strike:     float64(sc.miningModifiers.StrikeUpgrades[QuadrupleStrike]) * upgrade_data.PerStepStrikeImprovement,
-		x5Strike:     float64(sc.miningModifiers.StrikeUpgrades[QuintupleStrike]) * upgrade_data.PerStepStrikeImprovement,
-		eggLuck:      sc.eggLuck,
-		cloneLuck:    sc.cloneLuck,
-		eggLevel:     MythicEgg,
-		mineSpeed:    sc.miningModifiers.MineSpeed,
-		firstStrike:  1,
-		pickModifier: RubyPick,
+		x2Strike:         float64(sc.miningModifiers.StrikeUpgrades[DoubleStrike]) * upgrade_data.PerStepStrikeImprovement,
+		x3Strike:         float64(sc.miningModifiers.StrikeUpgrades[TripleStrike]) * upgrade_data.PerStepStrikeImprovement,
+		x4Strike:         float64(sc.miningModifiers.StrikeUpgrades[QuadrupleStrike]) * upgrade_data.PerStepStrikeImprovement,
+		x5Strike:         float64(sc.miningModifiers.StrikeUpgrades[QuintupleStrike]) * upgrade_data.PerStepStrikeImprovement,
+		eggLuck:          sc.eggLuck,
+		cloneLuck:        sc.cloneLuck,
+		eggLevel:         MythicEgg,
+		mineSpeed:        sc.miningModifiers.MineSpeed,
+		firstStrike:      1,
+		miningStoneBonus: RubyPickMiningBonus,
 	}
 }

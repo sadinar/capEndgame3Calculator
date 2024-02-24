@@ -23,7 +23,7 @@ func TestCalculateStrikeImprovementMargin(t *testing.T) {
 	)
 	sc := NewStonesCalculator(
 		userMods,
-		RubyPick,
+		RubyPickMiningBonus,
 		0.43,
 		0,
 		2,
@@ -57,7 +57,7 @@ func TestFindNextStoneUpgrade(t *testing.T) {
 	)
 	sc := NewStonesCalculator(
 		userMods,
-		RubyPick,
+		RubyPickMiningBonus,
 		0.43,
 		0,
 		100,

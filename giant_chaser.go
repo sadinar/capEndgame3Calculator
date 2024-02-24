@@ -37,10 +37,10 @@ func main() {
 	giantCalc := calculators.NewGiantCalculator(ocConfig, miningMods)
 	sc := calculators.NewStonesCalculator(
 		miningMods,
-		calculators.RubyPick,
-		0.61, // 0.43 base, rest lab bonuses
-		0.015,
-		160, // as shown in stats pane
+		5.725, // stats screen
+		0.61,  // 0.43 base, rest lab bonuses
+		0.03,  // stats screen
+		160,   // as shown in stats pane
 		calculators.MythicEgg,
 		ocConfig,
 		true,
