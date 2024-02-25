@@ -10,10 +10,7 @@ import (
 const OneMillion = 1000000
 
 func main() {
-	ocConfig := calculators.NewOverclockConfig(true, true, true, true, true, true, false)
 	miningMods := calculators.NewMiningModifiers(
-		1.1,
-		1.2,
 		0.72,
 		1,
 		.137, // exactly as on stats screen
@@ -34,7 +31,7 @@ func main() {
 	shinyMods := calculators.NewShinyModifiers(14.87) // exactly as seen on stats screen
 	duration := time.Hour * 24
 
-	giantCalc := calculators.NewGiantCalculator(ocConfig, miningMods)
+	giantCalc := calculators.NewGiantCalculator(miningMods, false)
 	sc := calculators.NewStonesCalculator(
 		miningMods,
 		472.5, // stats screen w/ ingot: 472.5    w/o ingot: 322.5

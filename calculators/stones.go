@@ -220,8 +220,7 @@ func (sc *Stones) calculateCloneImprovementMargin(upgradeCost int, period time.D
 
 func (sc *Stones) getBaselineComparator() Stones {
 	return Stones{
-		miningModifiers: NewMiningModifiers(0,
-			0,
+		miningModifiers: NewMiningModifiers(
 			.5,
 			1,
 			0,
