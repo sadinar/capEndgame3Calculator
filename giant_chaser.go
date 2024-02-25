@@ -16,6 +16,7 @@ func main() {
 		1.2,
 		0.72,
 		1,
+		.137, // exactly as on stats screen
 		map[int]int{
 			2: 74,
 			3: 74,
@@ -23,26 +24,24 @@ func main() {
 			5: 74,
 		},
 		70,
+		map[int]float64{
+			2: 27.02, // exactly as on stats screen
+			3: 7.998, // exactly as on stats screen
+			4: 2.663, // exactly as on stats screen
+			5: .985,  // exactly as on stats screen
+		},
 	)
-	shinyMods := calculators.NewShinyModifiers(
-		1.1,
-		1.1,
-		1.2,
-		10,
-		1,
-		76*OneMillion,
-	)
+	shinyMods := calculators.NewShinyModifiers(14.87) // exactly as seen on stats screen
 	duration := time.Hour * 24
 
 	giantCalc := calculators.NewGiantCalculator(ocConfig, miningMods)
 	sc := calculators.NewStonesCalculator(
 		miningMods,
 		472.5, // stats screen w/ ingot: 472.5    w/o ingot: 322.5
-		0.61,  // stats screen
-		0.03,  // stats screen
+		61,    // as shown on stats screen
+		3,     // as shown on stats screen
 		160,   // as shown in stats pane
 		calculators.MythicEgg,
-		ocConfig,
 		true,
 	)
 

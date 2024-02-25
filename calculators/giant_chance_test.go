@@ -101,6 +101,7 @@ func TestGetNextUpgrade(t *testing.T) {
 			1.0,
 			0.5,
 			1,
+			0,
 			map[int]int{
 				2: 0,
 				3: 0,
@@ -108,6 +109,12 @@ func TestGetNextUpgrade(t *testing.T) {
 				5: 0,
 			},
 			0,
+			map[int]float64{
+				2: 0,
+				3: 0,
+				4: 0,
+				5: 0,
+			},
 		),
 	)
 	nu := gc.GetNextUpgrade()

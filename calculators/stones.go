@@ -25,56 +25,31 @@ const PerLevelSpeedModifier = 0.1
 const PerLevelCloneModifier = 0.001
 
 type Stones struct {
-	firstStrike       float64
-	x2Strike          float64
-	x3Strike          float64
-	x4Strike          float64
-	x5Strike          float64
-	mineSpeed         float64
-	miningStoneBonus  float64
-	eggLuck           float64
-	cloneLuck         float64
-	calcifyChance     float64
-	eggLevel          int
-	stonesOverclocked bool
-	recursiveClone    bool
-	miningModifiers   MiningModifiers
-	printer           *message.Printer
+	firstStrike           float64
+	mineSpeed             float64
+	miningStoneMultiplier float64
+	eggLuck               float64
+	cloneLuck             float64
+	calcifyChance         float64
+	eggLevel              int
+	stonesOverclocked     bool
+	recursiveClone        bool
+	miningModifiers       MiningModifiers
+	printer               *message.Printer
 }
 
-func NewStonesCalculator(mm MiningModifiers, miningStoneBonus, eggLuck, cloneLuck, calcifyChance float64, eggLevel int, ocConfig OverclockConfig, recursiveClone bool) Stones {
+func NewStonesCalculator(mm MiningModifiers, miningStoneBonus, eggLuck, cloneLuck, calcifyChance float64, eggLevel int, recursiveClone bool) Stones {
 	sc := Stones{
-		firstStrike:       mm.FirstStrike,
-		x2Strike:          float64(mm.StrikeUpgrades[DoubleStrike]) * upgrade_data.PerStepStrikeImprovement,
-		x3Strike:          float64(mm.StrikeUpgrades[TripleStrike]) * upgrade_data.PerStepStrikeImprovement,
-		x4Strike:          float64(mm.StrikeUpgrades[QuadrupleStrike]) * upgrade_data.PerStepStrikeImprovement,
-		x5Strike:          float64(mm.StrikeUpgrades[QuintupleStrike]) * upgrade_data.PerStepStrikeImprovement,
-		mineSpeed:         mm.MineSpeed,
-		miningStoneBonus:  1 + (miningStoneBonus / 100),
-		eggLuck:           eggLuck,
-		cloneLuck:         cloneLuck,
-		calcifyChance:     1 + (calcifyChance / 100),
-		eggLevel:          eggLevel,
-		stonesOverclocked: ocConfig[StoneOverclockIndex],
-		recursiveClone:    recursiveClone,
-		miningModifiers:   mm,
-		printer:           message.NewPrinter(language.English),
-	}
-
-	if ocConfig[QuintupleStrike] {
-		sc.x5Strike *= 2
-	}
-
-	if ocConfig[QuadrupleStrike] {
-		sc.x4Strike *= 1.8
-	}
-
-	if ocConfig[TripleStrike] {
-		sc.x3Strike *= 1.6
-	}
-
-	if ocConfig[DoubleStrike] {
-		sc.x2Strike *= 1.4
+		firstStrike:           mm.FirstStrike,
+		mineSpeed:             mm.MineSpeed,
+		miningStoneMultiplier: 1 + (miningStoneBonus / 100),
+		eggLuck:               eggLuck / 100,
+		cloneLuck:             cloneLuck / 100,
+		calcifyChance:         1 + (calcifyChance / 100),
+		eggLevel:              eggLevel,
+		recursiveClone:        recursiveClone,
+		miningModifiers:       mm,
+		printer:               message.NewPrinter(language.English),
 	}
 
 	return sc
@@ -136,27 +111,21 @@ func (sc *Stones) CalculateMinedStones(period time.Duration) int {
 	regularStrikes = sc.mineSpeed * period.Seconds()
 	regularStrikes *= sc.firstStrike
 
-	x2Strikes := regularStrikes * sc.x2Strike
+	x2Strikes := regularStrikes * sc.miningModifiers.StrikeOdds[DoubleStrike]
+	x3Strikes := regularStrikes * sc.miningModifiers.StrikeOdds[TripleStrike]
+	x4Strikes := regularStrikes * sc.miningModifiers.StrikeOdds[QuadrupleStrike]
+	x5Strikes := regularStrikes * sc.miningModifiers.StrikeOdds[QuintupleStrike]
+
 	regularStrikes -= x2Strikes
-
-	x3Strikes := x2Strikes * sc.x3Strike
 	x2Strikes -= x3Strikes
-
-	x4Strikes := x3Strikes * sc.x4Strike
 	x3Strikes -= x4Strikes
-
-	x5Strikes := x4Strikes * sc.x5Strike
 	x4Strikes -= x5Strikes
 
-	stones := regularStrikes * stonesPerStrike * sc.miningStoneBonus
-	stones += x2Strikes * stonesPerStrike * sc.miningStoneBonus * 2
-	stones += x3Strikes * stonesPerStrike * sc.miningStoneBonus * 3
-	stones += x4Strikes * stonesPerStrike * sc.miningStoneBonus * 4
-	stones += x5Strikes * stonesPerStrike * sc.miningStoneBonus * 5
-
-	if sc.stonesOverclocked {
-		return int(stones * 1.5)
-	}
+	stones := regularStrikes * stonesPerStrike * sc.miningStoneMultiplier
+	stones += x2Strikes * stonesPerStrike * sc.miningStoneMultiplier * 2
+	stones += x3Strikes * stonesPerStrike * sc.miningStoneMultiplier * 3
+	stones += x4Strikes * stonesPerStrike * sc.miningStoneMultiplier * 4
+	stones += x5Strikes * stonesPerStrike * sc.miningStoneMultiplier * 5
 
 	return int(stones)
 }
@@ -215,13 +184,13 @@ func (sc *Stones) calculateStrikeImprovementMargin(strikeType int, period time.D
 
 	switch strikeType {
 	case DoubleStrike:
-		upgradeCalculator.x2Strike += upgrade_data.PerStepStrikeImprovement
+		upgradeCalculator.miningModifiers.StrikeOdds[DoubleStrike] += upgrade_data.PerStepStrikeImprovement
 	case TripleStrike:
-		upgradeCalculator.x3Strike += upgrade_data.PerStepStrikeImprovement
+		upgradeCalculator.miningModifiers.StrikeOdds[TripleStrike] += upgrade_data.PerStepStrikeImprovement
 	case QuadrupleStrike:
-		upgradeCalculator.x4Strike += upgrade_data.PerStepStrikeImprovement
+		upgradeCalculator.miningModifiers.StrikeOdds[QuadrupleStrike] += upgrade_data.PerStepStrikeImprovement
 	case QuintupleStrike:
-		upgradeCalculator.x5Strike += upgrade_data.PerStepStrikeImprovement
+		upgradeCalculator.miningModifiers.StrikeOdds[QuintupleStrike] += upgrade_data.PerStepStrikeImprovement
 	}
 
 	postUpgradeStones := upgradeCalculator.CalculateMinedStones(period)
@@ -251,15 +220,25 @@ func (sc *Stones) calculateCloneImprovementMargin(upgradeCost int, period time.D
 
 func (sc *Stones) getBaselineComparator() Stones {
 	return Stones{
-		x2Strike:         float64(sc.miningModifiers.StrikeUpgrades[DoubleStrike]) * upgrade_data.PerStepStrikeImprovement,
-		x3Strike:         float64(sc.miningModifiers.StrikeUpgrades[TripleStrike]) * upgrade_data.PerStepStrikeImprovement,
-		x4Strike:         float64(sc.miningModifiers.StrikeUpgrades[QuadrupleStrike]) * upgrade_data.PerStepStrikeImprovement,
-		x5Strike:         float64(sc.miningModifiers.StrikeUpgrades[QuintupleStrike]) * upgrade_data.PerStepStrikeImprovement,
-		eggLuck:          sc.eggLuck,
-		cloneLuck:        sc.cloneLuck,
-		eggLevel:         MythicEgg,
-		mineSpeed:        sc.miningModifiers.MineSpeed,
-		firstStrike:      1,
-		miningStoneBonus: RubyPickMiningBonus,
+		miningModifiers: NewMiningModifiers(0,
+			0,
+			.5,
+			1,
+			0,
+			nil,
+			0,
+			strikeOdds{
+				DoubleStrike:    sc.miningModifiers.StrikeOdds[DoubleStrike],
+				TripleStrike:    sc.miningModifiers.StrikeOdds[TripleStrike],
+				QuadrupleStrike: sc.miningModifiers.StrikeOdds[QuadrupleStrike],
+				QuintupleStrike: sc.miningModifiers.StrikeOdds[QuintupleStrike],
+			},
+		),
+		eggLuck:               sc.eggLuck,
+		cloneLuck:             sc.cloneLuck,
+		eggLevel:              MythicEgg,
+		mineSpeed:             sc.miningModifiers.MineSpeed,
+		firstStrike:           1,
+		miningStoneMultiplier: RubyPickMiningBonus,
 	}
 }

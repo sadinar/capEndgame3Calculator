@@ -22,6 +22,7 @@ const giantLuckOverclock = 1.5
 
 type upgradeCostList map[int]int
 type strikeUpgrades map[int]int
+type strikeOdds map[int]float64
 
 type GiantCalculator struct {
 	strikeUpgrades               strikeUpgrades

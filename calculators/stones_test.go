@@ -1,6 +1,7 @@
 package calculators
 
 import (
+	"capEndgame3Calculator/upgrade_data"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -13,6 +14,7 @@ func TestCalculateStrikeImprovementMargin(t *testing.T) {
 		1.2,
 		0.72,
 		1,
+		70*upgrade_data.PerStepGiantLuckImprovement,
 		map[int]int{
 			2: 74,
 			3: 74,
@@ -20,6 +22,12 @@ func TestCalculateStrikeImprovementMargin(t *testing.T) {
 			5: 74,
 		},
 		70,
+		map[int]float64{
+			2: 74 * upgrade_data.PerStepStrikeImprovement,
+			3: 74 * upgrade_data.PerStepStrikeImprovement,
+			4: 74 * upgrade_data.PerStepStrikeImprovement,
+			5: 74 * upgrade_data.PerStepStrikeImprovement,
+		},
 	)
 	sc := NewStonesCalculator(
 		userMods,
@@ -47,6 +55,7 @@ func TestFindNextStoneUpgrade(t *testing.T) {
 		1.2,
 		0.72,
 		1,
+		70*upgrade_data.PerStepGiantLuckImprovement,
 		map[int]int{
 			2: 74,
 			3: 74,
@@ -54,6 +63,12 @@ func TestFindNextStoneUpgrade(t *testing.T) {
 			5: 74,
 		},
 		70,
+		map[int]float64{
+			2: 74 * upgrade_data.PerStepStrikeImprovement,
+			3: 74 * upgrade_data.PerStepStrikeImprovement,
+			4: 74 * upgrade_data.PerStepStrikeImprovement,
+			5: 74 * upgrade_data.PerStepStrikeImprovement,
+		},
 	)
 	sc := NewStonesCalculator(
 		userMods,
