@@ -9,10 +9,8 @@ import (
 )
 
 const MaxGenSpeed = 5.0
-const MaxFactoryCalcify = 2.0
 const RubyPickMiningBonus = 2.0
 const PerLevelEggModifier = 0.50
-const StoneOverclockModifier = 1.5
 const CommonEgg = 1
 const UncommonEgg = 2
 const RareEgg = 3
