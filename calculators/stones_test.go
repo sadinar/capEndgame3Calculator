@@ -2,16 +2,14 @@ package calculators
 
 import (
 	"capEndgame3Calculator/upgrade_data"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 )
 
 func TestCalculateStrikeImprovementMargin(t *testing.T) {
-	ocConfig := NewOverclockConfig(true, true, false, true, true, true, false)
 	userMods := NewMiningModifiers(
-		1.1,
-		1.2,
 		0.72,
 		1,
 		70*upgrade_data.PerStepGiantLuckImprovement,
@@ -31,53 +29,46 @@ func TestCalculateStrikeImprovementMargin(t *testing.T) {
 	)
 	sc := NewStonesCalculator(
 		userMods,
-		RubyPickMiningBonus,
-		0.43,
-		0,
-		2,
-		MythicEgg,
-		ocConfig,
-		false,
-	)
-
-	assert.Equal(t, 0.185, sc.x3Strike)
-	margin := sc.calculateStrikeImprovementMargin(5, time.Hour)
-	assert.Equal(t, 0.0, margin)
-	margin = sc.calculateStrikeImprovementMargin(2, time.Hour)
-	assert.NotEqual(t, 0.0, margin)
-	assert.Equal(t, 0.185, sc.x3Strike)
-}
-
-func TestFindNextStoneUpgrade(t *testing.T) {
-	ocConfig := NewOverclockConfig(true, true, false, true, true, true, false)
-	userMods := NewMiningModifiers(
-		1.1,
-		1.2,
-		0.72,
-		1,
-		70*upgrade_data.PerStepGiantLuckImprovement,
-		map[int]int{
-			2: 74,
-			3: 74,
-			4: 74,
-			5: 74,
-		},
-		70,
-		map[int]float64{
-			2: 74 * upgrade_data.PerStepStrikeImprovement,
-			3: 74 * upgrade_data.PerStepStrikeImprovement,
-			4: 74 * upgrade_data.PerStepStrikeImprovement,
-			5: 74 * upgrade_data.PerStepStrikeImprovement,
-		},
-	)
-	sc := NewStonesCalculator(
-		userMods,
-		RubyPickMiningBonus,
+		219,
 		0.43,
 		0,
 		100,
 		MythicEgg,
-		ocConfig,
+		false,
+	)
+
+	margin := sc.calculateStrikeImprovementMargin(5, time.Hour)
+	assert.Equal(t, "0.000063", fmt.Sprintf("%5f", margin))
+	margin = sc.calculateStrikeImprovementMargin(2, time.Hour)
+	assert.NotEqual(t, 0.0, margin)
+}
+
+func TestFindNextStoneUpgrade(t *testing.T) {
+	userMods := NewMiningModifiers(
+		0.72,
+		1,
+		70*upgrade_data.PerStepGiantLuckImprovement,
+		map[int]int{
+			2: 74,
+			3: 74,
+			4: 74,
+			5: 74,
+		},
+		70,
+		map[int]float64{
+			2: 74 * upgrade_data.PerStepStrikeImprovement,
+			3: 74 * upgrade_data.PerStepStrikeImprovement,
+			4: 74 * upgrade_data.PerStepStrikeImprovement,
+			5: 74 * upgrade_data.PerStepStrikeImprovement,
+		},
+	)
+	sc := NewStonesCalculator(
+		userMods,
+		100,
+		0.43,
+		0,
+		100,
+		MythicEgg,
 		false,
 	)
 

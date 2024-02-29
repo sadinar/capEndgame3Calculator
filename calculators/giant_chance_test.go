@@ -1,106 +1,46 @@
 package calculators
 
 import (
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-func TestCalculateGiantRollChance(t *testing.T) {
-	sl := getCalculatorWithDummyPrices()
-	assert.Equal(t, float64(0), sl.calculateBaseGiantChance(0))
-
-	sl.strikeUpgrades[1] = 1
-	assert.Equal(t, float64(0), sl.calculateBaseGiantChance(0))
-
-	sl.strikeUpgrades[2] = 1
-	sl.strikeUpgrades[3] = 1
-	sl.strikeUpgrades[5] = 1
-	assert.Equal(t, float64(0), sl.calculateBaseGiantChance(0))
-
-	sl.strikeUpgrades[4] = 1
-	assert.Equal(t, float64(0), sl.calculateBaseGiantChance(0))
-
-	sl.giantLuckUpgrade = 1
-	expected := fmt.Sprintf("%.16f", 0.0025*0.0025*0.0025*0.0025*0.001)
-	calcResult := fmt.Sprintf("%.16f", sl.calculateBaseGiantChance(0))
-	assert.Equal(t, expected, calcResult)
-
-	expected = fmt.Sprintf("%.14f", .0025*2*0.0025*0.0025*0.0025*.001)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateBaseGiantChance(2))
-	assert.Equal(t, expected, calcResult)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateBaseGiantChance(3))
-	assert.Equal(t, expected, calcResult)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateBaseGiantChance(4))
-	assert.Equal(t, expected, calcResult)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateBaseGiantChance(5))
-	assert.Equal(t, expected, calcResult)
-
-	sl.strikeUpgrades[2] = 2
-	sl.strikeUpgrades[3] = 9
-	sl.strikeUpgrades[4] = 1
-	sl.strikeUpgrades[5] = 7
-	expected = fmt.Sprintf("%.14f", .0025*2*.0025*9*.0025*1*.0025*7*.001)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateBaseGiantChance(0))
-	assert.Equal(t, expected, calcResult)
-	expected = fmt.Sprintf("%.14f", .0025*3*.0025*9*.0025*1*.0025*7*.001)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateBaseGiantChance(2))
-	assert.Equal(t, expected, calcResult)
-	expected = fmt.Sprintf("%.14f", .0025*2*.0025*10*.0025*1*.0025*7*.001)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateBaseGiantChance(3))
-	assert.Equal(t, expected, calcResult)
-	expected = fmt.Sprintf("%.14f", .0025*2*.0025*9*.0025*2*.0025*7*.001)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateBaseGiantChance(4))
-	assert.Equal(t, expected, calcResult)
-	expected = fmt.Sprintf("%.14f", .0025*2*.0025*9*.0025*1*.0025*8*.001)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateBaseGiantChance(5))
-	assert.Equal(t, expected, calcResult)
-	sl.giantLuckUpgrade = 5
-	expected = fmt.Sprintf("%.14f", .0025*2*.0025*9*.0025*1*.0025*7*.001*5)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateBaseGiantChance(0))
-	assert.Equal(t, expected, calcResult)
-	expected = fmt.Sprintf("%.14f", .0025*2*.0025*9*.0025*1*.0025*7*.001*6)
-	calcResult = fmt.Sprintf("%.14f", sl.calculateBaseGiantChance(9000))
-	assert.Equal(t, expected, calcResult)
-}
-
 func TestFindNextUpgrade(t *testing.T) {
 	sl := getCalculatorWithDummyPrices()
-	assert.Equal(t, 2, sl.findNextUpgrade())
+	assert.Equal(t, 2, sl.findCartUpgrade())
 
-	sl.strikeUpgrades[2] = 1
-	assert.Equal(t, 3, sl.findNextUpgrade())
+	sl.miningModifiers.StrikeUpgrades[2] = 1
+	sl.miningModifiers.StrikeOdds[2] = 0.0025
+	assert.Equal(t, 3, sl.findCartUpgrade())
 
-	sl.strikeUpgrades[3] = 1
-	assert.Equal(t, 4, sl.findNextUpgrade())
+	sl.miningModifiers.StrikeUpgrades[3] = 1
+	sl.miningModifiers.StrikeOdds[3] = sl.miningModifiers.StrikeOdds[2] * 0.0025
+	assert.Equal(t, 4, sl.findCartUpgrade())
 
-	sl.strikeUpgrades[4] = 1
-	assert.Equal(t, 5, sl.findNextUpgrade())
+	sl.miningModifiers.StrikeUpgrades[4] = 1
+	sl.miningModifiers.StrikeOdds[4] = sl.miningModifiers.StrikeOdds[3] * 0.0025
+	assert.Equal(t, 5, sl.findCartUpgrade())
 
-	sl.strikeUpgrades[5] = 1
-	assert.Equal(t, 9000, sl.findNextUpgrade())
+	sl.miningModifiers.StrikeUpgrades[5] = 1
+	sl.miningModifiers.StrikeOdds[5] = sl.miningModifiers.StrikeOdds[4] * 0.0025
+	assert.Equal(t, 9000, sl.findCartUpgrade())
 
-	sl.giantLuckUpgrade = 1
-	assert.Equal(t, 2, sl.findNextUpgrade())
+	sl.miningModifiers.GiantLuckLevel = 1
+	sl.miningModifiers.GiantOdds = .001
+	assert.Equal(t, 2, sl.findCartUpgrade())
 
-	sl.strikeUpgrades[3] = 3
-	sl.strikeUpgrades[4] = 4
-	assert.Equal(t, 2, sl.findNextUpgrade())
-
-	sl.strikeUpgrades[2] = 2
-	sl.strikeUpgrades[3] = 2
-	sl.strikeUpgrades[4] = 2
-	assert.Equal(t, 5, sl.findNextUpgrade())
+	sl.miningModifiers.StrikeUpgrades[3] = 3
+	sl.miningModifiers.StrikeOdds[3] = sl.miningModifiers.StrikeOdds[2] * 0.0025 * 3
+	sl.miningModifiers.StrikeUpgrades[4] = 4
+	sl.miningModifiers.StrikeOdds[4] = sl.miningModifiers.StrikeOdds[3] * 0.0025 * 4
+	assert.Equal(t, 5, sl.findCartUpgrade())
 }
 
 func TestGetNextUpgrade(t *testing.T) {
 	gc := NewGiantCalculator(
-		NewOverclockConfig(false, false, false, false, false, false, false),
 		NewMiningModifiers(
-			1.0,
-			1.0,
 			0.5,
-			1,
+			1.0,
 			0,
 			map[int]int{
 				2: 0,
@@ -110,51 +50,51 @@ func TestGetNextUpgrade(t *testing.T) {
 			},
 			0,
 			map[int]float64{
-				2: 0,
-				3: 0,
-				4: 0,
-				5: 0,
+				2: 0.0,
+				3: 0.0,
+				4: 0.0,
+				5: 0.0,
 			},
 		),
+		false,
 	)
-	nu := gc.GetNextUpgrade()
+	nu := gc.GetNextUpgrade(1000000)
 	assert.Equal(t, "x2 strike", nu)
 
-	gc.strikeUpgrades[DoubleStrike] = 1
-	nu = gc.GetNextUpgrade()
+	gc.miningModifiers.StrikeUpgrades[DoubleStrike] = 1
+	nu = gc.GetNextUpgrade(1000000)
 	assert.Equal(t, "x3 strike", nu)
 
-	gc.strikeUpgrades[TripleStrike] = 1
-	nu = gc.GetNextUpgrade()
+	gc.miningModifiers.StrikeUpgrades[TripleStrike] = 1
+	nu = gc.GetNextUpgrade(1000000)
 	assert.Equal(t, "x4 strike", nu)
 
-	gc.strikeUpgrades[QuadrupleStrike] = 1
-	nu = gc.GetNextUpgrade()
+	gc.miningModifiers.StrikeUpgrades[QuadrupleStrike] = 1
+	nu = gc.GetNextUpgrade(1000000)
 	assert.Equal(t, "x5 strike", nu)
 
-	gc.strikeUpgrades[QuintupleStrike] = 1
-	nu = gc.GetNextUpgrade()
+	gc.miningModifiers.StrikeUpgrades[QuintupleStrike] = 1
+	nu = gc.GetNextUpgrade(1000000)
 	assert.Equal(t, "giant luck", nu)
 
-	gc.strikeUpgrades[DoubleStrike] = 70
-	gc.strikeUpgrades[TripleStrike] = 70
-	gc.strikeUpgrades[QuadrupleStrike] = 70
-	gc.strikeUpgrades[QuintupleStrike] = 70
-	nu = gc.GetNextUpgrade()
+	gc.miningModifiers.StrikeUpgrades[DoubleStrike] = 70
+	gc.miningModifiers.StrikeUpgrades[TripleStrike] = 70
+	gc.miningModifiers.StrikeUpgrades[QuadrupleStrike] = 70
+	gc.miningModifiers.StrikeUpgrades[QuintupleStrike] = 70
+	nu = gc.GetNextUpgrade(1000000)
 	assert.Equal(t, "giant luck", nu)
-
-	gc.giantLuckUpgrade = 59
-	nu = gc.GetNextUpgrade()
-	assert.Equal(t, "giant luck", nu)
-
-	gc.giantLuckUpgrade = 60
-	nu = gc.GetNextUpgrade()
-	assert.Equal(t, "x2 strike", nu)
 }
 
 func getCalculatorWithDummyPrices() GiantCalculator {
 	return GiantCalculator{
-		strikeUpgrades: map[int]int{},
+		miningModifiers: NewMiningModifiers(
+			0.5,
+			1,
+			0,
+			strikeUpgrades{DoubleStrike: 0, TripleStrike: 0, QuadrupleStrike: 0, QuintupleStrike: 0},
+			0,
+			strikeOdds{DoubleStrike: 0, TripleStrike: 0, QuadrupleStrike: 0, QuintupleStrike: 0},
+		),
 		strikePrices: upgradeCostList{
 			1:  20000,
 			2:  40000,

@@ -36,12 +36,43 @@ func NewGiantCalculator(mm MiningModifiers, giantShinyLuckOverclocked bool) Gian
 	}
 }
 
-func (gc *GiantCalculator) GetNextUpgrade() string {
-	nextUpgrade := gc.findNextUpgrade()
-	if nextUpgrade == GiantLuck {
+func (gc *GiantCalculator) GetNextUpgrade(speedUpgradeCost int) string {
+	bestNonSpeed := gc.findCartUpgrade()
+	upgradeCost := 0
+	strikeCosts := upgrade_data.GetStrikePrices()
+	giantLuckCosts := upgrade_data.GetGiantLuckPrices()
+
+	switch bestNonSpeed {
+	case DoubleStrike:
+		upgradeCost = strikeCosts[gc.miningModifiers.StrikeUpgrades[DoubleStrike]+1]
+	case TripleStrike:
+		upgradeCost = strikeCosts[gc.miningModifiers.StrikeUpgrades[TripleStrike]+1]
+	case QuadrupleStrike:
+		upgradeCost = strikeCosts[gc.miningModifiers.StrikeUpgrades[QuadrupleStrike]+1]
+	case QuintupleStrike:
+		upgradeCost = strikeCosts[gc.miningModifiers.StrikeUpgrades[QuintupleStrike]+1]
+	case GiantLuck:
+		upgradeCost = giantLuckCosts[gc.miningModifiers.GiantLuckLevel] + 1
+	}
+
+	nonSpeedMineStrikes := gc.getEggMineAttempts(time.Hour * 24 * 5)
+	nonSpeedGiantCount := float64(nonSpeedMineStrikes) * gc.calculateBaseGiantChance(bestNonSpeed)
+	nonSpeedEfficiency := nonSpeedGiantCount / float64(upgradeCost)
+
+	gc.miningModifiers.MineSpeed += upgrade_data.PerStepSpeedImprovement
+	speedMineStrikes := gc.getEggMineAttempts(time.Hour * 24 * 5)
+	speedGiantCount := float64(speedMineStrikes) * gc.calculateBaseGiantChance(NoChange)
+	speedEfficiency := speedGiantCount / float64(speedUpgradeCost)
+
+	gc.miningModifiers.MineSpeed -= upgrade_data.PerStepSpeedImprovement
+	if speedEfficiency > nonSpeedEfficiency {
+		return "speed"
+	}
+
+	if bestNonSpeed == GiantLuck {
 		return "giant luck"
 	} else {
-		return fmt.Sprintf("x%d strike", nextUpgrade)
+		return fmt.Sprintf("x%d strike", bestNonSpeed)
 	}
 }
 
@@ -49,11 +80,11 @@ func (gc *GiantCalculator) CalculateUpgradePath() {
 	fmt.Println("------------------------------------------------------------")
 	fmt.Println("| x2 | x3 | x4 | x5 | giant |    chance/hit   | stone cost")
 	for {
-		if gc.findNextUpgrade() == NoChange {
+		if gc.findCartUpgrade() == NoChange {
 			return
 		}
 
-		nextUpgrade := gc.findNextUpgrade()
+		nextUpgrade := gc.findCartUpgrade()
 		if nextUpgrade == GiantLuck {
 			gc.miningModifiers.GiantLuckLevel++
 		} else {
@@ -141,38 +172,6 @@ func (gc *GiantCalculator) GetUpgradeCost() int {
 	return totalCost
 }
 
-func (gc *GiantCalculator) SpeedComparison(speedUpgradeCost int, timePeriod time.Duration) (isSpeedBetter bool) {
-	bestNonSpeed := gc.findNextUpgrade()
-	upgradeCost := 0
-	strikeCosts := upgrade_data.GetStrikePrices()
-	giantLuckCosts := upgrade_data.GetGiantLuckPrices()
-
-	switch bestNonSpeed {
-	case DoubleStrike:
-		upgradeCost = strikeCosts[gc.miningModifiers.StrikeUpgrades[DoubleStrike]+1]
-	case TripleStrike:
-		upgradeCost = strikeCosts[gc.miningModifiers.StrikeUpgrades[TripleStrike]+1]
-	case QuadrupleStrike:
-		upgradeCost = strikeCosts[gc.miningModifiers.StrikeUpgrades[QuadrupleStrike]+1]
-	case QuintupleStrike:
-		upgradeCost = strikeCosts[gc.miningModifiers.StrikeUpgrades[QuintupleStrike]+1]
-	case GiantLuck:
-		upgradeCost = giantLuckCosts[gc.miningModifiers.GiantLuckLevel] + 1
-	}
-
-	nonSpeedMineStrikes := gc.getEggMineAttempts(timePeriod)
-	nonSpeedGiantCount := float64(nonSpeedMineStrikes) * gc.calculateBaseGiantChance(bestNonSpeed)
-	nonSpeedEfficiency := nonSpeedGiantCount / float64(upgradeCost)
-
-	gc.miningModifiers.MineSpeed += upgrade_data.PerStepSpeedImprovement
-	speedMineStrikes := gc.getEggMineAttempts(timePeriod)
-	speedGiantCount := float64(speedMineStrikes) * gc.calculateBaseGiantChance(NoChange)
-	speedEfficiency := speedGiantCount / float64(speedUpgradeCost)
-
-	gc.miningModifiers.MineSpeed -= upgrade_data.PerStepSpeedImprovement
-	return speedEfficiency > nonSpeedEfficiency
-}
-
 func (gc *GiantCalculator) findProbabilityBreakpoint(probabilityList map[int]float64, breakPoint float64) (int, float64) {
 	if probabilityList[0] >= 0.5 {
 		return 0, probabilityList[0]
@@ -197,7 +196,7 @@ func (gc *GiantCalculator) getEggMineAttempts(duration time.Duration) uint64 {
 	return uint64(duration.Seconds() * gc.miningModifiers.MineSpeed)
 }
 
-func (gc *GiantCalculator) findNextUpgrade() int {
+func (gc *GiantCalculator) findCartUpgrade() int {
 	if gc.getRequiredFirstUpgrade() != NoChange {
 		return gc.getRequiredFirstUpgrade()
 	}

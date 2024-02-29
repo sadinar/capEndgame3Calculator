@@ -11,8 +11,8 @@ const OneMillion = 1000000
 
 func main() {
 	miningMods := calculators.NewMiningModifiers(
-		0.72,
-		1,
+		0.72, // exactly as on stats screen
+		1, // from the wooden board behind egg
 		.137, // exactly as on stats screen
 		map[int]int{
 			2: 74,
@@ -28,25 +28,21 @@ func main() {
 			5: .985,  // exactly as on stats screen
 		},
 	)
-	shinyMods := calculators.NewShinyModifiers(14.87) // exactly as seen on stats screen
+	shinyMods := calculators.NewShinyModifiers(47.4) // exactly as seen on stats screen
 	duration := time.Hour * 24
 
 	giantCalc := calculators.NewGiantCalculator(miningMods, false)
 	sc := calculators.NewStonesCalculator(
 		miningMods,
-		472.5, // stats screen w/ ingot: 472.5    w/o ingot: 322.5
-		61,    // as shown on stats screen
-		3,     // as shown on stats screen
-		160,   // as shown in stats pane
+		352.5, // stats screen w/ ingot: 472.5    w/o ingot: 322.5
+		73,           // as shown on stats screen
+		5.7,         // as shown on stats screen
+		160,      // as shown in stats pane
 		calculators.MythicEgg,
 		true,
 	)
 
-	if giantCalc.SpeedComparison(1800000, duration*5) {
-		fmt.Println("next giant chance upgrade should be speed")
-	} else {
-		fmt.Println("next giant chance upgrade should be", giantCalc.GetNextUpgrade())
-	}
+	fmt.Println("next giant chance upgrade should be", giantCalc.GetNextUpgrade(1800000))
 	fmt.Println("next stone upgrade should be", sc.FindNextUpgrade(1800000, OneMillion))
 
 	giantCalc.PrintProbabilityMedian(duration, shinyMods)
@@ -54,6 +50,4 @@ func main() {
 	sc.PrintDamageChange(duration, shinyMods)
 	p := message.NewPrinter(message.MatchLanguage("en"))
 	fmt.Println(p.Sprintf("%d stones (%d genned and %d mined) gained in %v", gennedStones+minedStones, gennedStones, minedStones, duration))
-	fmt.Println(p.Sprintf("Extra stones per day from +0.1%% genned pets: %v", float64(gennedStones)*0.001))
-	fmt.Println(p.Sprintf("Shiny odds w/o mine OC: %.4f%%", 100*shinyMods.CalculateShinyOdds()))
 }

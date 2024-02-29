@@ -9,8 +9,7 @@ import (
 )
 
 const MaxGenSpeed = 5.0
-const RubyPickMiningBonus = 2.0
-const PerLevelEggModifier = 0.50
+const PerLevelEggModifier = 0.45
 const CommonEgg = 1
 const UncommonEgg = 2
 const RareEgg = 3
@@ -100,8 +99,8 @@ func (sc *Stones) CalculateMinedStones(period time.Duration) int {
 		return 0
 	}
 
-	stonesPerStrike := 1.0
-	for i := 2; i <= sc.eggLevel; i++ {
+	stonesPerStrike := 0.0
+	for i := 0; i < sc.eggLevel; i++ {
 		stonesPerStrike += PerLevelEggModifier
 	}
 
@@ -177,7 +176,7 @@ func (sc *Stones) calculateStrikeImprovementMargin(strikeType int, period time.D
 	strikeLevel := sc.miningModifiers.StrikeUpgrades[strikeType] + 1
 	strikeCosts := upgrade_data.GetStrikePrices()
 
-	upgradeCalculator := sc.getBaselineComparator()
+	upgradeCalculator := sc.copyComparator()
 	baselineStones := upgradeCalculator.CalculateMinedStones(period)
 
 	switch strikeType {
@@ -197,7 +196,7 @@ func (sc *Stones) calculateStrikeImprovementMargin(strikeType int, period time.D
 }
 
 func (sc *Stones) calculateSpeedImprovementMargin(upgradeCost int, period time.Duration) float64 {
-	upgradeCalculator := sc.getBaselineComparator()
+	upgradeCalculator := sc.copyComparator()
 
 	baselineStones := upgradeCalculator.CalculateMinedStones(period)
 	upgradeCalculator.mineSpeed += PerLevelSpeedModifier
@@ -207,7 +206,7 @@ func (sc *Stones) calculateSpeedImprovementMargin(upgradeCost int, period time.D
 }
 
 func (sc *Stones) calculateCloneImprovementMargin(upgradeCost int, period time.Duration) float64 {
-	upgradeCalculator := sc.getBaselineComparator()
+	upgradeCalculator := sc.copyComparator()
 
 	baselineStones := upgradeCalculator.CalculateGeneratedStones(period)
 	upgradeCalculator.cloneLuck += PerLevelCloneModifier
@@ -216,7 +215,7 @@ func (sc *Stones) calculateCloneImprovementMargin(upgradeCost int, period time.D
 	return float64(postUpgradeStones-baselineStones) / float64(upgradeCost)
 }
 
-func (sc *Stones) getBaselineComparator() Stones {
+func (sc *Stones) copyComparator() Stones {
 	return Stones{
 		miningModifiers: NewMiningModifiers(
 			.5,
@@ -235,7 +234,7 @@ func (sc *Stones) getBaselineComparator() Stones {
 		cloneLuck:             sc.cloneLuck,
 		eggLevel:              MythicEgg,
 		mineSpeed:             sc.miningModifiers.MineSpeed,
-		firstStrike:           1,
-		miningStoneMultiplier: RubyPickMiningBonus,
+		firstStrike:           sc.firstStrike,
+		miningStoneMultiplier: sc.miningStoneMultiplier,
 	}
 }
