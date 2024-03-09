@@ -231,7 +231,7 @@ func (sc *Stones) calculateCloneImprovementMargin(upgradeCost int, period time.D
 
 	baselineStones := upgradeCalculator.CalculateGeneratedStones(period)
 	upgradeCalculator.cloneLuck += PerLevelCloneModifier
-	postUpgradeStones := upgradeCalculator.CalculateMinedStones(period)
+	postUpgradeStones := upgradeCalculator.CalculateGeneratedStones(period)
 
 	return float64(postUpgradeStones-baselineStones) / float64(upgradeCost)
 }
@@ -256,5 +256,6 @@ func (sc *Stones) copyComparator() Stones {
 		eggLevel:              MythicEgg,
 		firstStrike:           sc.firstStrike,
 		miningStoneMultiplier: sc.miningStoneMultiplier,
+		calcifyChance:         sc.calcifyChance,
 	}
 }

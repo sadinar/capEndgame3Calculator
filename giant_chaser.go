@@ -28,7 +28,7 @@ func main() {
 			5: 0.945, // exactly as on stats screen
 		},
 	)
-	shinyMods := calculators.NewShinyModifiers(62.97) // exactly as seen on stats screen
+	shinyMods := calculators.NewShinyModifiers(68.12) // exactly as seen on stats screen
 	duration := time.Hour * 24
 
 	giantCalc := calculators.NewGiantCalculator(miningMods, true)
