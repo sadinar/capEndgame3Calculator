@@ -29,10 +29,11 @@ type GiantCalculator struct {
 
 func NewGiantCalculator(mm MiningModifiers, giantShinyLuckOverclocked bool) GiantCalculator {
 	return GiantCalculator{
-		strikePrices:    upgrade_data.GetStrikePrices(),
-		giantLuckPrices: upgrade_data.GetGiantLuckPrices(),
-		miningModifiers: mm,
-		printer:         message.NewPrinter(language.English),
+		strikePrices:       upgrade_data.GetStrikePrices(),
+		giantLuckPrices:    upgrade_data.GetGiantLuckPrices(),
+		miningModifiers:    mm,
+		shinyLuckOverclock: giantShinyLuckOverclocked,
+		printer:            message.NewPrinter(language.English),
 	}
 }
 
@@ -279,23 +280,23 @@ func (gc *GiantCalculator) calculateBaseGiantChance(incrementedChance int) float
 
 	switch incrementedChance {
 	case DoubleStrike:
-		increasedDoubleOdds := gc.miningModifiers.StrikeOdds[DoubleStrike] + upgrade_data.PerStepStrikeImprovement
+		increasedDoubleOdds := gc.miningModifiers.StrikeOdds[DoubleStrike] + upgrade_data.PerStepStrikeImprovement*1.4
 		return gc.miningModifiers.GiantOdds / gc.miningModifiers.StrikeOdds[DoubleStrike] * increasedDoubleOdds
 	case TripleStrike:
 		originalTripleOdds := gc.miningModifiers.StrikeOdds[TripleStrike] / gc.miningModifiers.StrikeOdds[DoubleStrike]
-		increasedTripleOdds := originalTripleOdds + upgrade_data.PerStepStrikeImprovement
+		increasedTripleOdds := originalTripleOdds + upgrade_data.PerStepStrikeImprovement*1.6
 		return gc.miningModifiers.GiantOdds / (originalTripleOdds) * increasedTripleOdds
 	case QuadrupleStrike:
 		originalQuadOdds := gc.miningModifiers.StrikeOdds[QuadrupleStrike] / gc.miningModifiers.StrikeOdds[TripleStrike]
-		increasedQuadOdds := originalQuadOdds + upgrade_data.PerStepStrikeImprovement
+		increasedQuadOdds := originalQuadOdds + upgrade_data.PerStepStrikeImprovement*1.8
 		return gc.miningModifiers.GiantOdds / originalQuadOdds * increasedQuadOdds
 	case QuintupleStrike:
 		originalPentaOdds := gc.miningModifiers.StrikeOdds[QuintupleStrike] / gc.miningModifiers.StrikeOdds[QuadrupleStrike]
-		increasedPentaOdds := originalPentaOdds + upgrade_data.PerStepStrikeImprovement
+		increasedPentaOdds := originalPentaOdds + upgrade_data.PerStepStrikeImprovement*2
 		return gc.miningModifiers.GiantOdds / originalPentaOdds * increasedPentaOdds
 	case GiantLuck:
 		originalGiantOdds := gc.miningModifiers.GiantOdds / gc.miningModifiers.StrikeOdds[QuadrupleStrike]
-		increasedGiantOdds := originalGiantOdds + upgrade_data.PerStepGiantLuckImprovement
+		increasedGiantOdds := originalGiantOdds + upgrade_data.PerStepGiantLuckImprovement*1.5*1.2*1.1 // achievement, oc, and rune multipliers
 		return gc.miningModifiers.GiantOdds / originalGiantOdds * increasedGiantOdds
 	}
 

@@ -12,7 +12,7 @@ func TestCalculateStrikeImprovementMargin(t *testing.T) {
 	userMods := NewMiningModifiers(
 		0.72,
 		1,
-		70*upgrade_data.PerStepGiantLuckImprovement,
+		.5+70*upgrade_data.PerStepGiantLuckImprovement,
 		map[int]int{
 			2: 74,
 			3: 74,
@@ -21,10 +21,10 @@ func TestCalculateStrikeImprovementMargin(t *testing.T) {
 		},
 		70,
 		map[int]float64{
-			2: 74 * upgrade_data.PerStepStrikeImprovement,
-			3: 74 * upgrade_data.PerStepStrikeImprovement,
-			4: 74 * upgrade_data.PerStepStrikeImprovement,
-			5: 74 * upgrade_data.PerStepStrikeImprovement,
+			2: 100,
+			3: 75,
+			4: 50,
+			5: 25,
 		},
 	)
 	sc := NewStonesCalculator(
@@ -37,8 +37,8 @@ func TestCalculateStrikeImprovementMargin(t *testing.T) {
 		false,
 	)
 
-	margin := sc.calculateStrikeImprovementMargin(5, time.Hour)
-	assert.Equal(t, "0.000063", fmt.Sprintf("%5f", margin))
+	margin := sc.calculateStrikeImprovementMargin(5, time.Hour*24*365)
+	assert.Equal(t, "0.005432", fmt.Sprintf("%5f", margin))
 	margin = sc.calculateStrikeImprovementMargin(2, time.Hour)
 	assert.NotEqual(t, 0.0, margin)
 }

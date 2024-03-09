@@ -27,7 +27,7 @@ func TestFindNextUpgrade(t *testing.T) {
 
 	sl.miningModifiers.GiantLuckLevel = 1
 	sl.miningModifiers.GiantOdds = .001
-	assert.Equal(t, 2, sl.findCartUpgrade())
+	assert.Equal(t, 5, sl.findCartUpgrade())
 
 	sl.miningModifiers.StrikeUpgrades[3] = 3
 	sl.miningModifiers.StrikeOdds[3] = sl.miningModifiers.StrikeOdds[2] * 0.0025 * 3

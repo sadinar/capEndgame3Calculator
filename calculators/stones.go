@@ -20,17 +20,17 @@ const AscendedEgg = 7
 const MythicEgg = 8
 const PerLevelSpeedModifier = 0.1
 const PerLevelCloneModifier = 0.001
+const MaxClones = 9
 
 type Stones struct {
 	firstStrike           float64
-	mineSpeed             float64
 	miningStoneMultiplier float64
 	eggLuck               float64
 	cloneLuck             float64
 	calcifyChance         float64
 	eggLevel              int
 	stonesOverclocked     bool
-	recursiveClone        bool
+	hasRecursiveClone     bool
 	miningModifiers       MiningModifiers
 	printer               *message.Printer
 }
@@ -38,13 +38,12 @@ type Stones struct {
 func NewStonesCalculator(mm MiningModifiers, miningStoneBonus, eggLuck, cloneLuck, calcifyChance float64, eggLevel int, recursiveClone bool) Stones {
 	sc := Stones{
 		firstStrike:           mm.FirstStrike,
-		mineSpeed:             mm.MineSpeed,
 		miningStoneMultiplier: 1 + (miningStoneBonus / 100),
 		eggLuck:               eggLuck / 100,
 		cloneLuck:             cloneLuck / 100,
 		calcifyChance:         1 + (calcifyChance / 100),
 		eggLevel:              eggLevel,
-		recursiveClone:        recursiveClone,
+		hasRecursiveClone:     recursiveClone,
 		miningModifiers:       mm,
 		printer:               message.NewPrinter(language.English),
 	}
@@ -103,9 +102,13 @@ func (sc *Stones) CalculateMinedStones(period time.Duration) int {
 	for i := 0; i < sc.eggLevel; i++ {
 		stonesPerStrike += PerLevelEggModifier
 	}
+	stonesPerStrike *= sc.miningStoneMultiplier
+	if stonesPerStrike < 1 {
+		stonesPerStrike = 1
+	}
 
 	regularStrikes := 0.0
-	regularStrikes = sc.mineSpeed * period.Seconds()
+	regularStrikes = sc.miningModifiers.MineSpeed * period.Seconds()
 	regularStrikes *= sc.firstStrike
 
 	x2Strikes := regularStrikes * sc.miningModifiers.StrikeOdds[DoubleStrike]
@@ -118,11 +121,11 @@ func (sc *Stones) CalculateMinedStones(period time.Duration) int {
 	x3Strikes -= x4Strikes
 	x4Strikes -= x5Strikes
 
-	stones := regularStrikes * stonesPerStrike * sc.miningStoneMultiplier
-	stones += x2Strikes * stonesPerStrike * sc.miningStoneMultiplier * 2
-	stones += x3Strikes * stonesPerStrike * sc.miningStoneMultiplier * 3
-	stones += x4Strikes * stonesPerStrike * sc.miningStoneMultiplier * 4
-	stones += x5Strikes * stonesPerStrike * sc.miningStoneMultiplier * 5
+	stones := regularStrikes * stonesPerStrike
+	stones += x2Strikes * stonesPerStrike * 2
+	stones += x3Strikes * stonesPerStrike * 3
+	stones += x4Strikes * stonesPerStrike * 4
+	stones += x5Strikes * stonesPerStrike * 5
 
 	return int(stones)
 }
@@ -132,8 +135,8 @@ func (sc *Stones) calculateTotalGeneratedPets(period time.Duration) (total, myth
 	eggsPerSecond := MaxGenSpeed
 	totalEggs = eggsPerSecond * period.Seconds()
 	clonedEggs := totalEggs * sc.cloneLuck
-	if sc.recursiveClone {
-		clonedEggs += clonedEggs * sc.cloneLuck
+	if sc.hasRecursiveClone {
+		clonedEggs += float64(sc.recursivelyClone(1, int(clonedEggs)))
 	}
 	totalEggs += clonedEggs
 
@@ -143,6 +146,18 @@ func (sc *Stones) calculateTotalGeneratedPets(period time.Duration) (total, myth
 	totalMythics := directMythics + fusedMythics
 
 	return totalEggs, totalMythics, totalAscended
+}
+
+func (sc *Stones) recursivelyClone(cloneDepth int, startingClones int) int {
+	if cloneDepth > 9 {
+		return 0
+	}
+
+	newClones := int(float64(startingClones) * sc.cloneLuck)
+	if newClones == 0 {
+		return 0
+	}
+	return newClones + sc.recursivelyClone(cloneDepth+1, newClones)
 }
 
 func (sc *Stones) FindNextUpgrade(speedCost, cloneCost int) string {
@@ -181,13 +196,19 @@ func (sc *Stones) calculateStrikeImprovementMargin(strikeType int, period time.D
 
 	switch strikeType {
 	case DoubleStrike:
-		upgradeCalculator.miningModifiers.StrikeOdds[DoubleStrike] += upgrade_data.PerStepStrikeImprovement
+		upgradeCalculator.miningModifiers.StrikeOdds[DoubleStrike] += upgrade_data.PerStepStrikeImprovement * 1.4
 	case TripleStrike:
-		upgradeCalculator.miningModifiers.StrikeOdds[TripleStrike] += upgrade_data.PerStepStrikeImprovement
+		originalTripleOdds := upgradeCalculator.miningModifiers.StrikeOdds[TripleStrike] / upgradeCalculator.miningModifiers.StrikeOdds[DoubleStrike]
+		increasedTripleOdds := originalTripleOdds + upgrade_data.PerStepStrikeImprovement*1.6
+		upgradeCalculator.miningModifiers.StrikeOdds[TripleStrike] = increasedTripleOdds * upgradeCalculator.miningModifiers.StrikeOdds[DoubleStrike]
 	case QuadrupleStrike:
-		upgradeCalculator.miningModifiers.StrikeOdds[QuadrupleStrike] += upgrade_data.PerStepStrikeImprovement
+		originalQuadOdds := upgradeCalculator.miningModifiers.StrikeOdds[QuadrupleStrike] / upgradeCalculator.miningModifiers.StrikeOdds[TripleStrike]
+		increasedQuadOdds := originalQuadOdds + upgrade_data.PerStepStrikeImprovement*1.8
+		upgradeCalculator.miningModifiers.StrikeOdds[QuadrupleStrike] = increasedQuadOdds * upgradeCalculator.miningModifiers.StrikeOdds[TripleStrike]
 	case QuintupleStrike:
-		upgradeCalculator.miningModifiers.StrikeOdds[QuintupleStrike] += upgrade_data.PerStepStrikeImprovement
+		originalPentaOdds := upgradeCalculator.miningModifiers.StrikeOdds[QuintupleStrike] / upgradeCalculator.miningModifiers.StrikeOdds[QuadrupleStrike]
+		increasedPentaOdds := originalPentaOdds + upgrade_data.PerStepStrikeImprovement*2
+		upgradeCalculator.miningModifiers.StrikeOdds[QuintupleStrike] = increasedPentaOdds * upgradeCalculator.miningModifiers.StrikeOdds[QuadrupleStrike]
 	}
 
 	postUpgradeStones := upgradeCalculator.CalculateMinedStones(period)
@@ -199,7 +220,7 @@ func (sc *Stones) calculateSpeedImprovementMargin(upgradeCost int, period time.D
 	upgradeCalculator := sc.copyComparator()
 
 	baselineStones := upgradeCalculator.CalculateMinedStones(period)
-	upgradeCalculator.mineSpeed += PerLevelSpeedModifier
+	upgradeCalculator.miningModifiers.MineSpeed += PerLevelSpeedModifier
 	postUpgradeStones := upgradeCalculator.CalculateMinedStones(period)
 
 	return float64(postUpgradeStones-baselineStones) / float64(upgradeCost)
@@ -218,22 +239,21 @@ func (sc *Stones) calculateCloneImprovementMargin(upgradeCost int, period time.D
 func (sc *Stones) copyComparator() Stones {
 	return Stones{
 		miningModifiers: NewMiningModifiers(
-			.5,
-			1,
+			sc.miningModifiers.MineSpeed,
+			100,
 			0,
 			nil,
 			0,
 			strikeOdds{
-				DoubleStrike:    sc.miningModifiers.StrikeOdds[DoubleStrike],
-				TripleStrike:    sc.miningModifiers.StrikeOdds[TripleStrike],
-				QuadrupleStrike: sc.miningModifiers.StrikeOdds[QuadrupleStrike],
-				QuintupleStrike: sc.miningModifiers.StrikeOdds[QuintupleStrike],
+				DoubleStrike:    sc.miningModifiers.StrikeOdds[DoubleStrike] * 100,
+				TripleStrike:    sc.miningModifiers.StrikeOdds[TripleStrike] * 100,
+				QuadrupleStrike: sc.miningModifiers.StrikeOdds[QuadrupleStrike] * 100,
+				QuintupleStrike: sc.miningModifiers.StrikeOdds[QuintupleStrike] * 100,
 			},
 		),
 		eggLuck:               sc.eggLuck,
 		cloneLuck:             sc.cloneLuck,
 		eggLevel:              MythicEgg,
-		mineSpeed:             sc.miningModifiers.MineSpeed,
 		firstStrike:           sc.firstStrike,
 		miningStoneMultiplier: sc.miningStoneMultiplier,
 	}

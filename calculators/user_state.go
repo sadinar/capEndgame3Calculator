@@ -17,7 +17,7 @@ func NewMiningModifiers(mineSpeed, firstStrike, giantOdds float64, strikeUpgrade
 
 	return MiningModifiers{
 		MineSpeed:      mineSpeed,
-		FirstStrike:    firstStrike,
+		FirstStrike:    firstStrike / 100,
 		StrikeUpgrades: strikeUpgrades,
 		GiantLuckLevel: giantLuckLevel,
 		GiantOdds:      giantOdds / 100,
