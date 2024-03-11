@@ -60,6 +60,9 @@ shinyMods := calculators.NewShinyModifiers(75.12) // exactly as seen on stats sc
 
 ### Giant Calculator
 
+###### Constructor
+Requires a mining modifier config along with a flag indicating whether the giant luck overclock is enabled.
+
 ###### Suggest next giant upgrade
 Given the cost of the next mining speed upgrade, `GetNextUpgrade` on the `Giant` calculator will examine all current 
 upgrades and suggest the next upgrade that will maximize increased giant chance for the minimum number of mythic stones.
@@ -78,7 +81,17 @@ expected to be a value greater than 0 which can reduce to one or more seconds. F
 number between 0 and 1. For example, if the first strike chance shown in game is 85.7%, the value passed in would be 
 0.857.
 
+```go
+giantCalc := calculators.NewGiantCalculator(miningMods, true)
+
+giantCalc.GetNextUpgrade(2100000)
+giantCalc.PrintProbabilityMedian(duration, shinyMods)
+```
+
 ### Stones Calculator
+
+###### Constructor
+Requires mining modifiers and stones modifiers config objects.
 
 ###### Suggest next stones upgrade
 Given the costs of the next mining speed and clone luck upgrades, `FindNextUpgrade` on the `Stones` calculator will 
@@ -93,11 +106,7 @@ Given a duration, PrintDamageChange will estimate how much each pet class' damag
 generation for that duration. This allows a comparison between different egg luck values alongside their stone effect.
 
 ```go
-giantCalc := calculators.NewGiantCalculator(miningMods, true)
 stoneCalc := calculators.NewStonesCalculator(miningMods, generationMods)
-
-giantCalc.GetNextUpgrade(2100000)
-giantCalc.PrintProbabilityMedian(duration, shinyMods)
 
 stoneCalc.FindNextUpgrade(2100000, 700000)
 stoneCalc.CalculateCombinedStones(duration)
