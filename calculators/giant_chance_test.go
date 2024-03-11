@@ -42,6 +42,7 @@ func TestGetNextUpgrade(t *testing.T) {
 			0.5,
 			1.0,
 			0,
+			0,
 			map[int]int{
 				2: 0,
 				3: 0,
@@ -85,11 +86,12 @@ func TestGetNextUpgrade(t *testing.T) {
 	assert.Equal(t, "giant luck", nu)
 }
 
-func getCalculatorWithDummyPrices() GiantCalculator {
-	return GiantCalculator{
+func getCalculatorWithDummyPrices() Giant {
+	return Giant{
 		miningModifiers: NewMiningModifiers(
 			0.5,
 			1,
+			0,
 			0,
 			strikeUpgrades{DoubleStrike: 0, TripleStrike: 0, QuadrupleStrike: 0, QuintupleStrike: 0},
 			0,

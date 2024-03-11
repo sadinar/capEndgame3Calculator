@@ -19,7 +19,7 @@ type upgradeCostList map[int]int
 type strikeUpgrades map[int]int
 type strikeOdds map[int]float64
 
-type GiantCalculator struct {
+type Giant struct {
 	strikePrices       upgradeCostList
 	giantLuckPrices    upgradeCostList
 	miningModifiers    MiningModifiers
@@ -27,8 +27,8 @@ type GiantCalculator struct {
 	printer            *message.Printer
 }
 
-func NewGiantCalculator(mm MiningModifiers, giantShinyLuckOverclocked bool) GiantCalculator {
-	return GiantCalculator{
+func NewGiantCalculator(mm MiningModifiers, giantShinyLuckOverclocked bool) Giant {
+	return Giant{
 		strikePrices:       upgrade_data.GetStrikePrices(),
 		giantLuckPrices:    upgrade_data.GetGiantLuckPrices(),
 		miningModifiers:    mm,
@@ -37,7 +37,7 @@ func NewGiantCalculator(mm MiningModifiers, giantShinyLuckOverclocked bool) Gian
 	}
 }
 
-func (gc *GiantCalculator) GetNextUpgrade(speedUpgradeCost int) string {
+func (gc *Giant) GetNextUpgrade(speedUpgradeCost int) string {
 	bestNonSpeed := gc.findCartUpgrade()
 	upgradeCost := 0
 	strikeCosts := upgrade_data.GetStrikePrices()
@@ -77,7 +77,7 @@ func (gc *GiantCalculator) GetNextUpgrade(speedUpgradeCost int) string {
 	}
 }
 
-func (gc *GiantCalculator) CalculateUpgradePath() {
+func (gc *Giant) CalculateUpgradePath() {
 	fmt.Println("------------------------------------------------------------")
 	fmt.Println("| x2 | x3 | x4 | x5 | giant |    chance/hit   | stone cost")
 	for {
@@ -107,14 +107,14 @@ func (gc *GiantCalculator) CalculateUpgradePath() {
 	}
 }
 
-func (gc *GiantCalculator) CalculateChancePerStrike() float64 {
+func (gc *Giant) CalculateChancePerStrike() float64 {
 	chance := gc.calculateBaseGiantChance(0)
 	chance *= gc.miningModifiers.FirstStrike
 
 	return chance
 }
 
-func (gc *GiantCalculator) PrintProbabilityDistribution(duration time.Duration) {
+func (gc *Giant) PrintProbabilityDistribution(duration time.Duration) {
 	dailyAttempts := gc.getEggMineAttempts(duration)
 	successProbability := gc.CalculateChancePerStrike()
 	successCount, consumedProbabilitySpace := FindReasonableSuccessCeiling(dailyAttempts, successProbability)
@@ -135,7 +135,7 @@ func (gc *GiantCalculator) PrintProbabilityDistribution(duration time.Duration) 
 	fmt.Println(fmt.Sprintf("%d+: %.12f%%", len(probabilityList), (1-consumedProbabilitySpace)*100))
 }
 
-func (gc *GiantCalculator) PrintProbabilityMedian(duration time.Duration, sMods ShinyModifiers) {
+func (gc *Giant) PrintProbabilityMedian(duration time.Duration, sMods ShinyModifiers) {
 	dailyAttempts := gc.getEggMineAttempts(duration)
 	successProbability := gc.CalculateChancePerStrike()
 	successCount, _ := FindReasonableSuccessCeiling(dailyAttempts, successProbability)
@@ -163,7 +163,7 @@ func (gc *GiantCalculator) PrintProbabilityMedian(duration time.Duration, sMods 
 	)
 }
 
-func (gc *GiantCalculator) GetUpgradeCost() int {
+func (gc *Giant) GetUpgradeCost() int {
 	totalCost := 0
 	for _, level := range gc.miningModifiers.StrikeUpgrades {
 		for i := 1; i <= level; i++ {
@@ -178,7 +178,7 @@ func (gc *GiantCalculator) GetUpgradeCost() int {
 	return totalCost
 }
 
-func (gc *GiantCalculator) findProbabilityBreakpoint(probabilityList map[int]float64, breakPoint float64) (int, float64) {
+func (gc *Giant) findProbabilityBreakpoint(probabilityList map[int]float64, breakPoint float64) (int, float64) {
 	if probabilityList[0] >= 0.5 {
 		return 0, probabilityList[0]
 	}
@@ -198,11 +198,11 @@ func (gc *GiantCalculator) findProbabilityBreakpoint(probabilityList map[int]flo
 	return maxIncludedIndex, totalProbability
 }
 
-func (gc *GiantCalculator) getEggMineAttempts(duration time.Duration) uint64 {
+func (gc *Giant) getEggMineAttempts(duration time.Duration) uint64 {
 	return uint64(duration.Seconds() * gc.miningModifiers.MineSpeed)
 }
 
-func (gc *GiantCalculator) findCartUpgrade() int {
+func (gc *Giant) findCartUpgrade() int {
 	if gc.getRequiredFirstUpgrade() != NoChange {
 		return gc.getRequiredFirstUpgrade()
 	}
@@ -240,7 +240,7 @@ func (gc *GiantCalculator) findCartUpgrade() int {
 	return bestStrikeUpgrade
 }
 
-func (gc *GiantCalculator) getRequiredFirstUpgrade() int {
+func (gc *Giant) getRequiredFirstUpgrade() int {
 	if gc.miningModifiers.StrikeUpgrades[DoubleStrike] == 0 {
 		return DoubleStrike
 	}
@@ -260,7 +260,7 @@ func (gc *GiantCalculator) getRequiredFirstUpgrade() int {
 	return NoChange
 }
 
-func (gc *GiantCalculator) listPossibleStrikeUpgrades() []int {
+func (gc *Giant) listPossibleStrikeUpgrades() []int {
 	strikeChoices := make([]int, 0)
 	if gc.miningModifiers.StrikeUpgrades[DoubleStrike] < len(gc.strikePrices) {
 		strikeChoices = append(strikeChoices, DoubleStrike)
@@ -278,7 +278,7 @@ func (gc *GiantCalculator) listPossibleStrikeUpgrades() []int {
 	return strikeChoices
 }
 
-func (gc *GiantCalculator) calculateBaseGiantChance(incrementedChance int) float64 {
+func (gc *Giant) calculateBaseGiantChance(incrementedChance int) float64 {
 	if incrementedChance == NoChange {
 		return gc.miningModifiers.GiantOdds
 	}
@@ -308,7 +308,7 @@ func (gc *GiantCalculator) calculateBaseGiantChance(incrementedChance int) float
 	panic("unknown calculate giant chance option")
 }
 
-func (gc *GiantCalculator) getProbabilityList(successCount, trials uint64, successProbability float64) map[int]float64 {
+func (gc *Giant) getProbabilityList(successCount, trials uint64, successProbability float64) map[int]float64 {
 	probabilityList := make(map[int]float64, 0)
 	for i := 0; i <= int(successCount); i++ {
 		chance := BinomialProbability(trials, uint64(i), successProbability)

@@ -11,8 +11,9 @@ import (
 func TestCalculateStrikeImprovementMargin(t *testing.T) {
 	userMods := NewMiningModifiers(
 		0.72,
-		1,
+		100,
 		.5+70*upgrade_data.PerStepGiantLuckImprovement,
+		0,
 		map[int]int{
 			2: 74,
 			3: 74,
@@ -27,18 +28,11 @@ func TestCalculateStrikeImprovementMargin(t *testing.T) {
 			5: 25,
 		},
 	)
-	sc := NewStonesCalculator(
-		userMods,
-		219,
-		0.43,
-		0,
-		100,
-		MythicEgg,
-		false,
-	)
+	genMods := NewEggGenerationModifiers(0.43, 0, 100, MythicEgg, false)
+	sc := NewStonesCalculator(userMods, genMods)
 
 	margin := sc.calculateStrikeImprovementMargin(5, time.Hour*24*365)
-	assert.Equal(t, "0.005432", fmt.Sprintf("%5f", margin))
+	assert.Equal(t, "0.001720", fmt.Sprintf("%5f", margin))
 	margin = sc.calculateStrikeImprovementMargin(2, time.Hour)
 	assert.NotEqual(t, 0.0, margin)
 }
@@ -46,8 +40,9 @@ func TestCalculateStrikeImprovementMargin(t *testing.T) {
 func TestFindNextStoneUpgrade(t *testing.T) {
 	userMods := NewMiningModifiers(
 		0.72,
-		1,
+		100,
 		70*upgrade_data.PerStepGiantLuckImprovement,
+		0,
 		map[int]int{
 			2: 74,
 			3: 74,
@@ -62,15 +57,8 @@ func TestFindNextStoneUpgrade(t *testing.T) {
 			5: 74 * upgrade_data.PerStepStrikeImprovement,
 		},
 	)
-	sc := NewStonesCalculator(
-		userMods,
-		100,
-		0.43,
-		0,
-		100,
-		MythicEgg,
-		false,
-	)
+	genMods := NewEggGenerationModifiers(0.43, 0, 100, MythicEgg, false)
+	sc := NewStonesCalculator(userMods, genMods)
 
 	result := sc.FindNextUpgrade(1800000, 10000000000)
 	assert.Equal(t, "speed", result)
