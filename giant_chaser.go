@@ -44,14 +44,9 @@ func main() {
 	giantCalc := calculators.NewGiantCalculator(miningMods, true)
 	stoneCalc := calculators.NewStonesCalculator(miningMods, generationMods)
 
-	fmt.Println(
-		"next giant chance upgrade should be",
-		giantCalc.GetNextUpgrade(2*Million+2*HundredThousand),
-	)
-	fmt.Println(
-		"next stone upgrade should be",
-		stoneCalc.FindNextUpgrade(2*Million+2*HundredThousand, 9*HundredThousand),
-	)
+	nextSpeedUpgradeCost := 2*Million + 2*HundredThousand
+	fmt.Println("next giant chance upgrade should be", giantCalc.GetNextUpgrade(nextSpeedUpgradeCost))
+	fmt.Println("next stone upgrade should be", stoneCalc.FindNextUpgrade(nextSpeedUpgradeCost, 9*HundredThousand))
 
 	giantCalc.PrintProbabilityMedian(duration, shinyMods)
 	gennedStones, minedStones := stoneCalc.CalculateCombinedStones(duration)
