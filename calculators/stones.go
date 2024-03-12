@@ -24,6 +24,8 @@ const MaxClones = 9
 const UniqueAscendedPets = 6
 const UniqueMythicPets = 6
 const BaseShinyDivisor = 1000
+const TitaniumAscendedBaseDamage = 1950
+const TitaniumMythicBaseDamage = 2000
 
 type Stones struct {
 	generationModifiers EggGenerationModifiers
@@ -67,18 +69,20 @@ func (sc *Stones) PrintDamageChange(period time.Duration, sMods ShinyModifiers) 
 
 	fmt.Println(
 		sc.printer.Sprintf(
-			"ascended generated: %d ascended dmg multiplier gained: x%.5f (+%d dmg)",
+			"ascended generated: %d (%d shiny score): ascended dmg multiplier gained: x%.5f (+%d dmg)",
 			int(totalAscended),
+			int(sMods.CalculateShinyOdds()*totalAscended*AscendedShinyScore),
 			ascDmgMultiplier,
-			int(1950*ascDmgMultiplier),
+			int(TitaniumAscendedBaseDamage*ascDmgMultiplier),
 		),
 	)
 	fmt.Println(
 		sc.printer.Sprintf(
-			"mythic generated: %d mythic dmg multiplier gained: x%.5f (+%d dmg)",
+			"mythic generated: %d (%d shiny score): mythic dmg multiplier gained: x%.5f (+%d dmg)",
 			int(totalMythics),
+			int(sMods.CalculateShinyOdds()*totalMythics*MythicShinyScore),
 			mythDmgMultiplier,
-			int(2000*mythDmgMultiplier),
+			int(TitaniumMythicBaseDamage*mythDmgMultiplier),
 		),
 	)
 }

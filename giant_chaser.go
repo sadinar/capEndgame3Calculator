@@ -7,7 +7,8 @@ import (
 	"time"
 )
 
-const OneMillion = 1000000
+const HundredThousand = 100000
+const Million = 1000000
 
 func main() {
 	miningMods := calculators.NewMiningModifiers(
@@ -31,7 +32,7 @@ func main() {
 	)
 	generationMods := calculators.NewEggGenerationModifiers(
 		51,    // as shown on stats screen
-		6.2,   // as shown on stats screen
+		6.3,   // as shown on stats screen
 		127.5, // as shown in stats pane
 		calculators.MythicEgg,
 		true,
@@ -43,8 +44,14 @@ func main() {
 	giantCalc := calculators.NewGiantCalculator(miningMods, true)
 	stoneCalc := calculators.NewStonesCalculator(miningMods, generationMods)
 
-	fmt.Println("next giant chance upgrade should be", giantCalc.GetNextUpgrade(2200000))
-	fmt.Println("next stone upgrade should be", stoneCalc.FindNextUpgrade(2200000, 800000))
+	fmt.Println(
+		"next giant chance upgrade should be",
+		giantCalc.GetNextUpgrade(2*Million+2*HundredThousand),
+	)
+	fmt.Println(
+		"next stone upgrade should be",
+		stoneCalc.FindNextUpgrade(2*Million+2*HundredThousand, 9*HundredThousand),
+	)
 
 	giantCalc.PrintProbabilityMedian(duration, shinyMods)
 	gennedStones, minedStones := stoneCalc.CalculateCombinedStones(duration)

@@ -27,11 +27,17 @@ func NewMiningModifiers(mineSpeed, firstStrike, giantOdds, stonesFromMining floa
 	}
 }
 
+const AscendedShinyScore = 30
+const MythicShinyScore = 40
+
 type ShinyModifiers struct {
 	shinyLuck float64
 }
 
 func NewShinyModifiers(shinyLuck float64) ShinyModifiers {
+	if shinyLuck > 100 {
+		shinyLuck = 100
+	}
 	return ShinyModifiers{shinyLuck: shinyLuck / 100}
 }
 
