@@ -136,7 +136,7 @@ func (sc *Stones) calculateTotalGeneratedPets(period time.Duration) (total, myth
 }
 
 func (sc *Stones) recursivelyClone(cloneDepth int, startingClones int) int {
-	if cloneDepth > 9 {
+	if cloneDepth > MaxClones {
 		return 0
 	}
 
