@@ -234,9 +234,9 @@ func (sc *Stones) copyComparator() Stones {
 	return Stones{
 		miningModifiers: NewMiningModifiers(
 			sc.miningModifiers.MineSpeed,
-			sc.miningModifiers.FirstStrike,
+			sc.miningModifiers.FirstStrike*100,
 			0,
-			sc.miningModifiers.MiningStoneMultiplier,
+			sc.miningModifiers.MiningStoneMultiplier*100,
 			nil,
 			0,
 			strikeOdds{
