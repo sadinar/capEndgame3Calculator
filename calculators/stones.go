@@ -21,6 +21,9 @@ const MythicEgg = 8
 const PerLevelSpeedModifier = 0.1
 const PerLevelCloneModifier = 0.001
 const MaxClones = 9
+const UniqueAscendedPets = 6
+const UniqueMythicPets = 6
+const BaseShinyDivisor = 1000
 
 type Stones struct {
 	generationModifiers EggGenerationModifiers
@@ -59,8 +62,8 @@ func (sc *Stones) PrintDamageChange(period time.Duration, sMods ShinyModifiers) 
 
 	_, totalMythics, totalAscended := sc.calculateTotalGeneratedPets(period)
 
-	ascDmgMultiplier := totalAscended / 6.0 / 1000.0 * sMods.CalculateShinyOdds()
-	mythDmgMultiplier := totalMythics / 6.0 / 1000.0 * sMods.CalculateShinyOdds()
+	ascDmgMultiplier := totalAscended / UniqueAscendedPets / BaseShinyDivisor * sMods.CalculateShinyOdds()
+	mythDmgMultiplier := totalMythics / UniqueMythicPets / BaseShinyDivisor * sMods.CalculateShinyOdds()
 
 	fmt.Println(
 		sc.printer.Sprintf(
