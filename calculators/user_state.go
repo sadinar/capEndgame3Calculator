@@ -10,7 +10,7 @@ type MiningModifiers struct {
 	MiningStoneMultiplier float64
 }
 
-func NewMiningModifiers(mineSpeed, firstStrike, giantOdds, miningStoneBonus float64, strikeUpgrades strikeUpgrades, giantLuckLevel int, strikeOdds strikeOdds) MiningModifiers {
+func NewMiningModifiers(mineSpeed, firstStrike, giantOdds, stonesFromMining float64, strikeUpgrades strikeUpgrades, giantLuckLevel int, strikeOdds strikeOdds) MiningModifiers {
 	strikeOdds[DoubleStrike] = strikeOdds[DoubleStrike] / 100
 	strikeOdds[TripleStrike] = strikeOdds[TripleStrike] / 100
 	strikeOdds[QuadrupleStrike] = strikeOdds[QuadrupleStrike] / 100
@@ -23,7 +23,7 @@ func NewMiningModifiers(mineSpeed, firstStrike, giantOdds, miningStoneBonus floa
 		GiantLuckLevel:        giantLuckLevel,
 		GiantOdds:             giantOdds / 100,
 		StrikeOdds:            strikeOdds,
-		MiningStoneMultiplier: 1 + (miningStoneBonus / 100),
+		MiningStoneMultiplier: stonesFromMining / 100,
 	}
 }
 

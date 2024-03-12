@@ -9,7 +9,7 @@ import (
 )
 
 const MaxGenSpeed = 5.0
-const PerLevelEggModifier = 0.45
+const PerLevelEggModifier = 0.5
 const CommonEgg = 1
 const UncommonEgg = 2
 const RareEgg = 3
@@ -85,8 +85,8 @@ func (sc *Stones) CalculateMinedStones(period time.Duration) int {
 		return 0
 	}
 
-	stonesPerStrike := 0.0
-	for i := 0; i < sc.generationModifiers.EggLevel; i++ {
+	stonesPerStrike := 1.0
+	for i := 1; i < sc.generationModifiers.EggLevel; i++ {
 		stonesPerStrike += PerLevelEggModifier
 	}
 	stonesPerStrike *= sc.miningModifiers.MiningStoneMultiplier

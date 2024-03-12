@@ -32,8 +32,8 @@ func TestCalculateStrikeImprovementMargin(t *testing.T) {
 	sc := NewStonesCalculator(userMods, genMods)
 
 	margin := sc.calculateStrikeImprovementMargin(5, time.Hour*24*365)
-	assert.Equal(t, "0.001720", fmt.Sprintf("%5f", margin))
-	margin = sc.calculateStrikeImprovementMargin(2, time.Hour)
+	assert.Equal(t, "0.000472", fmt.Sprintf("%5f", margin))
+	margin = sc.calculateStrikeImprovementMargin(2, time.Hour*24)
 	assert.NotEqual(t, 0.0, margin)
 }
 
