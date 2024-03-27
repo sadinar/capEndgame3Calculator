@@ -23,27 +23,29 @@ type Giant struct {
 	strikePrices       upgradeCostList
 	giantLuckPrices    upgradeCostList
 	miningModifiers    MiningModifiers
+	labModifiers       LabModifiers
 	shinyLuckOverclock bool
 	printer            *message.Printer
 }
 
-func NewGiantCalculator(mm MiningModifiers, giantShinyLuckOverclocked bool) Giant {
+func NewGiantCalculator(mm MiningModifiers, lm LabModifiers, giantShinyLuckOverclocked bool) Giant {
 	return Giant{
 		strikePrices:       upgrade_data.GetStrikePrices(),
 		giantLuckPrices:    upgrade_data.GetGiantLuckPrices(),
 		miningModifiers:    mm,
+		labModifiers:       lm,
 		shinyLuckOverclock: giantShinyLuckOverclocked,
 		printer:            message.NewPrinter(language.English),
 	}
 }
 
 func (gc *Giant) GetNextUpgrade(speedUpgradeCost int) string {
-	bestNonSpeed := gc.findCartUpgrade()
+	bestUpgrade := gc.findCartUpgrade()
 	upgradeCost := 0
 	strikeCosts := upgrade_data.GetStrikePrices()
 	giantLuckCosts := upgrade_data.GetGiantLuckPrices()
 
-	switch bestNonSpeed {
+	switch bestUpgrade {
 	case DoubleStrike:
 		upgradeCost = strikeCosts[gc.miningModifiers.StrikeUpgrades[DoubleStrike]+1]
 	case TripleStrike:
@@ -56,25 +58,19 @@ func (gc *Giant) GetNextUpgrade(speedUpgradeCost int) string {
 		upgradeCost = giantLuckCosts[gc.miningModifiers.GiantLuckLevel] + 1
 	}
 
-	nonSpeedMineStrikes := gc.getEggMineAttempts(time.Hour * 24 * 5)
-	nonSpeedGiantCount := float64(nonSpeedMineStrikes) * gc.calculateBaseGiantChance(bestNonSpeed)
-	nonSpeedEfficiency := nonSpeedGiantCount / float64(upgradeCost)
-
-	gc.miningModifiers.MineSpeed += upgrade_data.PerStepSpeedImprovement
-	speedMineStrikes := gc.getEggMineAttempts(time.Hour * 24 * 5)
-	speedGiantCount := float64(speedMineStrikes) * gc.calculateBaseGiantChance(NoChange)
-	speedEfficiency := speedGiantCount / float64(speedUpgradeCost)
-
-	gc.miningModifiers.MineSpeed -= upgrade_data.PerStepSpeedImprovement
-	if speedEfficiency > nonSpeedEfficiency {
+	if speedUpgradeCost != UpgradeComplete && gc.isSpeedBetterUpgrade(bestUpgrade, upgradeCost, speedUpgradeCost) {
 		return "speed"
 	}
 
-	if bestNonSpeed == GiantLuck {
-		return "giant luck"
-	} else {
-		return fmt.Sprintf("x%d strike", bestNonSpeed)
+	if bestUpgrade == NoChange {
+		return "n/a"
 	}
+
+	if bestUpgrade == GiantLuck {
+		return "giant luck"
+	}
+
+	return fmt.Sprintf("x%d strike", bestUpgrade)
 }
 
 func (gc *Giant) CalculateUpgradePath() {
@@ -176,6 +172,24 @@ func (gc *Giant) GetUpgradeCost() int {
 	}
 
 	return totalCost
+}
+
+func (gc *Giant) isSpeedBetterUpgrade(bestNonSpeedUpgrade, nonSpeedUpgradeCost, speedUpgradeCost int) bool {
+	if bestNonSpeedUpgrade == NoChange && speedUpgradeCost != UpgradeComplete {
+		return true
+	}
+
+	nonSpeedMineStrikes := gc.getEggMineAttempts(time.Hour * 24 * 5)
+	nonSpeedGiantCount := float64(nonSpeedMineStrikes) * gc.calculateBaseGiantChance(bestNonSpeedUpgrade)
+	nonSpeedEfficiency := nonSpeedGiantCount / float64(nonSpeedUpgradeCost)
+
+	gc.miningModifiers.MineSpeed += upgrade_data.PerStepSpeedImprovement
+	speedMineStrikes := gc.getEggMineAttempts(time.Hour * 24 * 5)
+	speedGiantCount := float64(speedMineStrikes) * gc.calculateBaseGiantChance(NoChange)
+	speedEfficiency := speedGiantCount / float64(speedUpgradeCost)
+	gc.miningModifiers.MineSpeed -= upgrade_data.PerStepSpeedImprovement
+
+	return speedEfficiency > nonSpeedEfficiency
 }
 
 func (gc *Giant) findProbabilityBreakpoint(probabilityList map[int]float64, breakPoint float64) (int, float64) {
@@ -301,7 +315,8 @@ func (gc *Giant) calculateBaseGiantChance(incrementedChance int) float64 {
 		return gc.miningModifiers.GiantOdds / originalPentaOdds * increasedPentaOdds
 	case GiantLuck:
 		originalGiantOdds := gc.miningModifiers.GiantOdds / gc.miningModifiers.StrikeOdds[QuadrupleStrike]
-		increasedGiantOdds := originalGiantOdds + upgrade_data.PerStepGiantLuckImprovement*1.5*1.2*1.1 // achievement, oc, and rune multipliers
+		modifiers := gc.labModifiers.t7GiantLuck * gc.labModifiers.t8GiantLuck * 1.5 * 1.2 * 1.1 // achievement, oc, and rune multipliers
+		increasedGiantOdds := originalGiantOdds + upgrade_data.PerStepGiantLuckImprovement*modifiers
 		return gc.miningModifiers.GiantOdds / originalGiantOdds * increasedGiantOdds
 	}
 

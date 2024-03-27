@@ -211,6 +211,10 @@ func (sc *Stones) calculateStrikeImprovementMargin(strikeType int, period time.D
 }
 
 func (sc *Stones) calculateSpeedImprovementMargin(upgradeCost int, period time.Duration) float64 {
+	if upgradeCost == UpgradeComplete {
+		return 0
+	}
+
 	upgradeCalculator := sc.copyComparator()
 
 	baselineStones := upgradeCalculator.CalculateMinedStones(period)
@@ -221,6 +225,10 @@ func (sc *Stones) calculateSpeedImprovementMargin(upgradeCost int, period time.D
 }
 
 func (sc *Stones) calculateCloneImprovementMargin(upgradeCost int, period time.Duration) float64 {
+	if upgradeCost == UpgradeComplete {
+		return 0
+	}
+
 	upgradeCalculator := sc.copyComparator()
 
 	baselineStones := upgradeCalculator.CalculateGeneratedStones(period)

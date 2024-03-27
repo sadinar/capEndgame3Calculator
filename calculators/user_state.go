@@ -1,5 +1,9 @@
 package calculators
 
+const AscendedShinyScore = 30
+const MythicShinyScore = 40
+const UpgradeComplete = 0
+
 type MiningModifiers struct {
 	MineSpeed             float64
 	FirstStrike           float64
@@ -26,9 +30,6 @@ func NewMiningModifiers(mineSpeed, firstStrike, giantOdds, stonesFromMining floa
 		MiningStoneMultiplier: stonesFromMining / 100,
 	}
 }
-
-const AscendedShinyScore = 30
-const MythicShinyScore = 40
 
 type ShinyModifiers struct {
 	shinyLuck float64
@@ -60,5 +61,17 @@ func NewEggGenerationModifiers(eggLuck, cloneLuck, calcifyChance float64, eggLev
 		CalcifyChance:     1 + (calcifyChance / 100),
 		EggLevel:          eggLevel,
 		HasRecursiveClone: hasRecursiveClone,
+	}
+}
+
+type LabModifiers struct {
+	t7GiantLuck float64
+	t8GiantLuck float64
+}
+
+func NewLabModifiers(t7GiantLuck, t8GiantLuck float64) LabModifiers {
+	return LabModifiers{
+		t7GiantLuck: t7GiantLuck,
+		t8GiantLuck: t8GiantLuck,
 	}
 }
