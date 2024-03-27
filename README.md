@@ -58,6 +58,10 @@ generationMods := calculators.NewEggGenerationModifiers(
 shinyMods := calculators.NewShinyModifiers(75.12) // exactly as seen on stats screen
 ```
 
+```go
+LabMods := calculators.NewLabModifiers(1.05, 1.08) // modifiers from lab upgrades in tiers 7 and 8. Use 1 if upgrade not purchased
+```
+
 ### Giant Calculator
 
 ###### Constructor
@@ -82,7 +86,7 @@ number between 0 and 1. For example, if the first strike chance shown in game is
 0.857.
 
 ```go
-giantCalc := calculators.NewGiantCalculator(miningMods, true)
+giantCalc := calculators.NewGiantCalculator(miningMods, LabMods, true)
 
 giantCalc.GetNextUpgrade(2100000)
 giantCalc.PrintProbabilityMedian(duration, shinyMods)
