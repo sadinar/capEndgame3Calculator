@@ -3,6 +3,11 @@ package calculators
 const AscendedShinyScore = 30
 const MythicShinyScore = 40
 const UpgradeComplete = 0
+const X2OverclockMultiplier = 1.4
+const X3OverclockMultiplier = 1.6
+const X4OverclockMultiplier = 1.8
+const X5OverclockMultiplier = 2.0
+const GiantLuckOverclockMultiplier = 1.5
 
 type MiningModifiers struct {
 	MineSpeed             float64
@@ -12,9 +17,13 @@ type MiningModifiers struct {
 	GiantLuckLevel        int
 	GiantOdds             float64
 	MiningStoneMultiplier float64
+	x2Overclock           bool
+	x3Overclock           bool
+	x4Overclock           bool
+	x5Overclock           bool
 }
 
-func NewMiningModifiers(mineSpeed, firstStrike, giantOdds, stonesFromMining float64, strikeUpgrades strikeUpgrades, giantLuckLevel int, strikeOdds strikeOdds) MiningModifiers {
+func NewMiningModifiers(mineSpeed, firstStrike, giantOdds, stonesFromMining float64, strikeUpgrades strikeUpgrades, giantLuckLevel int, strikeOdds strikeOdds, x2Overclock, x3Overclock, x4Overclock, x5Overclock bool) MiningModifiers {
 	strikeOdds[DoubleStrike] = strikeOdds[DoubleStrike] / 100
 	strikeOdds[TripleStrike] = strikeOdds[TripleStrike] / 100
 	strikeOdds[QuadrupleStrike] = strikeOdds[QuadrupleStrike] / 100
@@ -28,6 +37,10 @@ func NewMiningModifiers(mineSpeed, firstStrike, giantOdds, stonesFromMining floa
 		GiantOdds:             giantOdds / 100,
 		StrikeOdds:            strikeOdds,
 		MiningStoneMultiplier: stonesFromMining / 100,
+		x2Overclock:           x2Overclock,
+		x3Overclock:           x3Overclock,
+		x4Overclock:           x4Overclock,
+		x5Overclock:           x5Overclock,
 	}
 }
 
@@ -64,14 +77,20 @@ func NewEggGenerationModifiers(eggLuck, cloneLuck, calcifyChance float64, eggLev
 	}
 }
 
-type LabModifiers struct {
-	t7GiantLuck float64
-	t8GiantLuck float64
+type GiantModifiers struct {
+	t7GiantLuck   float64
+	t8GiantLuck   float64
+	achievement   float64
+	rune          float64
+	isOverclocked bool
 }
 
-func NewLabModifiers(t7GiantLuck, t8GiantLuck float64) LabModifiers {
-	return LabModifiers{
-		t7GiantLuck: t7GiantLuck,
-		t8GiantLuck: t8GiantLuck,
+func NewGiantModifiers(t7GiantLuck, t8GiantLuck, achievement, rune float64, isOverclocked bool) GiantModifiers {
+	return GiantModifiers{
+		t7GiantLuck:   t7GiantLuck,
+		t8GiantLuck:   t8GiantLuck,
+		achievement:   achievement,
+		rune:          rune,
+		isOverclocked: isOverclocked,
 	}
 }

@@ -23,17 +23,17 @@ type Giant struct {
 	strikePrices       upgradeCostList
 	giantLuckPrices    upgradeCostList
 	miningModifiers    MiningModifiers
-	labModifiers       LabModifiers
+	giantLuckModifiers GiantModifiers
 	shinyLuckOverclock bool
 	printer            *message.Printer
 }
 
-func NewGiantCalculator(mm MiningModifiers, lm LabModifiers, giantShinyLuckOverclocked bool) Giant {
+func NewGiantCalculator(mm MiningModifiers, lm GiantModifiers, giantShinyLuckOverclocked bool) Giant {
 	return Giant{
 		strikePrices:       upgrade_data.GetStrikePrices(),
 		giantLuckPrices:    upgrade_data.GetGiantLuckPrices(),
 		miningModifiers:    mm,
-		labModifiers:       lm,
+		giantLuckModifiers: lm,
 		shinyLuckOverclock: giantShinyLuckOverclocked,
 		printer:            message.NewPrinter(language.English),
 	}
@@ -299,23 +299,42 @@ func (gc *Giant) calculateBaseGiantChance(incrementedChance int) float64 {
 
 	switch incrementedChance {
 	case DoubleStrike:
-		increasedDoubleOdds := gc.miningModifiers.StrikeOdds[DoubleStrike] + upgrade_data.PerStepStrikeImprovement*1.4
+		increment := upgrade_data.PerStepStrikeImprovement
+		if gc.miningModifiers.x2Overclock {
+			increment *= X2OverclockMultiplier
+		}
+		increasedDoubleOdds := gc.miningModifiers.StrikeOdds[DoubleStrike] + increment
 		return gc.miningModifiers.GiantOdds / gc.miningModifiers.StrikeOdds[DoubleStrike] * increasedDoubleOdds
 	case TripleStrike:
+		increment := upgrade_data.PerStepStrikeImprovement
+		if gc.miningModifiers.x3Overclock {
+			increment *= X3OverclockMultiplier
+		}
 		originalTripleOdds := gc.miningModifiers.StrikeOdds[TripleStrike] / gc.miningModifiers.StrikeOdds[DoubleStrike]
-		increasedTripleOdds := originalTripleOdds + upgrade_data.PerStepStrikeImprovement*1.6
+		increasedTripleOdds := originalTripleOdds + increment
 		return gc.miningModifiers.GiantOdds / (originalTripleOdds) * increasedTripleOdds
 	case QuadrupleStrike:
+		increment := upgrade_data.PerStepStrikeImprovement
+		if gc.miningModifiers.x4Overclock {
+			increment *= X4OverclockMultiplier
+		}
 		originalQuadOdds := gc.miningModifiers.StrikeOdds[QuadrupleStrike] / gc.miningModifiers.StrikeOdds[TripleStrike]
-		increasedQuadOdds := originalQuadOdds + upgrade_data.PerStepStrikeImprovement*1.8
+		increasedQuadOdds := originalQuadOdds + increment
 		return gc.miningModifiers.GiantOdds / originalQuadOdds * increasedQuadOdds
 	case QuintupleStrike:
+		increment := upgrade_data.PerStepStrikeImprovement
+		if gc.miningModifiers.x5Overclock {
+			increment *= X5OverclockMultiplier
+		}
 		originalPentaOdds := gc.miningModifiers.StrikeOdds[QuintupleStrike] / gc.miningModifiers.StrikeOdds[QuadrupleStrike]
-		increasedPentaOdds := originalPentaOdds + upgrade_data.PerStepStrikeImprovement*2
+		increasedPentaOdds := originalPentaOdds + increment
 		return gc.miningModifiers.GiantOdds / originalPentaOdds * increasedPentaOdds
 	case GiantLuck:
-		originalGiantOdds := gc.miningModifiers.GiantOdds / gc.miningModifiers.StrikeOdds[QuadrupleStrike]
-		modifiers := gc.labModifiers.t7GiantLuck * gc.labModifiers.t8GiantLuck * 1.5 * 1.2 * 1.1 // achievement, oc, and rune multipliers
+		originalGiantOdds := gc.miningModifiers.GiantOdds / gc.miningModifiers.StrikeOdds[QuintupleStrike]
+		modifiers := gc.giantLuckModifiers.t7GiantLuck * gc.giantLuckModifiers.t8GiantLuck * gc.giantLuckModifiers.rune * gc.giantLuckModifiers.achievement
+		if gc.giantLuckModifiers.isOverclocked {
+			modifiers *= GiantLuckOverclockMultiplier
+		}
 		increasedGiantOdds := originalGiantOdds + upgrade_data.PerStepGiantLuckImprovement*modifiers
 		return gc.miningModifiers.GiantOdds / originalGiantOdds * increasedGiantOdds
 	}

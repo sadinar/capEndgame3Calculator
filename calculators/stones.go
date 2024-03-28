@@ -253,6 +253,10 @@ func (sc *Stones) copyComparator() Stones {
 				QuadrupleStrike: sc.miningModifiers.StrikeOdds[QuadrupleStrike] * 100,
 				QuintupleStrike: sc.miningModifiers.StrikeOdds[QuintupleStrike] * 100,
 			},
+			sc.miningModifiers.x2Overclock,
+			sc.miningModifiers.x3Overclock,
+			sc.miningModifiers.x4Overclock,
+			sc.miningModifiers.x5Overclock,
 		),
 		generationModifiers: NewEggGenerationModifiers(
 			sc.generationModifiers.EggLuck,
