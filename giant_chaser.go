@@ -11,9 +11,9 @@ const HundredThousand = 100000
 const Million = 1000000
 
 func main() {
-	//shinyMods, giantCalc, stoneCalc, nextSpeedUpgradeCost, nextCloneUpgradeCost := loadSadinar()
+	shinyMods, giantCalc, stoneCalc, nextSpeedUpgradeCost, nextCloneUpgradeCost := loadSadinar()
 	//shinyMods, giantCalc, stoneCalc, nextSpeedUpgradeCost, nextCloneUpgradeCost := loadSadinalt()
-	shinyMods, giantCalc, stoneCalc, nextSpeedUpgradeCost, nextCloneUpgradeCost := loadAltinar()
+	//shinyMods, giantCalc, stoneCalc, nextSpeedUpgradeCost, nextCloneUpgradeCost := loadAltinar()
 	duration := time.Hour * 24
 
 	fmt.Println("next giant chance upgrade should be", giantCalc.GetNextUpgrade(nextSpeedUpgradeCost))
@@ -30,20 +30,20 @@ func loadSadinar() (calculators.ShinyModifiers, calculators.Giant, calculators.S
 	miningMods := calculators.NewMiningModifiers(
 		1.00+.5, // exactly as on stats screen
 		100,     // exactly as shown on the wooden board behind egg
-		.149,    // exactly as on stats screen
+		.151,    // exactly as on stats screen
 		408.8,   // exactly as on stats screen
 		map[int]int{
 			2: 74,
 			3: 74,
 			4: 74,
-			5: 74,
+			5: 75,
 		},
 		70,
 		map[int]float64{
 			2: 29.4,  // exactly as on stats screen
 			3: 8.702, // exactly as on stats screen
 			4: 2.898, // exactly as on stats screen
-			5: 1.072, // exactly as on stats screen
+			5: 1.087, // exactly as on stats screen
 		},
 		true,
 		true,
