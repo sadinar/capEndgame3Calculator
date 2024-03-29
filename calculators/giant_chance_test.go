@@ -38,4 +38,7 @@ func TestGetNextUpgrade(t *testing.T) {
 	gc.miningModifiers.StrikeUpgrades[TripleStrike] = 75
 	assert.Equal(t, "x4 strike", gc.GetNextUpgrade(2500000))
 	assert.Equal(t, "speed", gc.GetNextUpgrade(250000))
+
+	gc.miningModifiers.StrikeUpgrades[DoubleStrike] = 72
+	assert.Equal(t, "x2 strike", gc.GetNextUpgrade(2500000))
 }

@@ -352,8 +352,7 @@ func (gc *Giant) propagateModifiedChance(modifiedStrike int, modifiedStrikeOdds 
 	nextStrikeBaseOdds := gc.miningModifiers.StrikeOdds[modifiedStrike+1] / gc.miningModifiers.StrikeOdds[modifiedStrike]
 	nextStrikeIncreasedOdds := nextStrikeBaseOdds * modifiedStrikeOdds
 
-	returnVal := gc.propagateModifiedChance(modifiedStrike+1, nextStrikeIncreasedOdds)
-	return returnVal
+	return gc.propagateModifiedChance(modifiedStrike+1, nextStrikeIncreasedOdds)
 }
 
 func (gc *Giant) getOriginalGiantOdds() float64 {
