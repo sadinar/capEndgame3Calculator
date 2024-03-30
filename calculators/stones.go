@@ -43,7 +43,7 @@ func NewStonesCalculator(mm MiningModifiers, egm EggGenerationModifiers) Stones 
 	return sc
 }
 
-func (sc *Stones) CalculateCombinedStones(period time.Duration) (generatedStones, minedStones int) {
+func (sc *Stones) CalculateStonesProduced(period time.Duration) (generatedStones, minedStones int) {
 	return sc.CalculateGeneratedStones(period), sc.CalculateMinedStones(period)
 }
 
