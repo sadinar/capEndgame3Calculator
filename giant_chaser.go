@@ -30,20 +30,20 @@ func loadSadinar() (calculators.ShinyModifiers, calculators.Giant, calculators.S
 	miningMods := calculators.NewMiningModifiers(
 		1.00+.5, // exactly as on stats screen
 		100,     // exactly as shown on the wooden board behind egg
-		.157,    // exactly as on stats screen
+		.159,    // exactly as on stats screen
 		408.8,   // exactly as on stats screen
 		map[int]int{
 			2: 74,
-			3: 75,
+			3: 76,
 			4: 75,
 			5: 76,
 		},
 		70,
 		map[int]float64{
 			2: 29.4,  // exactly as on stats screen
-			3: 8.82,  // exactly as on stats screen
-			4: 2.977, // exactly as on stats screen
-			5: 1.131, // exactly as on stats screen
+			3: 8.938, // exactly as on stats screen
+			4: 3.016, // exactly as on stats screen
+			5: 1.146, // exactly as on stats screen
 		},
 		true,
 		true,
@@ -73,7 +73,7 @@ func loadSadinalt() (calculators.ShinyModifiers, calculators.Giant, calculators.
 	miningMods := calculators.NewMiningModifiers(
 		1.06, // exactly as on stats screen
 		100,  // exactly as shown on the wooden board behind egg
-		.037, // exactly as on stats screen
+		.057, // exactly as on stats screen
 		180,  // exactly as on stats screen
 		map[int]int{
 			2: 70,
@@ -81,7 +81,7 @@ func loadSadinalt() (calculators.ShinyModifiers, calculators.Giant, calculators.
 			4: 71,
 			5: 71,
 		},
-		60,
+		61,
 		map[int]float64{
 			2: 23.5,  // exactly as on stats screen
 			3: 4.113, // exactly as on stats screen
@@ -101,7 +101,7 @@ func loadSadinalt() (calculators.ShinyModifiers, calculators.Giant, calculators.
 		true,
 	)
 	shinyMods := calculators.NewShinyModifiers(1.509) // exactly as seen on stats screen
-	LabMods := calculators.NewGiantModifiers(1.04, 1, 1.06, 1.2, false)
+	LabMods := calculators.NewGiantModifiers(1.04, 1, 1.06, 1.2, true)
 
 	giantCalc := calculators.NewGiantCalculator(miningMods, LabMods, false)
 	stoneCalc := calculators.NewStonesCalculator(miningMods, generationMods)
@@ -114,22 +114,22 @@ func loadSadinalt() (calculators.ShinyModifiers, calculators.Giant, calculators.
 
 func loadAltinar() (calculators.ShinyModifiers, calculators.Giant, calculators.Stones, int, int) {
 	miningMods := calculators.NewMiningModifiers(
-		.6,  // exactly as on stats screen
-		100, // exactly as shown on the wooden board behind egg
-		.03, // exactly as on stats screen
-		165, // exactly as on stats screen
+		.6,   // exactly as on stats screen
+		100,  // exactly as shown on the wooden board behind egg
+		.046, // exactly as on stats screen
+		165,  // exactly as on stats screen
 		map[int]int{
 			2: 68,
 			3: 69,
 			4: 69,
-			5: 69,
+			5: 70,
 		},
-		55,
+		56,
 		map[int]float64{
 			2: 23,    // exactly as on stats screen
 			3: 3.968, // exactly as on stats screen
 			4: 1.232, // exactly as on stats screen
-			5: 0.425, // exactly as on stats screen
+			5: 0.432, // exactly as on stats screen
 		},
 		false,
 		false,
@@ -144,7 +144,7 @@ func loadAltinar() (calculators.ShinyModifiers, calculators.Giant, calculators.S
 		true,
 	)
 	shinyMods := calculators.NewShinyModifiers(1.253) // exactly as seen on stats screen
-	LabMods := calculators.NewGiantModifiers(1.072, 1, 1.03, 1.138, false)
+	LabMods := calculators.NewGiantModifiers(1.072, 1, 1.03, 1.138, true)
 
 	giantCalc := calculators.NewGiantCalculator(miningMods, LabMods, false)
 	stoneCalc := calculators.NewStonesCalculator(miningMods, generationMods)
