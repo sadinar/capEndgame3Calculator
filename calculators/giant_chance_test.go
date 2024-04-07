@@ -29,9 +29,9 @@ func TestGetNextUpgrade(t *testing.T) {
 		true,
 		true,
 	)
-	LabMods := NewGiantModifiers(1, 1, 1.1, 1.2, true)
+	LabMods := NewGiantModifiers(1, 1, 1.1, 1.2, true, true)
 
-	gc := NewGiantCalculator(miningMods, LabMods, true)
+	gc := NewGiantCalculator(miningMods, LabMods)
 
 	assert.Equal(t, "x3 strike", gc.GetNextUpgrade(2500000))
 

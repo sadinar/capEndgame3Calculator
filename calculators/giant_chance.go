@@ -24,17 +24,15 @@ type Giant struct {
 	giantLuckPrices    upgradeCostList
 	miningModifiers    MiningModifiers
 	giantLuckModifiers GiantModifiers
-	shinyLuckOverclock bool
 	printer            *message.Printer
 }
 
-func NewGiantCalculator(mm MiningModifiers, lm GiantModifiers, giantShinyLuckOverclocked bool) Giant {
+func NewGiantCalculator(mm MiningModifiers, lm GiantModifiers) Giant {
 	return Giant{
 		strikePrices:       upgrade_data.GetStrikePrices(),
 		giantLuckPrices:    upgrade_data.GetGiantLuckPrices(),
 		miningModifiers:    mm,
 		giantLuckModifiers: lm,
-		shinyLuckOverclock: giantShinyLuckOverclocked,
 		printer:            message.NewPrinter(language.English),
 	}
 }
@@ -139,7 +137,7 @@ func (gc *Giant) PrintProbabilityMedian(duration time.Duration, sMods ShinyModif
 
 	medianIndex, medianProbability := gc.findProbabilityBreakpoint(probabilityList, 0.5)
 	shinyOdds := sMods.CalculateShinyOdds()
-	if gc.shinyLuckOverclock {
+	if gc.giantLuckModifiers.shinyOverclocked {
 		shinyOdds *= 1.5
 	}
 
@@ -333,7 +331,7 @@ func (gc *Giant) calculateGiantChance(incrementedChance int) float64 {
 	case GiantLuck:
 		modifiers := gc.giantLuckModifiers.t7GiantLuck * gc.giantLuckModifiers.t8GiantLuck
 		modifiers *= gc.giantLuckModifiers.rune * gc.giantLuckModifiers.achievement
-		if gc.giantLuckModifiers.isOverclocked {
+		if gc.giantLuckModifiers.luckOverclocked {
 			modifiers *= GiantLuckOverclockMultiplier
 		}
 		increasedGiantOdds := gc.getOriginalGiantOdds() + upgrade_data.PerStepGiantLuckImprovement*modifiers

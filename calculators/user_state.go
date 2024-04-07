@@ -78,19 +78,21 @@ func NewEggGenerationModifiers(eggLuck, cloneLuck, calcifyChance float64, eggLev
 }
 
 type GiantModifiers struct {
-	t7GiantLuck   float64
-	t8GiantLuck   float64
-	achievement   float64
-	rune          float64
-	isOverclocked bool
+	t7GiantLuck      float64
+	t8GiantLuck      float64
+	achievement      float64
+	rune             float64
+	luckOverclocked  bool
+	shinyOverclocked bool
 }
 
-func NewGiantModifiers(t7GiantLuck, t8GiantLuck, achievement, rune float64, isOverclocked bool) GiantModifiers {
+func NewGiantModifiers(t7GiantLuck, t8GiantLuck, achievement, rune float64, luckOverclocked, shinyOverclocked bool) GiantModifiers {
 	return GiantModifiers{
-		t7GiantLuck:   t7GiantLuck,
-		t8GiantLuck:   t8GiantLuck,
-		achievement:   achievement,
-		rune:          rune,
-		isOverclocked: isOverclocked,
+		t7GiantLuck:      t7GiantLuck,
+		t8GiantLuck:      t8GiantLuck,
+		achievement:      achievement,
+		rune:             rune,
+		luckOverclocked:  luckOverclocked,
+		shinyOverclocked: shinyOverclocked,
 	}
 }
