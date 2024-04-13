@@ -30,20 +30,20 @@ func loadSadinar() (calculators.ShinyModifiers, calculators.Giant, calculators.S
 	miningMods := calculators.NewMiningModifiers(
 		1.00+.5, // exactly as on stats screen
 		100,     // exactly as shown on the wooden board behind egg
-		.247,    // exactly as on stats screen
+		.253,    // exactly as on stats screen
 		408.8,   // exactly as on stats screen
 		map[int]int{
 			2: 78,
-			3: 79,
+			3: 80,
 			4: 80,
-			5: 79,
+			5: 80,
 		},
 		90,
 		map[int]float64{
 			2: 30.8,  // exactly as on stats screen
-			3: 9.733, // exactly as on stats screen
-			4: 3.504, // exactly as on stats screen
-			5: 1.384, // exactly as on stats screen
+			3: 9.856, // exactly as on stats screen
+			4: 3.548, // exactly as on stats screen
+			5: 1.419, // exactly as on stats screen
 		},
 		true,
 		true,

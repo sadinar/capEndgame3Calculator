@@ -24,10 +24,7 @@ func TestCaseOne(t *testing.T) {
 	assert.Equal(t, 3465559, minedStones)
 
 	dmgOutput := stoneCalc.PrintDamageChange(duration, shinyMods)
-	expectedOutput := "ascended generated: 226,394 (6,791,840 shiny score): ascended dmg multiplier gained: " +
-		"x37.73245 (+73,578 dmg)\nmythic generated: 311,100 (12,444,008 shiny score): mythic dmg multiplier " +
-		"gained: x51.85003 (+103,700 dmg)"
-	assert.Equal(t, expectedOutput, dmgOutput)
+	assert.Equal(t, getStoneBuildGenMessage(), dmgOutput)
 }
 
 func TestCaseTwo(t *testing.T) {
@@ -96,10 +93,34 @@ func TestCaseFour(t *testing.T) {
 	assert.Equal(t, 3467013, minedStones)
 
 	dmgOutput := stoneCalc.PrintDamageChange(duration, shinyMods)
-	expectedOutput := "ascended generated: 226,394 (6,791,840 shiny score): ascended dmg multiplier gained: " +
+	assert.Equal(t, getStoneBuildGenMessage(), dmgOutput)
+}
+
+func TestCaseFive(t *testing.T) {
+	shinyMods, giantCalc, stoneCalc, nextSpeedUpgradeCost, nextCloneUpgradeCost := caseFive()
+	duration := time.Hour * 24
+
+	assert.Equal(t, "giant luck", giantCalc.GetNextUpgrade(nextSpeedUpgradeCost))
+	assert.Equal(t, "speed", stoneCalc.FindNextUpgrade(nextSpeedUpgradeCost, nextCloneUpgradeCost))
+
+	medianIndex, shinyCount, medianProbability := giantCalc.PrintProbabilityMedian(duration, shinyMods)
+	assert.Equal(t, 328, medianIndex)
+	assert.Equal(t, 328, shinyCount)
+	assert.Less(t, medianProbability, 0.5171499)
+	assert.Greater(t, medianProbability, 0.5171490)
+
+	gennedStones, minedStones := stoneCalc.CalculateStonesProduced(duration)
+	assert.Equal(t, 707752, gennedStones)
+	assert.Equal(t, 3471829, minedStones)
+
+	dmgOutput := stoneCalc.PrintDamageChange(duration, shinyMods)
+	assert.Equal(t, getStoneBuildGenMessage(), dmgOutput)
+}
+
+func getStoneBuildGenMessage() string {
+	return "ascended generated: 226,394 (6,791,840 shiny score): ascended dmg multiplier gained: " +
 		"x37.73245 (+73,578 dmg)\nmythic generated: 311,100 (12,444,008 shiny score): mythic dmg multiplier " +
 		"gained: x51.85003 (+103,700 dmg)"
-	assert.Equal(t, expectedOutput, dmgOutput)
 }
 
 func caseOne() (ShinyModifiers, Giant, Stones, int, int) {
@@ -254,6 +275,46 @@ func caseFour() (ShinyModifiers, Giant, Stones, int, int) {
 		true,
 	)
 	shinyMods := NewShinyModifiers(100)
+	giantLuckMods := NewGiantModifiers(1, 1, 1.1, 1.2, true, false)
+
+	giantCalc := NewGiantCalculator(miningMods, giantLuckMods)
+	stoneCalc := NewStonesCalculator(miningMods, generationMods)
+
+	return shinyMods, giantCalc, stoneCalc, 2500000, 1100000
+}
+
+func caseFive() (ShinyModifiers, Giant, Stones, int, int) {
+	miningMods := NewMiningModifiers(
+		1.00+.5, // exactly as on stats screen
+		100,     // exactly as shown on the wooden board behind egg
+		.253,    // exactly as on stats screen
+		408.8,   // exactly as on stats screen
+		map[int]int{
+			2: 78,
+			3: 80,
+			4: 80,
+			5: 80,
+		},
+		90,
+		map[int]float64{
+			2: 30.8,  // exactly as on stats screen
+			3: 9.856, // exactly as on stats screen
+			4: 3.548, // exactly as on stats screen
+			5: 1.419, // exactly as on stats screen
+		},
+		true,
+		true,
+		true,
+		true,
+	)
+	generationMods := NewEggGenerationModifiers(
+		51,    // as shown on stats screen
+		6.5,   // as shown on stats screen
+		127.5, // as shown in stats pane
+		MythicEgg,
+		true,
+	)
+	shinyMods := NewShinyModifiers(100) // exactly as seen on stats screen
 	giantLuckMods := NewGiantModifiers(1, 1, 1.1, 1.2, true, false)
 
 	giantCalc := NewGiantCalculator(miningMods, giantLuckMods)
