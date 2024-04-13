@@ -57,9 +57,9 @@ func (sc *Stones) CalculateGeneratedStones(period time.Duration) int {
 	return int(totalMythics * sc.generationModifiers.CalcifyChance)
 }
 
-func (sc *Stones) PrintDamageChange(period time.Duration, sMods ShinyModifiers) {
+func (sc *Stones) PrintDamageChange(period time.Duration, sMods ShinyModifiers) string {
 	if period < time.Second {
-		return
+		return "no change"
 	}
 
 	_, totalMythics, totalAscended := sc.calculateTotalGeneratedPets(period)
@@ -67,24 +67,25 @@ func (sc *Stones) PrintDamageChange(period time.Duration, sMods ShinyModifiers) 
 	ascDmgMultiplier := totalAscended / UniqueAscendedPets / BaseShinyDivisor * sMods.CalculateShinyOdds()
 	mythDmgMultiplier := totalMythics / UniqueMythicPets / BaseShinyDivisor * sMods.CalculateShinyOdds()
 
-	fmt.Println(
-		sc.printer.Sprintf(
-			"ascended generated: %d (%d shiny score): ascended dmg multiplier gained: x%.5f (+%d dmg)",
-			int(totalAscended),
-			int(sMods.CalculateShinyOdds()*totalAscended*AscendedShinyScore),
-			ascDmgMultiplier,
-			int(TitaniumAscendedBaseDamage*ascDmgMultiplier),
-		),
+	ascendedOutput := sc.printer.Sprintf(
+		"ascended generated: %d (%d shiny score): ascended dmg multiplier gained: x%.5f (+%d dmg)",
+		int(totalAscended),
+		int(sMods.CalculateShinyOdds()*totalAscended*AscendedShinyScore),
+		ascDmgMultiplier,
+		int(TitaniumAscendedBaseDamage*ascDmgMultiplier),
 	)
-	fmt.Println(
-		sc.printer.Sprintf(
-			"mythic generated: %d (%d shiny score): mythic dmg multiplier gained: x%.5f (+%d dmg)",
-			int(totalMythics),
-			int(sMods.CalculateShinyOdds()*totalMythics*MythicShinyScore),
-			mythDmgMultiplier,
-			int(TitaniumMythicBaseDamage*mythDmgMultiplier),
-		),
+	mythicOutput := sc.printer.Sprintf(
+		"mythic generated: %d (%d shiny score): mythic dmg multiplier gained: x%.5f (+%d dmg)",
+		int(totalMythics),
+		int(sMods.CalculateShinyOdds()*totalMythics*MythicShinyScore),
+		mythDmgMultiplier,
+		int(TitaniumMythicBaseDamage*mythDmgMultiplier),
 	)
+
+	fmt.Println(ascendedOutput)
+	fmt.Println(mythicOutput)
+
+	return ascendedOutput + "\n" + mythicOutput
 }
 
 func (sc *Stones) CalculateMinedStones(period time.Duration) int {

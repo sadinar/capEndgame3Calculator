@@ -129,7 +129,7 @@ func (gc *Giant) PrintProbabilityDistribution(duration time.Duration) {
 	fmt.Println(fmt.Sprintf("%d+: %.12f%%", len(probabilityList), (1-consumedProbabilitySpace)*100))
 }
 
-func (gc *Giant) PrintProbabilityMedian(duration time.Duration, sMods ShinyModifiers) {
+func (gc *Giant) PrintProbabilityMedian(duration time.Duration, sMods ShinyModifiers) (int, int, float64) {
 	dailyAttempts := gc.getEggMineAttempts(duration)
 	successProbability := gc.CalculateChancePerStrike()
 	successCount, _ := FindReasonableSuccessCeiling(dailyAttempts, successProbability)
@@ -155,6 +155,8 @@ func (gc *Giant) PrintProbabilityMedian(duration time.Duration, sMods ShinyModif
 			duration,
 		),
 	)
+
+	return medianIndex, shinyCount, medianProbability
 }
 
 func (gc *Giant) GetUpgradeCost() int {
