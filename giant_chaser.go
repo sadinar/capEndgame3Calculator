@@ -24,26 +24,28 @@ func main() {
 	stoneCalc.PrintDamageChange(duration, shinyMods)
 	p := message.NewPrinter(message.MatchLanguage("en"))
 	fmt.Println(p.Sprintf("%d stones (%d genned and %d mined) gained in %v", gennedStones+minedStones, gennedStones, minedStones, duration))
+
+	//fromScratchUpgradePath()
 }
 
 func loadSadinar() (calculators.ShinyModifiers, calculators.Giant, calculators.Stones, int, int) {
 	miningMods := calculators.NewMiningModifiers(
 		1.00+.5, // exactly as on stats screen
 		100,     // exactly as shown on the wooden board behind egg
-		.253,    // exactly as on stats screen
+		.284,    // exactly as on stats screen
 		408.8,   // exactly as on stats screen
 		map[int]int{
-			2: 78,
+			2: 79,
 			3: 80,
 			4: 80,
 			5: 80,
 		},
-		90,
+		100,
 		map[int]float64{
-			2: 30.8,  // exactly as on stats screen
-			3: 9.856, // exactly as on stats screen
-			4: 3.548, // exactly as on stats screen
-			5: 1.419, // exactly as on stats screen
+			2: 31.15, // exactly as on stats screen
+			3: 9.968, // exactly as on stats screen
+			4: 3.588, // exactly as on stats screen
+			5: 1.435, // exactly as on stats screen
 		},
 		true,
 		true,
@@ -153,4 +155,32 @@ func loadAltinar() (calculators.ShinyModifiers, calculators.Giant, calculators.S
 	nextCloneUpgradeCost := 3 * HundredThousand
 
 	return shinyMods, giantCalc, stoneCalc, nextSpeedUpgradeCost, nextCloneUpgradeCost
+}
+
+func fromScratchUpgradePath() {
+	mm := calculators.NewMiningModifiers(
+		.5,
+		100,
+		0,
+		100,
+		map[int]int{2: 0, 3: 0, 4: 0, 5: 0},
+		0,
+		map[int]float64{2: 0, 3: 0, 4: 0, 5: 0},
+		false,
+		false,
+		false,
+		false,
+	)
+
+	gl := calculators.NewGiantModifiers(
+		1,
+		1,
+		1,
+		1,
+		false,
+		false,
+	)
+
+	gc := calculators.NewGiantCalculator(mm, gl)
+	gc.CalculateUpgradePath()
 }

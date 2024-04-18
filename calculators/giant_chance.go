@@ -74,8 +74,28 @@ func (gc *Giant) GetNextUpgrade(speedUpgradeCost int) string {
 func (gc *Giant) CalculateUpgradePath() {
 	fmt.Println("------------------------------------------------------------")
 	fmt.Println("| x2 | x3 | x4 | x5 | giant |    chance/hit   | stone cost")
+	originalStrikeUpgrades := strikeUpgrades{
+		DoubleStrike:    gc.miningModifiers.StrikeUpgrades[DoubleStrike],
+		TripleStrike:    gc.miningModifiers.StrikeUpgrades[TripleStrike],
+		QuadrupleStrike: gc.miningModifiers.StrikeUpgrades[QuadrupleStrike],
+		QuintupleStrike: gc.miningModifiers.StrikeUpgrades[QuintupleStrike],
+	}
+	originalStrikeOdds := strikeOdds{
+		DoubleStrike:    gc.miningModifiers.StrikeOdds[DoubleStrike],
+		TripleStrike:    gc.miningModifiers.StrikeOdds[TripleStrike],
+		QuadrupleStrike: gc.miningModifiers.StrikeOdds[QuadrupleStrike],
+		QuintupleStrike: gc.miningModifiers.StrikeOdds[QuintupleStrike],
+	}
+	originalGiantLuckLevel := gc.miningModifiers.GiantLuckLevel
+	originalGiantOdds := gc.miningModifiers.GiantOdds
+
 	for {
 		if gc.findCartUpgrade() == NoChange {
+			gc.miningModifiers.StrikeUpgrades = originalStrikeUpgrades
+			gc.miningModifiers.StrikeOdds = originalStrikeOdds
+			gc.miningModifiers.GiantLuckLevel = originalGiantLuckLevel
+			gc.miningModifiers.GiantOdds = originalGiantOdds
+
 			return
 		}
 
@@ -84,6 +104,77 @@ func (gc *Giant) CalculateUpgradePath() {
 			gc.miningModifiers.GiantLuckLevel++
 		} else {
 			gc.miningModifiers.StrikeUpgrades[nextUpgrade]++
+		}
+
+		modifiedStrikeOdds := strikeOdds{DoubleStrike: 0, TripleStrike: 0, QuadrupleStrike: 0, QuintupleStrike: 0}
+		switch nextUpgrade {
+		case DoubleStrike:
+			increasedOdds := gc.calculateIncreasedDoubleStrikeOdds()
+			modifiedStrikeOdds[DoubleStrike] = increasedOdds
+
+			if gc.miningModifiers.StrikeUpgrades[TripleStrike] == 0 {
+				gc.miningModifiers.StrikeOdds = modifiedStrikeOdds
+				continue
+			}
+
+			increasedOdds = gc.miningModifiers.StrikeOdds[TripleStrike] / gc.miningModifiers.StrikeOdds[DoubleStrike] * increasedOdds
+			modifiedStrikeOdds[TripleStrike] = increasedOdds
+
+			increasedOdds = gc.miningModifiers.StrikeOdds[QuadrupleStrike] / gc.miningModifiers.StrikeOdds[TripleStrike] * increasedOdds
+			modifiedStrikeOdds[QuadrupleStrike] = increasedOdds
+
+			increasedOdds = gc.miningModifiers.StrikeOdds[QuintupleStrike] / gc.miningModifiers.StrikeOdds[QuadrupleStrike] * increasedOdds
+			modifiedStrikeOdds[QuintupleStrike] = increasedOdds
+
+			gc.miningModifiers.StrikeOdds = modifiedStrikeOdds
+			gc.miningModifiers.GiantOdds = gc.getOriginalGiantOdds() * increasedOdds
+		case TripleStrike:
+			modifiedStrikeOdds[DoubleStrike] = gc.miningModifiers.StrikeOdds[DoubleStrike]
+
+			increasedOdds := gc.calculateIncreasedTripleStrikeOdds() * gc.miningModifiers.StrikeOdds[DoubleStrike]
+			modifiedStrikeOdds[TripleStrike] = increasedOdds
+
+			if gc.miningModifiers.StrikeUpgrades[QuadrupleStrike] == 0 {
+				gc.miningModifiers.StrikeOdds = modifiedStrikeOdds
+				continue
+			}
+
+			increasedOdds = gc.miningModifiers.StrikeOdds[QuadrupleStrike] / gc.miningModifiers.StrikeOdds[TripleStrike] * increasedOdds
+			modifiedStrikeOdds[QuadrupleStrike] = increasedOdds
+
+			increasedOdds = gc.miningModifiers.StrikeOdds[QuintupleStrike] / gc.miningModifiers.StrikeOdds[QuadrupleStrike] * increasedOdds
+			modifiedStrikeOdds[QuintupleStrike] = increasedOdds
+
+			gc.miningModifiers.StrikeOdds = modifiedStrikeOdds
+			gc.miningModifiers.GiantOdds = gc.getOriginalGiantOdds() * increasedOdds
+		case QuadrupleStrike:
+			modifiedStrikeOdds[DoubleStrike] = gc.miningModifiers.StrikeOdds[DoubleStrike]
+			modifiedStrikeOdds[TripleStrike] = gc.miningModifiers.StrikeOdds[TripleStrike]
+
+			increasedOdds := gc.calculateIncreasedQuadrupleStrikeOdds() * gc.miningModifiers.StrikeOdds[TripleStrike]
+			modifiedStrikeOdds[QuadrupleStrike] = increasedOdds
+
+			if gc.miningModifiers.StrikeUpgrades[QuintupleStrike] == 0 {
+				gc.miningModifiers.StrikeOdds = modifiedStrikeOdds
+				continue
+			}
+
+			increasedOdds = gc.miningModifiers.StrikeOdds[QuintupleStrike] / gc.miningModifiers.StrikeOdds[QuadrupleStrike] * increasedOdds
+			modifiedStrikeOdds[QuintupleStrike] = increasedOdds
+
+			gc.miningModifiers.StrikeOdds = modifiedStrikeOdds
+			gc.miningModifiers.GiantOdds = gc.getOriginalGiantOdds() * increasedOdds
+		case QuintupleStrike:
+			increasedOdds := gc.calculateIncreasedQuintupleStrikeOdds() * gc.miningModifiers.StrikeOdds[QuadrupleStrike]
+			gc.miningModifiers.StrikeOdds[QuintupleStrike] = increasedOdds
+
+			if gc.miningModifiers.GiantLuckLevel == 0 {
+				continue
+			}
+
+			gc.miningModifiers.GiantOdds = gc.getOriginalGiantOdds() * increasedOdds
+		case GiantLuck:
+			gc.miningModifiers.GiantOdds = gc.calculateIncreasedGiantOdds() * gc.miningModifiers.StrikeOdds[QuintupleStrike]
 		}
 
 		fmt.Println(
@@ -296,52 +387,75 @@ func (gc *Giant) calculateGiantChance(incrementedChance int) float64 {
 	if incrementedChance == NoChange {
 		return gc.miningModifiers.GiantOdds
 	}
-	increment := upgrade_data.PerStepStrikeImprovement
 
 	switch incrementedChance {
 	case DoubleStrike:
-		if gc.miningModifiers.x2Overclock {
-			increment *= X2OverclockMultiplier
-		}
-		increasedDoubleOdds := gc.miningModifiers.StrikeOdds[DoubleStrike] + increment
-
-		return gc.propagateModifiedChance(DoubleStrike, increasedDoubleOdds)
+		return gc.propagateModifiedChance(DoubleStrike, gc.calculateIncreasedDoubleStrikeOdds())
 	case TripleStrike:
-		if gc.miningModifiers.x3Overclock {
-			increment *= X3OverclockMultiplier
-		}
-		originalTripleOdds := gc.miningModifiers.StrikeOdds[TripleStrike] / gc.miningModifiers.StrikeOdds[DoubleStrike]
-		increasedTripleOdds := originalTripleOdds + increment
-
-		return gc.miningModifiers.StrikeOdds[DoubleStrike] * gc.propagateModifiedChance(TripleStrike, increasedTripleOdds)
+		return gc.miningModifiers.StrikeOdds[DoubleStrike] * gc.propagateModifiedChance(TripleStrike, gc.calculateIncreasedTripleStrikeOdds())
 	case QuadrupleStrike:
-		if gc.miningModifiers.x4Overclock {
-			increment *= X4OverclockMultiplier
-		}
-		originalQuadOdds := gc.miningModifiers.StrikeOdds[QuadrupleStrike] / gc.miningModifiers.StrikeOdds[TripleStrike]
-		increasedQuadOdds := originalQuadOdds + increment
-
-		return gc.miningModifiers.StrikeOdds[TripleStrike] * gc.propagateModifiedChance(QuadrupleStrike, increasedQuadOdds)
+		return gc.miningModifiers.StrikeOdds[TripleStrike] * gc.propagateModifiedChance(QuadrupleStrike, gc.calculateIncreasedQuadrupleStrikeOdds())
 	case QuintupleStrike:
-		if gc.miningModifiers.x5Overclock {
-			increment *= X5OverclockMultiplier
-		}
-		originalQuintOdds := gc.miningModifiers.StrikeOdds[QuintupleStrike] / gc.miningModifiers.StrikeOdds[QuadrupleStrike]
-		increasedQuintOdds := originalQuintOdds + increment
-
-		return gc.miningModifiers.StrikeOdds[QuadrupleStrike] * gc.propagateModifiedChance(QuintupleStrike, increasedQuintOdds)
+		return gc.miningModifiers.StrikeOdds[QuadrupleStrike] * gc.propagateModifiedChance(QuintupleStrike, gc.calculateIncreasedQuintupleStrikeOdds())
 	case GiantLuck:
-		modifiers := gc.giantLuckModifiers.t7GiantLuck * gc.giantLuckModifiers.t8GiantLuck
-		modifiers *= gc.giantLuckModifiers.rune * gc.giantLuckModifiers.achievement
-		if gc.giantLuckModifiers.luckOverclocked {
-			modifiers *= GiantLuckOverclockMultiplier
-		}
-		increasedGiantOdds := gc.getOriginalGiantOdds() + upgrade_data.PerStepGiantLuckImprovement*modifiers
-
-		return gc.miningModifiers.GiantOdds / gc.getOriginalGiantOdds() * increasedGiantOdds
+		return gc.miningModifiers.GiantOdds / gc.getOriginalGiantOdds() * gc.calculateIncreasedGiantOdds()
 	default:
 		panic("unknown calculate giant chance option")
 	}
+}
+
+func (gc *Giant) calculateIncreasedDoubleStrikeOdds() float64 {
+	increment := upgrade_data.PerStepStrikeImprovement
+	if gc.miningModifiers.x2Overclock {
+		increment *= X2OverclockMultiplier
+	}
+	increasedDoubleOdds := gc.miningModifiers.StrikeOdds[DoubleStrike] + increment
+
+	return increasedDoubleOdds
+}
+
+func (gc *Giant) calculateIncreasedTripleStrikeOdds() float64 {
+	increment := upgrade_data.PerStepStrikeImprovement
+	if gc.miningModifiers.x3Overclock {
+		increment *= X3OverclockMultiplier
+	}
+	originalTripleOdds := gc.miningModifiers.StrikeOdds[TripleStrike] / gc.miningModifiers.StrikeOdds[DoubleStrike]
+	increasedTripleOdds := originalTripleOdds + increment
+
+	return increasedTripleOdds
+}
+
+func (gc *Giant) calculateIncreasedQuadrupleStrikeOdds() float64 {
+	increment := upgrade_data.PerStepStrikeImprovement
+	if gc.miningModifiers.x4Overclock {
+		increment *= X4OverclockMultiplier
+	}
+	originalQuadOdds := gc.miningModifiers.StrikeOdds[QuadrupleStrike] / gc.miningModifiers.StrikeOdds[TripleStrike]
+	increasedQuadOdds := originalQuadOdds + increment
+
+	return increasedQuadOdds
+}
+
+func (gc *Giant) calculateIncreasedQuintupleStrikeOdds() float64 {
+	increment := upgrade_data.PerStepStrikeImprovement
+	if gc.miningModifiers.x5Overclock {
+		increment *= X5OverclockMultiplier
+	}
+	originalQuintOdds := gc.miningModifiers.StrikeOdds[QuintupleStrike] / gc.miningModifiers.StrikeOdds[QuadrupleStrike]
+	increasedQuintOdds := originalQuintOdds + increment
+
+	return increasedQuintOdds
+}
+
+func (gc *Giant) calculateIncreasedGiantOdds() float64 {
+	modifiers := gc.giantLuckModifiers.t7GiantLuck * gc.giantLuckModifiers.t8GiantLuck
+	modifiers *= gc.giantLuckModifiers.rune * gc.giantLuckModifiers.achievement
+	if gc.giantLuckModifiers.luckOverclocked {
+		modifiers *= GiantLuckOverclockMultiplier
+	}
+	increasedGiantOdds := gc.getOriginalGiantOdds() + upgrade_data.PerStepGiantLuckImprovement*modifiers
+
+	return increasedGiantOdds
 }
 
 func (gc *Giant) propagateModifiedChance(modifiedStrike int, modifiedStrikeOdds float64) float64 {
