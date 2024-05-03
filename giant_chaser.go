@@ -30,22 +30,22 @@ func main() {
 
 func loadSadinar() (calculators.ShinyModifiers, calculators.Giant, calculators.Stones, int, int) {
 	miningMods := calculators.NewMiningModifiers(
-		1.00+.5, // exactly as on stats screen
+		1.02+.5, // exactly as on stats screen
 		100,     // exactly as shown on the wooden board behind egg
-		.284,    // exactly as on stats screen
-		408.8,   // exactly as on stats screen
+		.51,     // exactly as on stats screen
+		333.8,   // exactly as on stats screen
 		map[int]int{
-			2: 79,
-			3: 80,
-			4: 80,
-			5: 80,
+			2: 80,
+			3: 87,
+			4: 89,
+			5: 88,
 		},
 		100,
 		map[int]float64{
-			2: 31.15, // exactly as on stats screen
-			3: 9.968, // exactly as on stats screen
-			4: 3.588, // exactly as on stats screen
-			5: 1.435, // exactly as on stats screen
+			2: 42,    // exactly as on stats screen
+			3: 14.62, // exactly as on stats screen
+			4: 5.854, // exactly as on stats screen
+			5: 2.576, // exactly as on stats screen
 		},
 		true,
 		true,
@@ -75,31 +75,31 @@ func loadSadinalt() (calculators.ShinyModifiers, calculators.Giant, calculators.
 	miningMods := calculators.NewMiningModifiers(
 		1.12, // exactly as on stats screen
 		100,  // exactly as shown on the wooden board behind egg
-		.04,  // exactly as on stats screen
-		210,  // exactly as on stats screen
+		.009, // exactly as on stats screen
+		390,  // exactly as on stats screen
 		map[int]int{
 			2: 71,
 			3: 71,
 			4: 71,
 			5: 71,
 		},
-		61,
+		62,
 		map[int]float64{
-			2: 24.15, // exactly as on stats screen
-			3: 4.287, // exactly as on stats screen
-			4: 1.37,  // exactly as on stats screen
-			5: 0.486, // exactly as on stats screen
+			2: 20.25, // exactly as on stats screen
+			3: 3.594, // exactly as on stats screen
+			4: 0.638, // exactly as on stats screen
+			5: 0.113, // exactly as on stats screen
 		},
 		false,
 		false,
-		true,
-		true,
+		false,
+		false,
 	)
 	generationMods := calculators.NewEggGenerationModifiers(
 		49,    // as shown on stats screen
 		5.8,   // as shown on stats screen
 		107.5, // as shown in stats pane
-		calculators.ProdigiousEgg,
+		calculators.MythicEgg,
 		true,
 	)
 	shinyMods := calculators.NewShinyModifiers(1.509) // exactly as seen on stats screen

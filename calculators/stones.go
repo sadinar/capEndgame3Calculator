@@ -179,12 +179,20 @@ func (sc *Stones) FindNextUpgrade(speedCost, cloneCost int) string {
 		bestUpgrade = "clone luck"
 	}
 
+	if len(bestUpgrade) == 0 {
+		return "n/a"
+	}
+
 	return bestUpgrade
 }
 
 func (sc *Stones) calculateStrikeImprovementMargin(strikeType int, period time.Duration) float64 {
 	strikeLevel := sc.miningModifiers.StrikeUpgrades[strikeType] + 1
 	strikeCosts := upgrade_data.GetStrikePrices()
+
+	if strikeLevel > len(strikeCosts) {
+		return 0
+	}
 
 	upgradeCalculator := sc.copyComparator()
 	baselineStones := upgradeCalculator.CalculateMinedStones(period)
