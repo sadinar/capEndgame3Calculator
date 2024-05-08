@@ -156,6 +156,24 @@ func TestCaseSeven(t *testing.T) {
 	assert.Equal(t, 1627952, minedStones)
 }
 
+func TestCaseEight(t *testing.T) {
+	shinyMods, giantCalc, stoneCalc, nextSpeedUpgradeCost, nextCloneUpgradeCost := caseEight()
+	duration := time.Hour * 12
+
+	assert.Equal(t, "x2 strike", giantCalc.GetNextUpgrade(nextSpeedUpgradeCost))
+	assert.Equal(t, "speed", stoneCalc.FindNextUpgrade(nextSpeedUpgradeCost, nextCloneUpgradeCost))
+
+	medianIndex, shinyCount, medianProbability := giantCalc.PrintProbabilityMedian(duration, shinyMods)
+	assert.Equal(t, 29, medianIndex)
+	assert.Equal(t, 7, shinyCount)
+	assert.Less(t, medianProbability, 0.544371071059593)
+	assert.Greater(t, medianProbability, 0.5443710710595928)
+
+	gennedStones, minedStones := stoneCalc.CalculateStonesProduced(duration)
+	assert.Equal(t, 314023, gennedStones)
+	assert.Equal(t, 1234330, minedStones)
+}
+
 func TestNoRemainingUpgrades(t *testing.T) {
 	_, giantCalc, stoneCalc, _, _ := caseOne()
 	giantCalc.miningModifiers.StrikeUpgrades[2] = 100
@@ -178,6 +196,88 @@ func TestCloneEvaluated(t *testing.T) {
 	_, _, stoneCalc, nextSpeedUpgradeCost, _ := caseSix()
 
 	assert.Equal(t, "clone luck", stoneCalc.FindNextUpgrade(nextSpeedUpgradeCost, 1500))
+}
+
+func TestFullUpgradePath(t *testing.T) {
+	miningMods := NewMiningModifiers(
+		1.02+.5,
+		100,
+		.564,
+		348.8,
+		map[int]int{
+			2: 80,
+			3: 91,
+			4: 91,
+			5: 91,
+		},
+		100,
+		map[int]float64{
+			2: 42,
+			3: 15.29,
+			4: 6.26,
+			5: 2.848,
+		},
+		true,
+		true,
+		true,
+		true,
+	)
+	giantLuckMods := NewGiantModifiers(1, 1, 1.1, 1.2, true, false)
+	giantCalc := NewGiantCalculator(miningMods, giantLuckMods)
+
+	fullPath := giantCalc.CalculateUpgradePath()
+	expectedOutput := "" +
+		"------------------------------------------------------------\n" +
+		"| x2 | x3 | x4 | x5 | giant |    chance/hit   | stone cost\n" +
+		"|080 |091 |092 |091 |100    | 0.564000000000% | 189950000\n" +
+		"|080 |091 |092 |092 |100    | 0.564000000000% | 192450000\n" +
+		"|080 |092 |092 |092 |100    | 0.564000000000% | 194950000\n" +
+		"|080 |092 |093 |092 |100    | 0.564000000000% | 197450000\n" +
+		"|080 |092 |093 |093 |100    | 0.564000000000% | 199950000\n" +
+		"|080 |093 |093 |093 |100    | 0.564000000000% | 202450000\n" +
+		"|080 |093 |094 |093 |100    | 0.564000000000% | 204950000\n" +
+		"|080 |093 |094 |094 |100    | 0.564000000000% | 207450000\n" +
+		"|080 |094 |094 |094 |100    | 0.564000000000% | 209950000\n" +
+		"|080 |094 |095 |094 |100    | 0.564000000000% | 212450000\n" +
+		"|080 |094 |095 |095 |100    | 0.564000000000% | 214950000\n" +
+		"|080 |095 |095 |095 |100    | 0.564000000000% | 217450000\n" +
+		"|080 |095 |096 |095 |100    | 0.564000000000% | 219950000\n" +
+		"|080 |095 |096 |096 |100    | 0.564000000000% | 222450000\n" +
+		"|080 |096 |096 |096 |100    | 0.564000000000% | 224950000\n" +
+		"|080 |096 |097 |096 |100    | 0.564000000000% | 227450000\n" +
+		"|080 |096 |097 |097 |100    | 0.564000000000% | 229950000\n" +
+		"|081 |096 |097 |097 |100    | 0.564000000000% | 231950000\n" +
+		"|081 |097 |097 |097 |100    | 0.564000000000% | 234450000\n" +
+		"|082 |097 |097 |097 |100    | 0.564000000000% | 236450000\n" +
+		"|082 |097 |098 |097 |100    | 0.564000000000% | 238950000\n" +
+		"|082 |097 |098 |098 |100    | 0.564000000000% | 241450000\n" +
+		"|082 |098 |098 |098 |100    | 0.564000000000% | 243950000\n" +
+		"|083 |098 |098 |098 |100    | 0.564000000000% | 245950000\n" +
+		"|083 |098 |099 |098 |100    | 0.564000000000% | 248450000\n" +
+		"|083 |098 |099 |099 |100    | 0.564000000000% | 250950000\n" +
+		"|083 |099 |099 |099 |100    | 0.564000000000% | 253450000\n" +
+		"|084 |099 |099 |099 |100    | 0.564000000000% | 255450000\n" +
+		"|084 |099 |100 |099 |100    | 0.564000000000% | 257950000\n" +
+		"|084 |099 |100 |100 |100    | 0.564000000000% | 260450000\n" +
+		"|084 |100 |100 |100 |100    | 0.564000000000% | 262950000\n" +
+		"|085 |100 |100 |100 |100    | 0.564000000000% | 264950000\n" +
+		"|086 |100 |100 |100 |100    | 0.564000000000% | 266950000\n" +
+		"|087 |100 |100 |100 |100    | 0.564000000000% | 268950000\n" +
+		"|088 |100 |100 |100 |100    | 0.564000000000% | 270950000\n" +
+		"|089 |100 |100 |100 |100    | 0.564000000000% | 272950000\n" +
+		"|090 |100 |100 |100 |100    | 0.564000000000% | 274950000\n" +
+		"|091 |100 |100 |100 |100    | 0.564000000000% | 277450000\n" +
+		"|092 |100 |100 |100 |100    | 0.564000000000% | 279950000\n" +
+		"|093 |100 |100 |100 |100    | 0.564000000000% | 282450000\n" +
+		"|094 |100 |100 |100 |100    | 0.564000000000% | 284950000\n" +
+		"|095 |100 |100 |100 |100    | 0.564000000000% | 287450000\n" +
+		"|096 |100 |100 |100 |100    | 0.564000000000% | 289950000\n" +
+		"|097 |100 |100 |100 |100    | 0.564000000000% | 292450000\n" +
+		"|098 |100 |100 |100 |100    | 0.564000000000% | 294950000\n" +
+		"|099 |100 |100 |100 |100    | 0.564000000000% | 297450000\n" +
+		"|100 |100 |100 |100 |100    | 0.564000000000% | 299950000\n"
+
+	assert.Equal(t, expectedOutput, fullPath)
 }
 
 func caseOne() (ShinyModifiers, Giant, Stones, int, int) {
@@ -458,4 +558,44 @@ func caseSeven() (ShinyModifiers, Giant, Stones, int, int) {
 	stoneCalc := NewStonesCalculator(miningMods, generationMods)
 
 	return shinyMods, giantCalc, stoneCalc, 2500000, 1100000
+}
+
+func caseEight() (ShinyModifiers, Giant, Stones, int, int) {
+	miningMods := NewMiningModifiers(
+		1.16,  // exactly as on stats screen
+		100,   // exactly as shown on the wooden board behind egg
+		.058,  // exactly as on stats screen
+		401.2, // exactly as on stats screen
+		map[int]int{
+			2: 72,
+			3: 74,
+			4: 74,
+			5: 74,
+		},
+		67,
+		map[int]float64{
+			2: 28.7,  // exactly as on stats screen
+			3: 5.31,  // exactly as on stats screen
+			4: 1.768, // exactly as on stats screen
+			5: 0.654, // exactly as on stats screen
+		},
+		true,
+		false,
+		true,
+		true,
+	)
+	generationMods := NewEggGenerationModifiers(
+		49,    // as shown on stats screen
+		5.8,   // as shown on stats screen
+		107.5, // as shown in stats pane
+		MythicEgg,
+		true,
+	)
+	shinyMods := NewShinyModifiers(24.26) // exactly as seen on stats screen
+	LabMods := NewGiantModifiers(1, 1, 1.1, 1.2, false, false)
+
+	giantCalc := NewGiantCalculator(miningMods, LabMods)
+	stoneCalc := NewStonesCalculator(miningMods, generationMods)
+
+	return shinyMods, giantCalc, stoneCalc, 1200000, 400000
 }

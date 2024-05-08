@@ -11,8 +11,8 @@ const HundredThousand = 100000
 const Million = 1000000
 
 func main() {
-	//shinyMods, giantCalc, stoneCalc, nextSpeedUpgradeCost, nextCloneUpgradeCost := loadSadinar()
-	shinyMods, giantCalc, stoneCalc, nextSpeedUpgradeCost, nextCloneUpgradeCost := loadSadinalt()
+	shinyMods, giantCalc, stoneCalc, nextSpeedUpgradeCost, nextCloneUpgradeCost := loadSadinar()
+	//shinyMods, giantCalc, stoneCalc, nextSpeedUpgradeCost, nextCloneUpgradeCost := loadSadinalt()
 	//shinyMods, giantCalc, stoneCalc, nextSpeedUpgradeCost, nextCloneUpgradeCost := loadAltinar()
 	duration := time.Hour * 24
 
@@ -32,20 +32,20 @@ func loadSadinar() (calculators.ShinyModifiers, calculators.Giant, calculators.S
 	miningMods := calculators.NewMiningModifiers(
 		1.02+.5, // exactly as on stats screen
 		100,     // exactly as shown on the wooden board behind egg
-		.516,    // exactly as on stats screen
-		333.8,   // exactly as on stats screen
+		.564,    // exactly as on stats screen
+		348.8,   // exactly as on stats screen
 		map[int]int{
 			2: 80,
-			3: 88,
-			4: 89,
-			5: 88,
+			3: 91,
+			4: 91,
+			5: 91,
 		},
 		100,
 		map[int]float64{
 			2: 42,    // exactly as on stats screen
-			3: 14.78, // exactly as on stats screen
-			4: 5.921, // exactly as on stats screen
-			5: 2.605, // exactly as on stats screen
+			3: 15.29, // exactly as on stats screen
+			4: 6.26,  // exactly as on stats screen
+			5: 2.848, // exactly as on stats screen
 		},
 		true,
 		true,
@@ -54,7 +54,7 @@ func loadSadinar() (calculators.ShinyModifiers, calculators.Giant, calculators.S
 	)
 	generationMods := calculators.NewEggGenerationModifiers(
 		51,    // as shown on stats screen
-		6.5,   // as shown on stats screen
+		6.0,   // as shown on stats screen
 		127.5, // as shown in stats pane
 		calculators.MythicEgg,
 		true,
@@ -73,27 +73,27 @@ func loadSadinar() (calculators.ShinyModifiers, calculators.Giant, calculators.S
 
 func loadSadinalt() (calculators.ShinyModifiers, calculators.Giant, calculators.Stones, int, int) {
 	miningMods := calculators.NewMiningModifiers(
-		1.13, // exactly as on stats screen
-		100,  // exactly as shown on the wooden board behind egg
-		.01,  // exactly as on stats screen
-		390,  // exactly as on stats screen
+		1.16,  // exactly as on stats screen
+		100,   // exactly as shown on the wooden board behind egg
+		.058,  // exactly as on stats screen
+		401.2, // exactly as on stats screen
 		map[int]int{
-			2: 71,
-			3: 72,
-			4: 71,
-			5: 72,
+			2: 72,
+			3: 74,
+			4: 74,
+			5: 74,
 		},
-		64,
+		67,
 		map[int]float64{
-			2: 20.25, // exactly as on stats screen
-			3: 3.645, // exactly as on stats screen
-			4: 0.647, // exactly as on stats screen
-			5: 0.116, // exactly as on stats screen
+			2: 28.7,  // exactly as on stats screen
+			3: 5.31,  // exactly as on stats screen
+			4: 1.768, // exactly as on stats screen
+			5: 0.654, // exactly as on stats screen
 		},
+		true,
 		false,
-		false,
-		false,
-		false,
+		true,
+		true,
 	)
 	generationMods := calculators.NewEggGenerationModifiers(
 		49,    // as shown on stats screen
@@ -102,13 +102,13 @@ func loadSadinalt() (calculators.ShinyModifiers, calculators.Giant, calculators.
 		calculators.MythicEgg,
 		true,
 	)
-	shinyMods := calculators.NewShinyModifiers(1.509) // exactly as seen on stats screen
-	LabMods := calculators.NewGiantModifiers(1.04, 1, 1.06, 1.2, false, false)
+	shinyMods := calculators.NewShinyModifiers(24.26) // exactly as seen on stats screen
+	LabMods := calculators.NewGiantModifiers(1, 1, 1.1, 1.2, false, false)
 
 	giantCalc := calculators.NewGiantCalculator(miningMods, LabMods)
 	stoneCalc := calculators.NewStonesCalculator(miningMods, generationMods)
 
-	nextSpeedUpgradeCost := 8 * HundredThousand
+	nextSpeedUpgradeCost := 1*Million + 2*HundredThousand
 	nextCloneUpgradeCost := 4 * HundredThousand
 
 	return shinyMods, giantCalc, stoneCalc, nextSpeedUpgradeCost, nextCloneUpgradeCost
@@ -182,5 +182,5 @@ func fromScratchUpgradePath() {
 	)
 
 	gc := calculators.NewGiantCalculator(mm, gl)
-	gc.CalculateUpgradePath()
+	fmt.Println(gc.CalculateUpgradePath())
 }

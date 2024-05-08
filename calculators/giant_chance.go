@@ -71,9 +71,9 @@ func (gc *Giant) GetNextUpgrade(speedUpgradeCost int) string {
 	return fmt.Sprintf("x%d strike", bestUpgrade)
 }
 
-func (gc *Giant) CalculateUpgradePath() {
-	fmt.Println("------------------------------------------------------------")
-	fmt.Println("| x2 | x3 | x4 | x5 | giant |    chance/hit   | stone cost")
+func (gc *Giant) CalculateUpgradePath() string {
+	output := "------------------------------------------------------------\n"
+	output += "| x2 | x3 | x4 | x5 | giant |    chance/hit   | stone cost\n"
 	originalStrikeUpgrades := strikeUpgrades{
 		DoubleStrike:    gc.miningModifiers.StrikeUpgrades[DoubleStrike],
 		TripleStrike:    gc.miningModifiers.StrikeUpgrades[TripleStrike],
@@ -96,7 +96,7 @@ func (gc *Giant) CalculateUpgradePath() {
 			gc.miningModifiers.GiantLuckLevel = originalGiantLuckLevel
 			gc.miningModifiers.GiantOdds = originalGiantOdds
 
-			return
+			return output
 		}
 
 		nextUpgrade := gc.findCartUpgrade()
@@ -177,17 +177,15 @@ func (gc *Giant) CalculateUpgradePath() {
 			gc.miningModifiers.GiantOdds = gc.calculateIncreasedGiantOdds() * gc.miningModifiers.StrikeOdds[QuintupleStrike]
 		}
 
-		fmt.Println(
-			fmt.Sprintf(
-				"|%03d |%03d |%03d |%03d |%03d    | %.12f%% | %d",
-				gc.miningModifiers.StrikeUpgrades[DoubleStrike],
-				gc.miningModifiers.StrikeUpgrades[TripleStrike],
-				gc.miningModifiers.StrikeUpgrades[QuadrupleStrike],
-				gc.miningModifiers.StrikeUpgrades[QuintupleStrike],
-				gc.miningModifiers.GiantLuckLevel,
-				gc.calculateGiantChance(0)*100,
-				gc.GetUpgradeCost(),
-			),
+		output += fmt.Sprintf(
+			"|%03d |%03d |%03d |%03d |%03d    | %.12f%% | %d\n",
+			gc.miningModifiers.StrikeUpgrades[DoubleStrike],
+			gc.miningModifiers.StrikeUpgrades[TripleStrike],
+			gc.miningModifiers.StrikeUpgrades[QuadrupleStrike],
+			gc.miningModifiers.StrikeUpgrades[QuintupleStrike],
+			gc.miningModifiers.GiantLuckLevel,
+			gc.calculateGiantChance(0)*100,
+			gc.GetUpgradeCost(),
 		)
 	}
 }
