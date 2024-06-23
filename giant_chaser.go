@@ -2,6 +2,7 @@ package main
 
 import (
 	"capEndgame3Calculator/calculators"
+	"capEndgame3Calculator/character_config"
 	"fmt"
 	"golang.org/x/text/message"
 	"time"
@@ -29,66 +30,27 @@ func main() {
 }
 
 func loadSadinar() (calculators.ShinyModifiers, calculators.Giant, calculators.Stones, int, int) {
-	miningMods := calculators.NewMiningModifiers(
-		1.02+.5, // exactly as on stats screen
-		100,     // exactly as shown on the wooden board behind egg
-		.564,    // exactly as on stats screen
-		348.8,   // exactly as on stats screen
-		map[int]int{
-			2: 80,
-			3: 91,
-			4: 91,
-			5: 91,
-		},
-		100,
-		map[int]float64{
-			2: 42,    // exactly as on stats screen
-			3: 15.29, // exactly as on stats screen
-			4: 6.26,  // exactly as on stats screen
-			5: 2.848, // exactly as on stats screen
-		},
-		true,
-		true,
-		true,
-		true,
-	)
-	generationMods := calculators.NewEggGenerationModifiers(
-		51,    // as shown on stats screen
-		6.0,   // as shown on stats screen
-		127.5, // as shown in stats pane
-		calculators.MythicEgg,
-		true,
-	)
-	shinyMods := calculators.NewShinyModifiers(100) // exactly as seen on stats screen
-	giantLuckMods := calculators.NewGiantModifiers(1, 1, 1.1, 1.2, true, false)
-
-	giantCalc := calculators.NewGiantCalculator(miningMods, giantLuckMods)
-	stoneCalc := calculators.NewStonesCalculator(miningMods, generationMods)
-
-	nextSpeedUpgradeCost := 2*Million + 5*HundredThousand
-	nextCloneUpgradeCost := 1*Million + HundredThousand
-
-	return shinyMods, giantCalc, stoneCalc, nextSpeedUpgradeCost, nextCloneUpgradeCost
+	return character_config.ConfigureCalculators("./character_config/sadinar.json")
 }
 
 func loadSadinalt() (calculators.ShinyModifiers, calculators.Giant, calculators.Stones, int, int) {
 	miningMods := calculators.NewMiningModifiers(
-		1.16,  // exactly as on stats screen
-		100,   // exactly as shown on the wooden board behind egg
-		.058,  // exactly as on stats screen
-		401.2, // exactly as on stats screen
+		1.19, // exactly as on stats screen
+		100,  // exactly as shown on the wooden board behind egg
+		.325, // exactly as on stats screen
+		300,  // exactly as on stats screen
 		map[int]int{
-			2: 72,
-			3: 74,
-			4: 74,
-			5: 74,
+			2: 74,
+			3: 76,
+			4: 79,
+			5: 79,
 		},
-		67,
+		85,
 		map[int]float64{
-			2: 28.7,  // exactly as on stats screen
-			3: 5.31,  // exactly as on stats screen
-			4: 1.768, // exactly as on stats screen
-			5: 0.654, // exactly as on stats screen
+			2: 39.9,  // exactly as on stats screen
+			3: 12.13, // exactly as on stats screen
+			4: 4.312, // exactly as on stats screen
+			5: 1.703, // exactly as on stats screen
 		},
 		true,
 		false,
@@ -97,18 +59,18 @@ func loadSadinalt() (calculators.ShinyModifiers, calculators.Giant, calculators.
 	)
 	generationMods := calculators.NewEggGenerationModifiers(
 		49,    // as shown on stats screen
-		5.8,   // as shown on stats screen
-		107.5, // as shown in stats pane
+		4.8,   // as shown on stats screen
+		127.5, // as shown in stats pane
 		calculators.MythicEgg,
 		true,
 	)
-	shinyMods := calculators.NewShinyModifiers(24.26) // exactly as seen on stats screen
-	LabMods := calculators.NewGiantModifiers(1, 1, 1.1, 1.2, false, false)
+	shinyMods := calculators.NewShinyModifiers(51.07) // exactly as seen on stats screen
+	LabMods := calculators.NewGiantModifiers(1.08, 1.03, 1.1, 1.2, true, true)
 
 	giantCalc := calculators.NewGiantCalculator(miningMods, LabMods)
 	stoneCalc := calculators.NewStonesCalculator(miningMods, generationMods)
 
-	nextSpeedUpgradeCost := 1*Million + 2*HundredThousand
+	nextSpeedUpgradeCost := 1*Million + 6*HundredThousand
 	nextCloneUpgradeCost := 4 * HundredThousand
 
 	return shinyMods, giantCalc, stoneCalc, nextSpeedUpgradeCost, nextCloneUpgradeCost
@@ -116,42 +78,42 @@ func loadSadinalt() (calculators.ShinyModifiers, calculators.Giant, calculators.
 
 func loadAltinar() (calculators.ShinyModifiers, calculators.Giant, calculators.Stones, int, int) {
 	miningMods := calculators.NewMiningModifiers(
-		.86,  // exactly as on stats screen
+		1.17, // exactly as on stats screen
 		100,  // exactly as shown on the wooden board behind egg
-		.034, // exactly as on stats screen
-		165,  // exactly as on stats screen
+		.227, // exactly as on stats screen
+		300,  // exactly as on stats screen
 		map[int]int{
-			2: 70,
-			3: 70,
-			4: 70,
-			5: 70,
+			2: 72,
+			3: 75,
+			4: 75,
+			5: 75,
 		},
-		57,
+		72,
 		map[int]float64{
-			2: 23.5,  // exactly as on stats screen
-			3: 4.113, // exactly as on stats screen
-			4: 1.295, // exactly as on stats screen
-			5: 0.453, // exactly as on stats screen
+			2: 39.2,  // exactly as on stats screen
+			3: 11.76, // exactly as on stats screen
+			4: 3.969, // exactly as on stats screen
+			5: 1.488, // exactly as on stats screen
 		},
-		false,
-		false,
-		false,
+		true,
+		true,
+		true,
 		true,
 	)
 	generationMods := calculators.NewEggGenerationModifiers(
 		48,    // as shown on stats screen
-		5.7,   // as shown on stats screen
-		127.5, // as shown in stats pane
-		calculators.UncommonEgg,
+		4.7,   // as shown on stats screen
+		107.5, // as shown in stats pane
+		calculators.MythicEgg,
 		true,
 	)
-	shinyMods := calculators.NewShinyModifiers(1.509) // exactly as seen on stats screen
-	LabMods := calculators.NewGiantModifiers(1.048, 1, 1.05, 1.2, false, false)
+	shinyMods := calculators.NewShinyModifiers(15.49) // exactly as seen on stats screen
+	LabMods := calculators.NewGiantModifiers(1.08, 1.03, 1.1, 1.2, true, false)
 
 	giantCalc := calculators.NewGiantCalculator(miningMods, LabMods)
 	stoneCalc := calculators.NewStonesCalculator(miningMods, generationMods)
 
-	nextSpeedUpgradeCost := 3 * HundredThousand
+	nextSpeedUpgradeCost := 1*Million + 3*HundredThousand
 	nextCloneUpgradeCost := 3 * HundredThousand
 
 	return shinyMods, giantCalc, stoneCalc, nextSpeedUpgradeCost, nextCloneUpgradeCost
