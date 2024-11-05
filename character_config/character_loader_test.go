@@ -65,11 +65,12 @@ func TestConfigureCalculators(t *testing.T) {
 }
 
 func TestAscensionPets(t *testing.T) {
-	character := parseCharacterFile("./AllAscensionPets.json")
-	assert.Equal(t, 2, character.AscensionMods.WingboltLevel)
 	dir, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println(dir)
+
+	character := parseCharacterFile("./AllAscensionPets.json")
+	assert.Equal(t, 2, character.AscensionMods.WingboltLevel)
 }
