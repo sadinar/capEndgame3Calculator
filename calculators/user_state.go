@@ -96,3 +96,21 @@ func NewGiantModifiers(t7GiantLuck, t8GiantLuck, achievement, rune float64, luck
 		shinyOverclocked: shinyOverclocked,
 	}
 }
+
+type AscensionModifiers struct {
+	miningSpeedBonus float64
+}
+
+func NewAscensionModifiers(wingboltLevel int) AscensionModifiers {
+	mods := AscensionModifiers{}
+	switch wingboltLevel {
+	case 1:
+		mods.miningSpeedBonus = 0.5
+	case 2:
+		mods.miningSpeedBonus = 1
+	case 3:
+		mods.miningSpeedBonus = 1.5
+	}
+
+	return mods
+}

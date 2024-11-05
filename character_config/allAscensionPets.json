@@ -1,0 +1,55 @@
+{
+  "miningMods": {
+    "speed": 0,
+    "firstStrike": 0,
+    "giantOdds": 0,
+    "stonesFromMining": 0,
+    "cartUpgradeLevels": {
+      "x2Strike": 0,
+      "x3Strike": 0,
+      "x4Strike": 0,
+      "x5Strike": 0,
+      "giantLuck": 0
+    },
+    "strikeOdds": {
+      "x2Strike": 0,
+      "x3Strike": 0,
+      "x4Strike": 0,
+      "x5Strike": 0
+    },
+    "overclocks": {
+      "x2": false,
+      "x3": false,
+      "x4": false,
+      "x5": false
+    }
+  },
+  "generationMods": {
+    "eggLuck": 0,
+    "cloneLuck": 0,
+    "calcifyChance": 0,
+    "minedEgg": "",
+    "hasRecursiveClone": false
+  },
+  "shinyLuck": 0,
+  "giantLuckMods": {
+    "labTier7": 0,
+    "labTier8": 0,
+    "achievement": 0,
+    "runes": 0,
+    "overclocked": false,
+    "shinyOverclocked": false
+  },
+  "nextMineSpeedCost": 0,
+  "nextCloneLuckCost": 0,
+  "ascensionMods": {
+    "trunkyLevel": 1,
+    "hoppityLevel": 2,
+    "grimLevel": 3,
+    "wingboltLevel": 2,
+    "novaLevel": 1,
+    "radiLevel": 2,
+    "battackLevel": 3,
+    "flutterLevel": 3
+  }
+}

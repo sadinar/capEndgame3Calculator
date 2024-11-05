@@ -315,7 +315,7 @@ func caseOne() (ShinyModifiers, Giant, Stones, int, int) {
 	giantLuckMods := NewGiantModifiers(1, 1, 1.1, 1.2, true, false)
 
 	giantCalc := NewGiantCalculator(miningMods, giantLuckMods)
-	stoneCalc := NewStonesCalculator(miningMods, generationMods)
+	stoneCalc := NewStonesCalculator(miningMods, generationMods, AscensionModifiers{})
 
 	return shinyMods, giantCalc, stoneCalc, 2500000, 1100000
 }
@@ -355,7 +355,7 @@ func caseTwo() (ShinyModifiers, Giant, Stones, int, int) {
 	LabMods := NewGiantModifiers(1.04, 1, 1.06, 1.2, false, false)
 
 	giantCalc := NewGiantCalculator(miningMods, LabMods)
-	stoneCalc := NewStonesCalculator(miningMods, generationMods)
+	stoneCalc := NewStonesCalculator(miningMods, generationMods, AscensionModifiers{})
 
 	return shinyMods, giantCalc, stoneCalc, 600000, 400000
 }
@@ -395,7 +395,7 @@ func caseThree() (ShinyModifiers, Giant, Stones, int, int) {
 	LabMods := NewGiantModifiers(1.048, 1, 1.05, 1.2, false, false)
 
 	giantCalc := NewGiantCalculator(miningMods, LabMods)
-	stoneCalc := NewStonesCalculator(miningMods, generationMods)
+	stoneCalc := NewStonesCalculator(miningMods, generationMods, AscensionModifiers{})
 
 	return shinyMods, giantCalc, stoneCalc, 300000, 300000
 }
@@ -435,7 +435,7 @@ func caseFour() (ShinyModifiers, Giant, Stones, int, int) {
 	giantLuckMods := NewGiantModifiers(1, 1, 1.1, 1.2, true, false)
 
 	giantCalc := NewGiantCalculator(miningMods, giantLuckMods)
-	stoneCalc := NewStonesCalculator(miningMods, generationMods)
+	stoneCalc := NewStonesCalculator(miningMods, generationMods, AscensionModifiers{})
 
 	return shinyMods, giantCalc, stoneCalc, 2500000, 1100000
 }
@@ -475,7 +475,7 @@ func caseFive() (ShinyModifiers, Giant, Stones, int, int) {
 	giantLuckMods := NewGiantModifiers(1, 1, 1.1, 1.2, true, false)
 
 	giantCalc := NewGiantCalculator(miningMods, giantLuckMods)
-	stoneCalc := NewStonesCalculator(miningMods, generationMods)
+	stoneCalc := NewStonesCalculator(miningMods, generationMods, AscensionModifiers{})
 
 	return shinyMods, giantCalc, stoneCalc, 2500000, 1100000
 }
@@ -515,7 +515,7 @@ func caseSix() (ShinyModifiers, Giant, Stones, int, int) {
 	giantLuckMods := NewGiantModifiers(1, 1, 1.1, 1.2, true, false)
 
 	giantCalc := NewGiantCalculator(miningMods, giantLuckMods)
-	stoneCalc := NewStonesCalculator(miningMods, generationMods)
+	stoneCalc := NewStonesCalculator(miningMods, generationMods, AscensionModifiers{})
 
 	return shinyMods, giantCalc, stoneCalc, 2500000, 1100000
 }
@@ -555,7 +555,7 @@ func caseSeven() (ShinyModifiers, Giant, Stones, int, int) {
 	giantLuckMods := NewGiantModifiers(1, 1, 1.1, 1.2, true, false)
 
 	giantCalc := NewGiantCalculator(miningMods, giantLuckMods)
-	stoneCalc := NewStonesCalculator(miningMods, generationMods)
+	stoneCalc := NewStonesCalculator(miningMods, generationMods, AscensionModifiers{})
 
 	return shinyMods, giantCalc, stoneCalc, 2500000, 1100000
 }
@@ -595,7 +595,7 @@ func caseEight() (ShinyModifiers, Giant, Stones, int, int) {
 	LabMods := NewGiantModifiers(1, 1, 1.1, 1.2, false, false)
 
 	giantCalc := NewGiantCalculator(miningMods, LabMods)
-	stoneCalc := NewStonesCalculator(miningMods, generationMods)
+	stoneCalc := NewStonesCalculator(miningMods, generationMods, AscensionModifiers{})
 
 	return shinyMods, giantCalc, stoneCalc, 1200000, 400000
 }

@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-const MaxGenSpeed = 5.0
+const MaxPodiumGenSpeed = 5.0
 const PerLevelEggModifier = 0.5
 const CommonEgg = 1
 const UncommonEgg = 2
@@ -30,13 +30,15 @@ const TitaniumMythicBaseDamage = 2000
 type Stones struct {
 	generationModifiers EggGenerationModifiers
 	miningModifiers     MiningModifiers
+	ascensionModifiers  AscensionModifiers
 	printer             *message.Printer
 }
 
-func NewStonesCalculator(mm MiningModifiers, egm EggGenerationModifiers) Stones {
+func NewStonesCalculator(mm MiningModifiers, egm EggGenerationModifiers, am AscensionModifiers) Stones {
 	sc := Stones{
 		generationModifiers: egm,
 		miningModifiers:     mm,
+		ascensionModifiers:  am,
 		printer:             message.NewPrinter(language.English),
 	}
 
@@ -127,7 +129,7 @@ func (sc *Stones) CalculateMinedStones(period time.Duration) int {
 
 func (sc *Stones) calculateTotalGeneratedPets(period time.Duration) (total, mythics, ascended float64) {
 	totalEggs := 0.0
-	eggsPerSecond := MaxGenSpeed
+	eggsPerSecond := MaxPodiumGenSpeed + sc.ascensionModifiers.miningSpeedBonus
 	totalEggs = eggsPerSecond * period.Seconds()
 	clonedEggs := totalEggs * sc.generationModifiers.CloneLuck
 	if sc.generationModifiers.HasRecursiveClone {

@@ -52,6 +52,16 @@ type characterConfig struct {
 	} `json:"giantLuckMods"`
 	NextMineSpeedCost int `json:"nextMineSpeedCost"`
 	NextCloneLuckCost int `json:"nextCloneLuckCost"`
+	AscensionMods     struct {
+		TrunkyLevel   int `json:"trunkyLevel"`
+		HoppityLevel  int `json:"hoppityLevel"`
+		GrimLevel     int `json:"grimLevel"`
+		WingboltLevel int `json:"wingboltLevel"`
+		NovaLevel     int `json:"novaLevel"`
+		RadiLevel     int `json:"radiLevel"`
+		BattackLevel  int `json:"battackLevel"`
+		FlutterLevel  int `json:"flutterLevel"`
+	} `json:"ascensionMods"`
 }
 
 func (c characterConfig) getEggIndex() int {
@@ -77,7 +87,7 @@ func (c characterConfig) getEggIndex() int {
 	}
 }
 
-func ConfigureCalculators(fileLoc string) (calculators.ShinyModifiers, calculators.Giant, calculators.Stones, int, int) {
+func parseCharacterFile(fileLoc string) characterConfig {
 	fileData, err := os.ReadFile(fileLoc)
 	if err != nil {
 		panic(err)
@@ -88,6 +98,12 @@ func ConfigureCalculators(fileLoc string) (calculators.ShinyModifiers, calculato
 	if err != nil {
 		panic(err)
 	}
+
+	return character
+}
+
+func ConfigureCalculators(fileLoc string) (calculators.ShinyModifiers, calculators.Giant, calculators.Stones, int, int) {
+	character := parseCharacterFile(fileLoc)
 
 	miningMods := calculators.NewMiningModifiers(
 		character.MiningMods.Speed,
@@ -100,7 +116,7 @@ func ConfigureCalculators(fileLoc string) (calculators.ShinyModifiers, calculato
 			4: character.MiningMods.CartUpgradeLevels.X4Strike,
 			5: character.MiningMods.CartUpgradeLevels.X5Strike,
 		},
-		character.MiningMods.GiantLuckLevel,
+		character.MiningMods.CartUpgradeLevels.GiantLuck,
 		map[int]float64{
 			2: character.MiningMods.StrikeOdds.X2Strike,
 			3: character.MiningMods.StrikeOdds.X3Strike,
@@ -121,9 +137,10 @@ func ConfigureCalculators(fileLoc string) (calculators.ShinyModifiers, calculato
 	)
 	shinyMods := calculators.NewShinyModifiers(character.ShinyLuck)
 	giantLuckMods := calculators.NewGiantModifiers(1, 1, 1.1, 1.2, true, false)
+	ascensionMods := calculators.NewAscensionModifiers(character.AscensionMods.WingboltLevel)
 
 	giantCalc := calculators.NewGiantCalculator(miningMods, giantLuckMods)
-	stoneCalc := calculators.NewStonesCalculator(miningMods, generationMods)
+	stoneCalc := calculators.NewStonesCalculator(miningMods, generationMods, ascensionMods)
 
 	return shinyMods, giantCalc, stoneCalc, character.NextMineSpeedCost, character.NextCloneLuckCost
 }

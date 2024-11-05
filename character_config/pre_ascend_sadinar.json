@@ -11,7 +11,6 @@
       "x5Strike": 100,
       "giantLuck": 100
     },
-    "giantLuckLevel": 100,
     "strikeOdds": {
       "x2Strike": 49.0,
       "x3Strike": 19.6,
@@ -42,5 +41,15 @@
     "shinyOverclocked": false
   },
   "nextMineSpeedCost": 2500000,
-  "nextCloneLuckCost": 0
+  "nextCloneLuckCost": 0,
+  "ascensionMods": {
+    "trunkyLevel": 0,
+    "hoppityLevel": 0,
+    "grimLevel": 0,
+    "wingboltLevel": 0,
+    "novaLevel": 0,
+    "radiLevel": 0,
+    "battackLevel": 0,
+    "flutterLevel": 0
+  }
 }
