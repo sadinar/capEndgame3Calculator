@@ -71,6 +71,6 @@ func TestAscensionPets(t *testing.T) {
 	}
 	fmt.Println(dir)
 
-	character := parseCharacterFile("./AllAscensionPets.json")
+	character := parseCharacterFile("./allAscensionPets.json")
 	assert.Equal(t, 2, character.AscensionMods.WingboltLevel)
 }
