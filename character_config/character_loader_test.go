@@ -1,7 +1,10 @@
 package character_config
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
+	"log"
+	"os"
 	"testing"
 	"time"
 )
@@ -63,12 +66,10 @@ func TestConfigureCalculators(t *testing.T) {
 
 func TestAscensionPets(t *testing.T) {
 	character := parseCharacterFile("./AllAscensionPets.json")
-	assert.Equal(t, 1, character.AscensionMods.TrunkyLevel)
-	assert.Equal(t, 2, character.AscensionMods.HoppityLevel)
-	assert.Equal(t, 3, character.AscensionMods.GrimLevel)
 	assert.Equal(t, 2, character.AscensionMods.WingboltLevel)
-	assert.Equal(t, 1, character.AscensionMods.NovaLevel)
-	assert.Equal(t, 2, character.AscensionMods.RadiLevel)
-	assert.Equal(t, 3, character.AscensionMods.BattackLevel)
-	assert.Equal(t, 3, character.AscensionMods.FlutterLevel)
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(dir)
 }

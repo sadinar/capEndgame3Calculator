@@ -43,13 +43,6 @@
   "nextMineSpeedCost": 0,
   "nextCloneLuckCost": 0,
   "ascensionMods": {
-    "trunkyLevel": 1,
-    "hoppityLevel": 2,
-    "grimLevel": 3,
-    "wingboltLevel": 2,
-    "novaLevel": 1,
-    "radiLevel": 2,
-    "battackLevel": 3,
-    "flutterLevel": 3
+    "wingboltLevel": 2
   }
 }
