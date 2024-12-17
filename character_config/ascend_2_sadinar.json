@@ -1,0 +1,48 @@
+{
+  "miningMods": {
+    "speed": 0.5,
+    "firstStrike": 0,
+    "giantOdds": 0,
+    "stonesFromMining": 0,
+    "cartUpgradeLevels": {
+      "x2Strike": 0,
+      "x3Strike": 0,
+      "x4Strike": 0,
+      "x5Strike": 0,
+      "giantLuck": 0
+    },
+    "strikeOdds": {
+      "x2Strike": 0,
+      "x3Strike": 0,
+      "x4Strike": 0,
+      "x5Strike": 0
+    },
+    "overclocks": {
+      "x2": false,
+      "x3": false,
+      "x4": false,
+      "x5": false
+    }
+  },
+  "generationMods": {
+    "eggLuck": 65,
+    "cloneLuck": 5.5,
+    "calcifyChance": 160,
+    "minedEgg": "common",
+    "hasRecursiveClone": true
+  },
+  "shinyLuck": 0.528,
+  "giantLuckMods": {
+    "labTier7": 1,
+    "labTier8": 1,
+    "achievement": 1,
+    "runes": 1,
+    "overclocked": false,
+    "shinyOverclocked": false
+  },
+  "nextMineSpeedCost": 1000000,
+  "nextCloneLuckCost": 150000,
+  "ascensionMods": {
+    "wingboltLevel": 2
+  }
+}

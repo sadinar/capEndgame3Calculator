@@ -13,7 +13,7 @@ const Million = 1000000
 
 func main() {
 	shinyMods, giantCalc, stoneCalc, nextSpeedUpgradeCost, nextCloneUpgradeCost := loadSadinar()
-	duration := time.Hour * 22
+	duration := time.Hour * 24
 
 	fmt.Println("next giant chance upgrade should be", giantCalc.GetNextUpgrade(nextSpeedUpgradeCost))
 	fmt.Println("next stone upgrade should be", stoneCalc.FindNextUpgrade(nextSpeedUpgradeCost, nextCloneUpgradeCost))
@@ -28,7 +28,7 @@ func main() {
 }
 
 func loadSadinar() (calculators.ShinyModifiers, calculators.Giant, calculators.Stones, int, int) {
-	return character_config.ConfigureCalculators("./character_config/ascend_1_sadinar.json")
+	return character_config.ConfigureCalculators("./character_config/ascend_2_sadinar.json")
 }
 
 func fromScratchUpgradePath() {
