@@ -24,15 +24,17 @@ type Giant struct {
 	giantLuckPrices    upgradeCostList
 	miningModifiers    MiningModifiers
 	giantLuckModifiers GiantModifiers
+	ascensionModifiers AscensionModifiers
 	printer            *message.Printer
 }
 
-func NewGiantCalculator(mm MiningModifiers, lm GiantModifiers) Giant {
+func NewGiantCalculator(mm MiningModifiers, lm GiantModifiers, am AscensionModifiers) Giant {
 	return Giant{
 		strikePrices:       upgrade_data.GetStrikePrices(),
 		giantLuckPrices:    upgrade_data.GetGiantLuckPrices(),
 		miningModifiers:    mm,
 		giantLuckModifiers: lm,
+		ascensionModifiers: am,
 		printer:            message.NewPrinter(language.English),
 	}
 }
@@ -448,6 +450,7 @@ func (gc *Giant) calculateIncreasedQuintupleStrikeOdds() float64 {
 func (gc *Giant) calculateIncreasedGiantOdds() float64 {
 	modifiers := gc.giantLuckModifiers.t7GiantLuck * gc.giantLuckModifiers.t8GiantLuck
 	modifiers *= gc.giantLuckModifiers.rune * gc.giantLuckModifiers.achievement
+	modifiers *= gc.ascensionModifiers.giantLuckMultiplier
 	if gc.giantLuckModifiers.luckOverclocked {
 		modifiers *= GiantLuckOverclockMultiplier
 	}

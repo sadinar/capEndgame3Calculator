@@ -16,10 +16,12 @@ func main() {
 	duration := time.Hour * 24
 
 	fmt.Println("next giant chance upgrade should be", giantCalc.GetNextUpgrade(nextSpeedUpgradeCost))
-	fmt.Println("next stone upgrade should be", stoneCalc.FindNextUpgrade(nextSpeedUpgradeCost, nextCloneUpgradeCost))
 
-	giantCalc.PrintProbabilityMedian(duration, shinyMods)
 	gennedStones, minedStones := stoneCalc.CalculateStonesProduced(duration)
+	if minedStones > 0 {
+		fmt.Println("next stone upgrade should be", stoneCalc.FindNextUpgrade(nextSpeedUpgradeCost, nextCloneUpgradeCost))
+		giantCalc.PrintProbabilityMedian(duration, shinyMods)
+	}
 	stoneCalc.PrintDamageChange(duration, shinyMods)
 	p := message.NewPrinter(message.MatchLanguage("en"))
 	fmt.Println(p.Sprintf("%d stones (%d genned and %d mined) gained in %v", gennedStones+minedStones, gennedStones, minedStones, duration))
@@ -55,6 +57,8 @@ func fromScratchUpgradePath() {
 		false,
 	)
 
-	gc := calculators.NewGiantCalculator(mm, gl)
+	al := calculators.NewAscensionModifiers(0, 0)
+
+	gc := calculators.NewGiantCalculator(mm, gl, al)
 	fmt.Println(gc.CalculateUpgradePath())
 }

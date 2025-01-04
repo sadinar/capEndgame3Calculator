@@ -65,15 +65,17 @@ type EggGenerationModifiers struct {
 	CalcifyChance     float64
 	EggLevel          int
 	HasRecursiveClone bool
+	IsUsingCrank      bool
 }
 
-func NewEggGenerationModifiers(eggLuck, cloneLuck, calcifyChance float64, eggLevel int, hasRecursiveClone bool) EggGenerationModifiers {
+func NewEggGenerationModifiers(eggLuck, cloneLuck, calcifyChance float64, eggLevel int, hasRecursiveClone, isUsingCrank bool) EggGenerationModifiers {
 	return EggGenerationModifiers{
 		EggLuck:           eggLuck / 100,
 		CloneLuck:         cloneLuck / 100,
 		CalcifyChance:     1 + (calcifyChance / 100),
 		EggLevel:          eggLevel,
 		HasRecursiveClone: hasRecursiveClone,
+		IsUsingCrank:      isUsingCrank,
 	}
 }
 
@@ -98,19 +100,25 @@ func NewGiantModifiers(t7GiantLuck, t8GiantLuck, achievement, rune float64, luck
 }
 
 type AscensionModifiers struct {
-	miningSpeedBonus float64
+	genSpeedBonus       float64
+	giantLuckMultiplier float64
 }
 
-func NewAscensionModifiers(wingboltLevel int) AscensionModifiers {
+func NewAscensionModifiers(wingboltLevel int, giantLuckModifier float64) AscensionModifiers {
 	mods := AscensionModifiers{}
 	switch wingboltLevel {
 	case 1:
-		mods.miningSpeedBonus = 0.5
+		mods.genSpeedBonus = 0.5
 	case 2:
-		mods.miningSpeedBonus = 1
+		mods.genSpeedBonus = 1
 	case 3:
-		mods.miningSpeedBonus = 1.5
+		mods.genSpeedBonus = 1.5
 	}
+
+	if giantLuckModifier < 1 {
+		giantLuckModifier = 1
+	}
+	mods.giantLuckMultiplier = giantLuckModifier
 
 	return mods
 }

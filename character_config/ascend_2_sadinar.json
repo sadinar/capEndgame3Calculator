@@ -1,48 +1,50 @@
 {
   "miningMods": {
     "speed": 0.5,
-    "firstStrike": 0,
-    "giantOdds": 0,
-    "stonesFromMining": 0,
+    "firstStrike": 100,
+    "giantOdds": 0.22,
+    "stonesFromMining": 100,
     "cartUpgradeLevels": {
-      "x2Strike": 0,
-      "x3Strike": 0,
-      "x4Strike": 0,
-      "x5Strike": 0,
-      "giantLuck": 0
+      "x2Strike": 48,
+      "x3Strike": 48,
+      "x4Strike": 48,
+      "x5Strike": 48,
+      "giantLuck": 47
     },
     "strikeOdds": {
-      "x2Strike": 0,
-      "x3Strike": 0,
-      "x4Strike": 0,
-      "x5Strike": 0
+      "x2Strike": 44.8,
+      "x3Strike": 30.11,
+      "x4Strike": 6.503,
+      "x5Strike": 1.561
     },
     "overclocks": {
-      "x2": false,
-      "x3": false,
-      "x4": false,
-      "x5": false
+      "x2": true,
+      "x3": true,
+      "x4": true,
+      "x5": true
     }
   },
   "generationMods": {
-    "eggLuck": 65,
+    "eggLuck": 71.4,
     "cloneLuck": 5.5,
     "calcifyChance": 160,
     "minedEgg": "common",
-    "hasRecursiveClone": true
+    "hasRecursiveClone": true,
+    "isUsingCrank": true
   },
-  "shinyLuck": 0.528,
+  "shinyLuck": 0.984,
   "giantLuckMods": {
     "labTier7": 1,
     "labTier8": 1,
     "achievement": 1,
     "runes": 1,
-    "overclocked": false,
+    "overclocked": true,
     "shinyOverclocked": false
   },
-  "nextMineSpeedCost": 1000000,
+  "nextMineSpeedCost": 60000,
   "nextCloneLuckCost": 150000,
   "ascensionMods": {
-    "wingboltLevel": 2
+    "wingboltLevel": 2,
+    "giantLuckMultiplier": 2
   }
 }

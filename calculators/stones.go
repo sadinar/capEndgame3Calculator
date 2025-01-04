@@ -91,7 +91,7 @@ func (sc *Stones) PrintDamageChange(period time.Duration, sMods ShinyModifiers) 
 }
 
 func (sc *Stones) CalculateMinedStones(period time.Duration) int {
-	if period < time.Second {
+	if sc.generationModifiers.IsUsingCrank || period < time.Second {
 		return 0
 	}
 
@@ -129,7 +129,10 @@ func (sc *Stones) CalculateMinedStones(period time.Duration) int {
 
 func (sc *Stones) calculateTotalGeneratedPets(period time.Duration) (total, mythics, ascended float64) {
 	totalEggs := 0.0
-	eggsPerSecond := MaxPodiumGenSpeed + sc.ascensionModifiers.miningSpeedBonus
+	eggsPerSecond := MaxPodiumGenSpeed + sc.ascensionModifiers.genSpeedBonus
+	if sc.generationModifiers.IsUsingCrank {
+		eggsPerSecond += 1.5
+	}
 	totalEggs = eggsPerSecond * period.Seconds()
 	clonedEggs := totalEggs * sc.generationModifiers.CloneLuck
 	if sc.generationModifiers.HasRecursiveClone {
@@ -275,6 +278,7 @@ func (sc *Stones) copyComparator() Stones {
 			sc.generationModifiers.CalcifyChance,
 			MythicEgg,
 			sc.generationModifiers.HasRecursiveClone,
+			sc.generationModifiers.IsUsingCrank,
 		),
 	}
 }
