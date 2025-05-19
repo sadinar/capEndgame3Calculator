@@ -43,7 +43,7 @@ func TestGetEggIndex(t *testing.T) {
 }
 
 func TestConfigureCalculators(t *testing.T) {
-	shinyMods, giantCalc, stoneCalc, speedCost, cloneCost := ConfigureCalculators("./pre_ascend_sadinar.json")
+	shinyMods, giantCalc, stoneCalc, ScoreCalc, speedCost, cloneCost := ConfigureCalculators("./pre_ascend_sadinar.json")
 
 	assert.Equal(t, "speed", giantCalc.GetNextUpgrade(speedCost))
 	assert.Equal(t, "speed", stoneCalc.FindNextUpgrade(speedCost, cloneCost))
@@ -62,6 +62,8 @@ func TestConfigureCalculators(t *testing.T) {
 		"gained: x77.83750 (+151,783 dmg)\nmythic generated: 155,675 (6,227,000 shiny score): mythic dmg " +
 		"multiplier gained: x25.94583 (+51,891 dmg)"
 	assert.Equal(t, expectedDmgOutput, stoneCalc.PrintDamageChange(time.Hour*24, shinyMods))
+
+	assert.Equal(t, 0, ScoreCalc.BonusPetScore(1000))
 }
 
 func TestAscensionPets(t *testing.T) {
