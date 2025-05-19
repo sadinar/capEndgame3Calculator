@@ -1,9 +1,9 @@
 {
   "miningMods": {
-    "speed": 0.5,
+    "speed": 1.12,
     "firstStrike": 100,
-    "giantOdds": 0.239,
-    "stonesFromMining": 100,
+    "giantOdds": 0.157,
+    "stonesFromMining": 427.5,
     "cartUpgradeLevels": {
       "x2Strike": 48,
       "x3Strike": 48,
@@ -12,27 +12,28 @@
       "giantLuck": 49
     },
     "strikeOdds": {
-      "x2Strike": 44.8,
-      "x3Strike": 30.11,
-      "x4Strike": 6.638,
-      "x5Strike": 1.626
+      "x2Strike": 35,
+      "x3Strike": 9.52,
+      "x4Strike": 2.913,
+      "x5Strike": 0.99
     },
     "overclocks": {
-      "x2": true,
-      "x3": true,
-      "x4": true,
-      "x5": true
+      "x2": false,
+      "x3": false,
+      "x4": false,
+      "x5": false
     }
   },
   "generationMods": {
-    "eggLuck": 71.4,
-    "cloneLuck": 5.5,
-    "calcifyChance": 160,
-    "minedEgg": "common",
+    "eggLuck": 66,
+    "cloneLuck": 3.8,
+    "calcifyChance": 117.5,
+    "minedEgg": "mythic",
     "hasRecursiveClone": true,
-    "isUsingCrank": true
+    "isUsingCrank": false
   },
-  "shinyLuck": 1.957,
+  "shinyLuck": 21.76,
+  "shinyStoneLuck": 0.035,
   "giantLuckMods": {
     "labTier7": 1,
     "labTier8": 1,
@@ -45,6 +46,7 @@
   "nextCloneLuckCost": 150000,
   "ascensionMods": {
     "wingboltLevel": 2,
-    "giantLuckMultiplier": 2
+    "giantLuckMultiplier": 2,
+    "bonusPetScoreOdds": 0.15
   }
 }

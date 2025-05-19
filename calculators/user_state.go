@@ -52,11 +52,37 @@ func NewShinyModifiers(shinyLuck float64) ShinyModifiers {
 	if shinyLuck > 100 {
 		shinyLuck = 100
 	}
+	if shinyLuck < 0 {
+		shinyLuck = 0
+	}
+
 	return ShinyModifiers{shinyLuck: shinyLuck / 100}
 }
 
 func (sm ShinyModifiers) CalculateShinyOdds() float64 {
 	return sm.shinyLuck
+}
+
+type ShinyStoneModifiers struct {
+	shinyStoneLuck float64
+}
+
+func NewShinyStoneModifiers(shinyLuck float64) ShinyStoneModifiers {
+	if shinyLuck > 100 {
+		shinyLuck = 100
+	}
+	if shinyLuck < 0 {
+		shinyLuck = 0
+	}
+
+	return ShinyStoneModifiers{shinyStoneLuck: shinyLuck / 100}
+}
+
+func (ssm *ShinyStoneModifiers) addShinyStones(totalStones float64) float64 {
+	shinyStones := totalStones * ssm.shinyStoneLuck
+	shinyStoneValue := shinyStones * 1000
+
+	return totalStones + shinyStoneValue
 }
 
 type EggGenerationModifiers struct {

@@ -42,8 +42,9 @@ type characterConfig struct {
 		HasRecursiveClone bool    `json:"hasRecursiveClone"`
 		IsUsingCrank      bool    `json:"isUsingCrank"`
 	} `json:"generationMods"`
-	ShinyLuck     float64 `json:"shinyLuck"`
-	GiantLuckMods struct {
+	ShinyLuck      float64 `json:"shinyLuck"`
+	ShinyStoneLuck float64 `json:"shinyStoneLuck"`
+	GiantLuckMods  struct {
 		LabTier7         float64 `json:"labTier7"`
 		LabTier8         float64 `json:"labTier8"`
 		Achievement      float64 `json:"achievement"`
@@ -63,6 +64,7 @@ type characterConfig struct {
 		BattackLevel        int     `json:"battackLevel"`
 		FlutterLevel        int     `json:"flutterLevel"`
 		GiantLuckMultiplier float64 `json:"giantLuckMultiplier"`
+		BonusPetScoreOdds   float64 `json:"bonusPetScoreOdds"`
 	} `json:"ascensionMods"`
 }
 
@@ -104,7 +106,7 @@ func parseCharacterFile(fileLoc string) characterConfig {
 	return character
 }
 
-func ConfigureCalculators(fileLoc string) (calculators.ShinyModifiers, calculators.Giant, calculators.Stones, int, int) {
+func ConfigureCalculators(fileLoc string) (calculators.ShinyModifiers, calculators.Giant, calculators.Stones, calculators.PetScore, int, int) {
 	character := parseCharacterFile(fileLoc)
 
 	miningMods := calculators.NewMiningModifiers(
@@ -139,6 +141,7 @@ func ConfigureCalculators(fileLoc string) (calculators.ShinyModifiers, calculato
 		character.GenerationMods.IsUsingCrank,
 	)
 	shinyMods := calculators.NewShinyModifiers(character.ShinyLuck)
+	shinyStoneMods := calculators.NewShinyStoneModifiers(character.ShinyStoneLuck)
 	giantLuckMods := calculators.NewGiantModifiers(
 		character.GiantLuckMods.LabTier7,
 		character.GiantLuckMods.LabTier8,
@@ -153,7 +156,8 @@ func ConfigureCalculators(fileLoc string) (calculators.ShinyModifiers, calculato
 	)
 
 	giantCalc := calculators.NewGiantCalculator(miningMods, giantLuckMods, ascensionMods)
-	stoneCalc := calculators.NewStonesCalculator(miningMods, generationMods, ascensionMods)
+	stoneCalc := calculators.NewStonesCalculator(miningMods, generationMods, ascensionMods, shinyStoneMods)
+	petScoreCalc := calculators.NewBonusPetScoreCalculator(character.AscensionMods.BonusPetScoreOdds)
 
-	return shinyMods, giantCalc, stoneCalc, character.NextMineSpeedCost, character.NextCloneLuckCost
+	return shinyMods, giantCalc, stoneCalc, petScoreCalc, character.NextMineSpeedCost, character.NextCloneLuckCost
 }

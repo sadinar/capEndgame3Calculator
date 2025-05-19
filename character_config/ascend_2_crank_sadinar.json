@@ -25,14 +25,15 @@
     }
   },
   "generationMods": {
-    "eggLuck": 71.4,
+    "eggLuck": 73,
     "cloneLuck": 5.5,
     "calcifyChance": 160,
     "minedEgg": "common",
     "hasRecursiveClone": true,
     "isUsingCrank": true
   },
-  "shinyLuck": 1.957,
+  "shinyLuck": 4.28,
+  "shinyStoneLuck": 0,
   "giantLuckMods": {
     "labTier7": 1,
     "labTier8": 1,

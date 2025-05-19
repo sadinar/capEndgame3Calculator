@@ -31,14 +31,16 @@ type Stones struct {
 	generationModifiers EggGenerationModifiers
 	miningModifiers     MiningModifiers
 	ascensionModifiers  AscensionModifiers
+	shinyStoneModifiers ShinyStoneModifiers
 	printer             *message.Printer
 }
 
-func NewStonesCalculator(mm MiningModifiers, egm EggGenerationModifiers, am AscensionModifiers) Stones {
+func NewStonesCalculator(mm MiningModifiers, egm EggGenerationModifiers, am AscensionModifiers, ssm ShinyStoneModifiers) Stones {
 	sc := Stones{
 		generationModifiers: egm,
 		miningModifiers:     mm,
 		ascensionModifiers:  am,
+		shinyStoneModifiers: ssm,
 		printer:             message.NewPrinter(language.English),
 	}
 
@@ -54,9 +56,10 @@ func (sc *Stones) CalculateGeneratedStones(period time.Duration) int {
 		return 0
 	}
 
-	_, totalMythics, _ := sc.calculateTotalGeneratedPets(period)
+	_, totalMythics, _ := sc.CalculateTotalGeneratedPets(period)
+	totalStones := totalMythics * sc.generationModifiers.CalcifyChance
 
-	return int(totalMythics * sc.generationModifiers.CalcifyChance)
+	return int(sc.shinyStoneModifiers.addShinyStones(totalStones))
 }
 
 func (sc *Stones) PrintDamageChange(period time.Duration, sMods ShinyModifiers) string {
@@ -64,7 +67,7 @@ func (sc *Stones) PrintDamageChange(period time.Duration, sMods ShinyModifiers) 
 		return "no change"
 	}
 
-	_, totalMythics, totalAscended := sc.calculateTotalGeneratedPets(period)
+	_, totalMythics, totalAscended := sc.CalculateTotalGeneratedPets(period)
 
 	ascDmgMultiplier := totalAscended / UniqueAscendedPets / BaseShinyDivisor * sMods.CalculateShinyOdds()
 	mythDmgMultiplier := totalMythics / UniqueMythicPets / BaseShinyDivisor * sMods.CalculateShinyOdds()
@@ -124,10 +127,10 @@ func (sc *Stones) CalculateMinedStones(period time.Duration) int {
 	stones += x4Strikes * stonesPerStrike * 4
 	stones += x5Strikes * stonesPerStrike * 5
 
-	return int(stones)
+	return int(sc.shinyStoneModifiers.addShinyStones(stones))
 }
 
-func (sc *Stones) calculateTotalGeneratedPets(period time.Duration) (total, mythics, ascended float64) {
+func (sc *Stones) CalculateTotalGeneratedPets(period time.Duration) (total, mythics, ascended float64) {
 	totalEggs := 0.0
 	eggsPerSecond := MaxPodiumGenSpeed + sc.ascensionModifiers.genSpeedBonus
 	if sc.generationModifiers.IsUsingCrank {

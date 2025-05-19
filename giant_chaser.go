@@ -12,7 +12,7 @@ const HundredThousand = 100000
 const Million = 1000000
 
 func main() {
-	shinyMods, giantCalc, stoneCalc, nextSpeedUpgradeCost, nextCloneUpgradeCost := loadSadinar()
+	shinyMods, giantCalc, stoneCalc, bonusPetScoreCalc, nextSpeedUpgradeCost, nextCloneUpgradeCost := loadSadinar()
 	duration := time.Hour * 24
 
 	fmt.Println("next giant chance upgrade should be", giantCalc.GetNextUpgrade(nextSpeedUpgradeCost))
@@ -21,16 +21,24 @@ func main() {
 	if minedStones > 0 {
 		fmt.Println("next stone upgrade should be", stoneCalc.FindNextUpgrade(nextSpeedUpgradeCost, nextCloneUpgradeCost))
 		giantCalc.PrintProbabilityMedian(duration, shinyMods)
+	} else {
+		fmt.Println("mining instead would result in:")
+		fmt.Print("    ")
+		giantCalc.PrintProbabilityMedian(duration, shinyMods)
 	}
 	stoneCalc.PrintDamageChange(duration, shinyMods)
 	p := message.NewPrinter(message.MatchLanguage("en"))
 	fmt.Println(p.Sprintf("%d stones (%d genned and %d mined) gained in %v", gennedStones+minedStones, gennedStones, minedStones, duration))
+	_, gennedMythics, _ := stoneCalc.CalculateTotalGeneratedPets(duration)
+	petScore := minedStones + int(gennedMythics) + bonusPetScoreCalc.BonusPetScore(gennedMythics)
+	fmt.Println(p.Sprintf("Pet score gained: %d", petScore))
 
 	//fromScratchUpgradePath()
 }
 
-func loadSadinar() (calculators.ShinyModifiers, calculators.Giant, calculators.Stones, int, int) {
-	return character_config.ConfigureCalculators("./character_config/ascend_2_sadinar.json")
+func loadSadinar() (calculators.ShinyModifiers, calculators.Giant, calculators.Stones, calculators.PetScore, int, int) {
+	//return character_config.ConfigureCalculators("./character_config/ascend_3_crank_sadinar.json")
+	return character_config.ConfigureCalculators("./character_config/ascend_3_mine_sadinar.json")
 }
 
 func fromScratchUpgradePath() {
